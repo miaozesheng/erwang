@@ -3,117 +3,598 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erwang's Blog</title>
+    <title>Erwang's Lab | 技术探索</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        :root {
+            --primary: #00f0ff;
+            --secondary: #7b2dff;
+            --accent: #00ff88;
+            --dark: #0a0a0f;
+            --dark-light: #12121a;
+            --text: #e0e0e0;
+            --text-dim: #666;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+            background: var(--dark);
+            color: var(--text);
             min-height: 100vh;
-            padding: 40px 20px;
+            overflow-x: hidden;
         }
+
+        /* Matrix Rain Background */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 240, 255, 0.03) 2px,
+                    rgba(0, 240, 255, 0.03) 4px
+                ),
+                linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.05) 50%, transparent 100%);
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100px); }
+        }
+
+        /* Grid Pattern */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 60px 20px;
         }
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #667eea;
-        }
-        .subtitle {
-            color: #666;
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-        }
-        .section {
-            margin-bottom: 30px;
-        }
-        .section h2 {
-            font-size: 1.3rem;
-            color: #764ba2;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #eee;
-        }
-        .section p {
-            color: #555;
-            margin-bottom: 10px;
-        }
-        .links {
+
+        /* Header */
+        header {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 80px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
         }
-        .links a {
-            display: inline-block;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 500;
-            transition: transform 0.2s, box-shadow 0.2s;
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            letter-spacing: 2px;
         }
-        .links a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+
+        .logo span {
+            color: var(--accent);
         }
-        footer {
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Hero Section */
+        .hero {
             text-align: center;
-            margin-top: 30px;
-            color: #888;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.3)); }
+            100% { filter: drop-shadow(0 0 40px rgba(123, 45, 255, 0.5)); }
+        }
+
+        .hero .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .typing-text {
+            display: inline;
+            border-right: 2px solid var(--primary);
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { border-color: var(--primary); }
+            50% { border-color: transparent; }
+        }
+
+        /* Cards Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: rgba(18, 18, 26, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .card p {
+            color: var(--text-dim);
+            line-height: 1.6;
             font-size: 0.9rem;
         }
-        @media (max-width: 600px) {
-            .card {
-                padding: 25px;
+
+        .card .tag {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 4px 12px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--primary);
+        }
+
+        /* Terminal Section */
+        .terminal {
+            background: var(--dark-light);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .terminal-header {
+            background: rgba(0, 240, 255, 0.1);
+            padding: 12px 20px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .terminal-line {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .terminal-prompt {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+
+        .terminal-command {
+            color: var(--text);
+        }
+
+        .terminal-output {
+            color: var(--text-dim);
+            padding-left: 20px;
+        }
+
+        .highlight {
+            color: var(--primary);
+        }
+
+        /* Links Section */
+        .links-section {
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .links-section h2 {
+            font-size: 1.5rem;
+            color: var(--text);
+            margin-bottom: 30px;
+        }
+
+        .link-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .link-btn:hover::before {
+            left: 100%;
+        }
+
+        .link-btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 240, 255, 0.1);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer span {
+            color: var(--primary);
+        }
+
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 var(--secondary);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 var(--accent);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(30px, 9999px, 10px, 0); }
+            20% { clip: rect(80px, 9999px, 90px, 0); }
+            40% { clip: rect(20px, 9999px, 60px, 0); }
+            60% { clip: rect(70px, 9999px, 50px, 0); }
+            80% { clip: rect(50px, 9999px, 80px, 0); }
+            100% { clip: rect(10px, 9999px, 40px, 0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
             }
-            h1 {
-                font-size: 2rem;
+            
+            .container {
+                padding: 30px 15px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .terminal-body {
+                font-size: 0.8rem;
+            }
+            
+            .link-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 10s infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) translateX(0); 
+                opacity: 0;
+            }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { 
+                transform: translateY(-100vh) translateX(50px); 
+                opacity: 0;
             }
         }
     </style>
 </head>
 <body>
+    <div class="matrix-bg"></div>
+    <div class="grid-bg"></div>
+    
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 2.5s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 4.5s;"></div>
+
     <div class="container">
-        <div class="card">
-            <h1>Hello, I'm Erwang</h1>
-            <p class="subtitle">Welcome to my personal blog</p>
-            
-            <div class="section">
-                <h2>About Me</h2>
-                <p>一个热爱技术、喜欢折腾的开发者。在这个博客里，我会分享一些技术心得、生活感悟。</p>
+        <header>
+            <div class="logo">&lt;ERWANG<span>/LAB</span>&gt;</div>
+            <div class="status">
+                <span class="status-dot"></span>
+                <span>System Online</span>
             </div>
-            
-            <div class="section">
-                <h2>Quick Links</h2>
-                <div class="links">
-                    <a href="https://github.com/miaozesheng" target="_blank">GitHub</a>
-                </div>
+        </header>
+
+        <section class="hero">
+            <h1>Erwang</h1>
+            <p class="subtitle">
+                <span class="typing-text">Full Stack Developer</span>
+                <span class="typing-text" style="animation-delay: 1s;"> | Code Enthusiast</span>
+                <span class="typing-text" style="animation-delay: 2s;"> | Technology Explorer</span>
+            </p>
+        </section>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>About Me</h3>
+                <p>热爱技术的开发者，喜欢探索新技术，捣鼓各种有趣的项目。这里是我的个人空间，记录学习和成长的点滴。</p>
+                <span class="tag">// developer</span>
             </div>
-            
-            <div class="section">
-                <h2>Recent Posts</h2>
-                <p>博客正在建设中，内容即将上线...</p>
+
+            <div class="card">
+                <div class="card-icon">🔧</div>
+                <h3>Tech Stack</h3>
+                <p>Go / Python / TypeScript / Rust / Docker / Kubernetes / CloudNative</p>
+                <span class="tag">// skills</span>
             </div>
-            
-            <footer>
-                <p>&copy; 2026 Erwang. All rights reserved.</p>
-            </footer>
+
+            <div class="card">
+                <div class="card-icon">🚀</div>
+                <h3>Projects</h3>
+                <p>正在整理中... 敬请期待更多有趣的开源项目。</p>
+                <span class="tag">// coming soon</span>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📡</div>
+                <h3>Contact</h3>
+                <p>有问题或者想交流技术，欢迎通过 GitHub 找到我。</p>
+                <span class="tag">// let's talk</span>
+            </div>
         </div>
+
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot yellow"></span>
+                <span class="terminal-dot green"></span>
+            </div>
+            <div class="terminal-body">
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">whoami</span>
+                </div>
+                <div class="terminal-output">Erwang — Full Stack Developer & Technology Enthusiast</div>
+                <br>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">cat location.txt</span>
+                </div>
+                <div class="terminal-output"><span class="highlight">Earth, CN, SF Bay Area</span></div>
+                <br>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">echo $INTERESTS</span>
+                </div>
+                <div class="terminal-output">[CloudNative, DevOps, System Design, OpenSource]</div>
+                <br>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">systemctl status blog</span>
+                </div>
+                <div class="terminal-output">● blog.service - Erwang's Personal Blog<br>
+     Loaded: <span class="highlight">loaded</span> (/usr/lib/systemd/system/blog.service; enabled)<br>
+     Active: <span class="highlight">active (updating)</span> since Mon 2026-03-23</div>
+            </div>
+        </div>
+
+        <div class="links-section">
+            <h2>// Connect With Me</h2>
+            <div class="link-buttons">
+                <a href="https://github.com/miaozesheng" target="_blank" class="link-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+                <a href="mailto:hello@erwang.top" class="link-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                    Email
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <p><span>©</span> 2026 Erwang's Lab | Built with <span>&lt;3</span> & Code</p>
+        </footer>
     </div>
+
+    <script>
+        // Typing effect
+        const texts = document.querySelectorAll('.typing-text');
+        let currentIndex = 0;
+
+        function showNextText() {
+            texts.forEach((text, index) => {
+                if (index <= currentIndex) {
+                    text.style.opacity = '1';
+                }
+            });
+            if (currentIndex < texts.length - 1) {
+                currentIndex++;
+                setTimeout(showNextText, 1000);
+            }
+        }
+
+        // Initialize
+        texts.forEach(text => text.style.opacity = '0');
+        setTimeout(showNextText, 500);
+
+        // Mouse parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.card');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            cards.forEach((card, index) => {
+                const speed = (index + 1) * 0.5;
+                card.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+            });
+        });
+    </script>
 </body>
 </html>
