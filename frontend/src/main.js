@@ -8,7 +8,7 @@ import App from './App.vue'
 import './style.css'
 
 // Configure axios base URL
-axios.defaults.baseURL = 'http://47.102.109.115:8080/api'
+axios.defaults.baseURL = '/api'
 
 // Add JWT token to requests
 axios.interceptors.request.use(
