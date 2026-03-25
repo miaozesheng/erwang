@@ -8,7 +8,7 @@ import App from './App.vue'
 import './style.css'
 
 // Configure axios base URL
-axios.defaults.baseURL = '/api'
+axios.defaults.baseURL = 'https://api.erwang.top/api'
 
 // Add JWT token to requests
 axios.interceptors.request.use(
