@@ -5,9 +5,9 @@ After=network.target mysqld.service mariadb.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/www/wwwroot/erwang/backend
-EnvironmentFile=/www/wwwroot/erwang/deploy/erwang-backend.env
-ExecStart=/usr/bin/java -jar /www/wwwroot/erwang/backend/app.jar --spring.profiles.active=${SPRING_PROFILES_ACTIVE}
+WorkingDirectory=/www/server/erwang/backend
+EnvironmentFile=/www/server/erwang/deploy/erwang-backend.env
+ExecStart=/usr/bin/java -jar /www/server/erwang/backend/app.jar --spring.profiles.active=${SPRING_PROFILES_ACTIVE}
 SuccessExitStatus=143
 Restart=always
 RestartSec=5

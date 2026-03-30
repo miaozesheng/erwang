@@ -19,13 +19,11 @@ mvn clean package -DskipTests
 
 ## 二、上传到服务器
 
-把 `你的服务器IP` 替换成真实 IP。
-
 ```bash
-scp -r /Users/miaozesheng/study/erwang/frontend/dist/* root@你的服务器IP:/www/wwwroot/erwang/frontend/dist/
-scp /Users/miaozesheng/study/erwang/backend/target/blog-backend-1.0.0.jar root@你的服务器IP:/www/wwwroot/erwang/backend/app.jar
-scp /Users/miaozesheng/study/erwang/backend/sql/init.sql root@你的服务器IP:/www/wwwroot/erwang/backend/sql/init.sql
-scp /Users/miaozesheng/study/erwang/deploy/* root@你的服务器IP:/www/wwwroot/erwang/deploy/
+scp -r /Users/miaozesheng/study/erwang/frontend/dist/* root@47.102.109.115:/www/wwwroot/erwang/
+scp /Users/miaozesheng/study/erwang/backend/target/blog-backend-1.0.0.jar root@47.102.109.115:/www/server/erwang/backend/app.jar
+scp /Users/miaozesheng/study/erwang/backend/sql/init.sql root@47.102.109.115:/www/server/erwang/backend/sql/init.sql
+scp /Users/miaozesheng/study/erwang/deploy/* root@47.102.109.115:/www/server/erwang/deploy/
 ```
 
 ---
@@ -33,8 +31,9 @@ scp /Users/miaozesheng/study/erwang/deploy/* root@你的服务器IP:/www/wwwroot
 ## 三、服务器初始化目录
 
 ```bash
-mkdir -p /www/wwwroot/erwang/{frontend/dist,backend,uploads,deploy}
-mkdir -p /www/wwwroot/erwang/backend/sql
+mkdir -p /www/wwwroot/erwang
+mkdir -p /www/server/erwang/{backend,uploads,deploy}
+mkdir -p /www/server/erwang/backend/sql
 ```
 
 ---
@@ -56,7 +55,7 @@ FLUSH PRIVILEGES;
 
 ### 3) 导入表结构
 ```bash
-mysql -uroot -p blog < /www/wwwroot/erwang/backend/sql/init.sql
+mysql -uroot -p blog < /www/server/erwang/backend/sql/init.sql
 ```
 
 ---
@@ -64,8 +63,8 @@ mysql -uroot -p blog < /www/wwwroot/erwang/backend/sql/init.sql
 ## 五、配置后端环境变量
 
 ```bash
-cp /www/wwwroot/erwang/deploy/erwang-backend.env.example /www/wwwroot/erwang/deploy/erwang-backend.env
-vi /www/wwwroot/erwang/deploy/erwang-backend.env
+cp /www/server/erwang/deploy/erwang-backend.env.example /www/server/erwang/deploy/erwang-backend.env
+vi /www/server/erwang/deploy/erwang-backend.env
 ```
 
 建议写成：
@@ -84,7 +83,7 @@ JWT_SECRET=请替换成一串至少32位的随机密钥
 JWT_EXPIRATION=86400000
 
 CORS_ORIGINS=https://erwang.me,https://www.erwang.me
-APP_UPLOAD_DIR=/www/wwwroot/erwang/uploads
+APP_UPLOAD_DIR=/www/server/erwang/uploads
 ```
 
 ---
@@ -92,7 +91,7 @@ APP_UPLOAD_DIR=/www/wwwroot/erwang/uploads
 ## 六、安装并启动后端服务
 
 ```bash
-cp /www/wwwroot/erwang/deploy/erwang.service /etc/systemd/system/erwang.service
+cp /www/server/erwang/deploy/erwang.service /etc/systemd/system/erwang.service
 systemctl daemon-reload
 systemctl enable erwang
 systemctl start erwang
@@ -127,7 +126,7 @@ www.erwang.me
 站点根目录：
 
 ```text
-/www/wwwroot/erwang/frontend/dist
+/www/wwwroot/erwang
 ```
 
 Nginx 核心配置：
@@ -137,7 +136,7 @@ server {
     listen 80;
     server_name erwang.me www.erwang.me;
 
-    root /www/wwwroot/erwang/frontend/dist;
+    root /www/wwwroot/erwang;
     index index.html;
 
     location /api/ {

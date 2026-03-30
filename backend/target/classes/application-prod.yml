@@ -20,7 +20,7 @@ jwt:
   expiration: ${JWT_EXPIRATION:86400000}
 
 app:
-  upload-dir: ${APP_UPLOAD_DIR:/www/wwwroot/erwang/uploads}
+  upload-dir: ${APP_UPLOAD_DIR:/www/server/erwang/uploads}
 
 cors:
   allowed-origins: ${CORS_ORIGINS:https://erwang.me,https://www.erwang.me}
