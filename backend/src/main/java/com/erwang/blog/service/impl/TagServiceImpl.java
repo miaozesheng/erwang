@@ -26,4 +26,12 @@ public class TagServiceImpl implements TagService {
     public Tag getById(Long id) {
         return tagMapper.selectById(id);
     }
+
+    @Override
+    public Long createByName(String name) {
+        Tag tag = new Tag();
+        tag.setName(name);
+        tagMapper.insert(tag);
+        return tag.getId();
+    }
 }

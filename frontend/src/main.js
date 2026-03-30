@@ -3,26 +3,8 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import router from './router'
-import axios from 'axios'
 import App from './App.vue'
 import './style.css'
-
-// Configure axios base URL
-axios.defaults.baseURL = 'https://api.erwang.top/api'
-
-// Add JWT token to requests
-axios.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  error => {
-    return Promise.reject(error)
-  }
-)
 
 // Create app
 const app = createApp(App)

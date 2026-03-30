@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -16,12 +18,24 @@ public class CategoryController {
     private final CategoryService categoryService;
     
     @GetMapping
-    public Result<List<Category>> list() {
-        return Result.success(categoryService.listAll());
+    public Result<List<String>> list() {
+        List<String> names = categoryService.listAll().stream()
+                .map(Category::getName)
+                .collect(Collectors.toList());
+        return Result.success(names);
     }
     
     @GetMapping("/{id}")
     public Result<Category> getById(@PathVariable Long id) {
         return Result.success(categoryService.getById(id));
+    }
+
+    @PostMapping
+    public Result<Long> create(@RequestBody Map<String, String> params) {
+        String name = params.get("name");
+        if (name == null || name.trim().isEmpty()) {
+            return Result.error("分类名称不能为空");
+        }
+        return Result.success(categoryService.createByName(name.trim()));
     }
 }

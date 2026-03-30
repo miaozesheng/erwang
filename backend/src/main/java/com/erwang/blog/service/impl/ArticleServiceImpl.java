@@ -1,10 +1,17 @@
 package com.erwang.blog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.erwang.blog.entity.Article;
 import com.erwang.blog.entity.ArticleTag;
+import com.erwang.blog.entity.Category;
+import com.erwang.blog.entity.Tag;
 import com.erwang.blog.mapper.ArticleMapper;
 import com.erwang.blog.mapper.ArticleTagMapper;
+import com.erwang.blog.mapper.CategoryMapper;
+import com.erwang.blog.mapper.TagMapper;
 import com.erwang.blog.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +28,8 @@ public class ArticleServiceImpl implements ArticleService {
     
     private final ArticleMapper articleMapper;
     private final ArticleTagMapper articleTagMapper;
+    private final CategoryMapper categoryMapper;
+    private final TagMapper tagMapper;
     
     @Override
     public List<Article> listAll() {
@@ -27,6 +37,57 @@ public class ArticleServiceImpl implements ArticleService {
         wrapper.eq(Article::getStatus, 1);
         wrapper.orderByDesc(Article::getIsTop, Article::getCreatedAt);
         return articleMapper.selectList(wrapper);
+    }
+
+    @Override
+    public IPage<Article> listPage(Integer page, Integer size, String keyword, String category, String tag) {
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasCategory = category != null && !category.trim().isEmpty();
+        boolean hasTag = tag != null && !tag.trim().isEmpty();
+
+        LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Article::getStatus, 1);
+        if (hasKeyword) {
+            String trimKeyword = keyword.trim();
+            wrapper.and(w -> w.like(Article::getTitle, trimKeyword)
+                    .or()
+                    .like(Article::getContent, trimKeyword));
+        }
+
+        if (hasCategory) {
+            QueryWrapper<Category> categoryWrapper = new QueryWrapper<>();
+            categoryWrapper.select("id").eq("name", category.trim());
+            List<Category> categories = categoryMapper.selectList(categoryWrapper);
+            if (categories.isEmpty()) {
+                return new Page<>(page, size);
+            }
+            List<Long> categoryIds = categories.stream().map(Category::getId).collect(Collectors.toList());
+            wrapper.in(Article::getCategoryId, categoryIds);
+        }
+
+        if (hasTag) {
+            QueryWrapper<Tag> tagWrapper = new QueryWrapper<>();
+            tagWrapper.select("id").eq("name", tag.trim());
+            List<Tag> tags = tagMapper.selectList(tagWrapper);
+            if (tags.isEmpty()) {
+                return new Page<>(page, size);
+            }
+            List<Long> tagIds = tags.stream().map(Tag::getId).collect(Collectors.toList());
+
+            QueryWrapper<ArticleTag> articleTagWrapper = new QueryWrapper<>();
+            articleTagWrapper.select("article_id").in("tag_id", tagIds);
+            List<ArticleTag> articleTags = articleTagMapper.selectList(articleTagWrapper);
+            if (articleTags.isEmpty()) {
+                return new Page<>(page, size);
+            }
+            List<Long> articleIds = articleTags.stream().map(ArticleTag::getArticleId).distinct().collect(Collectors.toList());
+            wrapper.in(Article::getId, articleIds);
+        }
+
+        wrapper.orderByDesc(Article::getIsTop, Article::getCreatedAt);
+
+        Page<Article> pageReq = new Page<>(page, size);
+        return articleMapper.selectPage(pageReq, wrapper);
     }
     
     @Override

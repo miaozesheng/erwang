@@ -1,10 +1,50 @@
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { marked } from 'marked'
 import { ElMessage } from 'element-plus'
-import { getArticle, createArticle, updateArticle, getCategories, getTags } from '../api'
+import { getArticle, createArticle, updateArticle, getCategories, getTags, uploadFile, resolveFileUrl } from '../api'
 import Header from '../components/Header.vue'
+import Vditor from 'vditor'
+import 'vditor/dist/index.css'
+
+const DRAFT_KEY = 'erwang_article_draft'
+
+const saveDraft = () => {
+  if (isEdit.value) return
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({
+    title: form.title,
+    content: form.content,
+    category: form.category,
+    tags: form.tags,
+    excerpt: form.excerpt,
+    savedAt: Date.now()
+  }))
+}
+
+const loadDraft = () => {
+  if (isEdit.value) return false
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return false
+    const draft = JSON.parse(raw)
+    if (Date.now() - draft.savedAt > 7 * 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(DRAFT_KEY)
+      return false
+    }
+    form.title = draft.title || ''
+    form.content = draft.content || ''
+    form.category = draft.category || ''
+    form.tags = draft.tags || []
+    form.excerpt = draft.excerpt || ''
+    return true
+  } catch { return false }
+}
+
+const clearDraft = () => {
+  localStorage.removeItem(DRAFT_KEY)
+}
+
+let draftTimer = null
 
 const route = useRoute()
 const router = useRouter()
@@ -20,38 +60,127 @@ const form = reactive({
   excerpt: ''
 })
 
+const contentStats = computed(() => {
+  const content = form.content || ''
+  const plainText = content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/[#>*_~\-|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const words = plainText ? plainText.split(' ').filter(Boolean).length : 0
+  return {
+    words,
+    chars: content.length
+  }
+})
+
 const categories = ref([])
 const tags = ref([])
-const previewMode = ref(false)
+const vditorRef = ref(null)
+let vditorInstance = null
 
-const renderedPreview = computed(() => {
-  return form.content ? marked(form.content) : '<p class="empty">预览区域</p>'
-})
+
+
+const initVditor = () => {
+  if (vditorInstance) {
+    vditorInstance.destroy()
+    vditorInstance = null
+  }
+
+  vditorInstance = new Vditor('vditor-editor', {
+    mode: 'ir',
+    lang: 'zh_CN',
+    theme: 'dark',
+    height: 500,
+    placeholder: '开始编写 Markdown 内容...',
+    value: form.content,
+    cache: { enable: false },
+    toolbar: [
+      'headings', 'bold', 'italic', 'strike', '|',
+      'line', 'quote', 'list', 'ordered-list', 'check', '|',
+      'code', 'inline-code', 'table', 'link', 'upload', '|',
+      'undo', 'redo', '|',
+      'edit-mode', 'outline', 'fullscreen'
+    ],
+    input: (value) => {
+      form.content = value
+      saveDraft()
+    },
+    upload: {
+      accept: 'image/*',
+      multiple: false,
+      handler: async (files) => {
+        const file = files[0]
+        if (!file) return null
+        const maxSize = 10 * 1024 * 1024
+        if (file.size > maxSize) {
+          ElMessage.warning('图片大小不能超过 10MB')
+          return null
+        }
+        try {
+          const res = await uploadFile(file)
+          const rawUrl = res.data?.data?.url || res.data?.url || ''
+          const displayUrl = resolveFileUrl(rawUrl)
+          if (displayUrl && vditorInstance) {
+            vditorInstance.insertValue(`![image](${displayUrl})`)
+          }
+          ElMessage.success('图片上传成功')
+        } catch (error) {
+          console.error('Upload failed:', error)
+          ElMessage.error('图片上传失败')
+        }
+        return null
+      }
+    },
+    after: () => {
+      if (form.content && vditorInstance) {
+        vditorInstance.setValue(form.content)
+      }
+      const editorEl = document.getElementById('vditor-editor')
+      if (editorEl) {
+        editorEl.classList.add('vditor-cyber')
+      }
+    }
+  })
+}
 
 const fetchData = async () => {
   loading.value = true
   try {
     const [catRes, tagRes] = await Promise.all([getCategories(), getTags()])
-    categories.value = catRes.data.categories || catRes.data || []
-    tags.value = tagRes.data.tags || tagRes.data || []
-    
+    categories.value = catRes.data.data || []
+    tags.value = tagRes.data.data || []
+
     if (isEdit.value) {
       const res = await getArticle(route.params.id)
-      const article = res.data.article || res.data
+      const article = res.data.data || {}
       form.title = article.title || ''
       form.content = article.content || ''
       form.category = article.category || ''
       form.tags = article.tags || []
-      form.excerpt = article.excerpt || ''
+      form.excerpt = article.excerpt || article.summary || ''
+    } else {
+      const hasDraft = loadDraft()
+      if (hasDraft) {
+        ElMessage.info('已恢复上次未保存的草稿')
+      }
     }
   } catch (e) {
     console.error('Failed to fetch data:', e)
   } finally {
     loading.value = false
+    initVditor()
   }
 }
 
 const handleSave = async () => {
+  if (vditorInstance) {
+    form.content = vditorInstance.getValue()
+  }
+
   if (!form.title.trim()) {
     ElMessage.warning('请输入文章标题')
     return
@@ -60,7 +189,7 @@ const handleSave = async () => {
     ElMessage.warning('请输入文章内容')
     return
   }
-  
+
   saving.value = true
   try {
     const data = {
@@ -70,15 +199,16 @@ const handleSave = async () => {
       tags: form.tags,
       excerpt: form.excerpt
     }
-    
+
     if (isEdit.value) {
       await updateArticle(route.params.id, data)
       ElMessage.success('更新成功')
     } else {
       await createArticle(data)
       ElMessage.success('创建成功')
+      clearDraft()
     }
-    
+
     router.push('/admin')
   } catch (e) {
     console.error('Failed to save:', e)
@@ -95,97 +225,104 @@ const handleCancel = () => {
 onMounted(() => {
   fetchData()
 })
+
+onBeforeUnmount(() => {
+  if (vditorInstance) {
+    vditorInstance.destroy()
+    vditorInstance = null
+  }
+  if (draftTimer) clearInterval(draftTimer)
+})
 </script>
 
 <template>
   <div class="page-container">
     <Header />
-    
-    <main class="main-content">
-      <div class="editor-header">
-        <h1 class="editor-title">{{ isEdit ? '编辑文章' : '新建文章' }}</h1>
-        <div class="header-actions">
-          <el-button @click="previewMode = !previewMode">
-            {{ previewMode ? '编辑' : '预览' }}
-          </el-button>
-          <el-button @click="handleCancel">取消</el-button>
-          <el-button type="primary" :loading="saving" @click="handleSave">
-            {{ isEdit ? '更新' : '发布' }}
-          </el-button>
-        </div>
-      </div>
 
-      <div v-loading="loading" class="editor-container">
-        <div v-if="!previewMode" class="editor-form">
+    <main class="main-content">
+      <section class="editor-shell">
+        <div class="editor-corners" aria-hidden="true"></div>
+
+        <div class="editor-header">
+          <h1 class="editor-title">{{ isEdit ? '编辑文章' : '新建文章' }}</h1>
+          <div class="header-actions">
+            <el-button @click="handleCancel">取消</el-button>
+            <el-button type="primary" :loading="saving" @click="handleSave">
+              {{ isEdit ? '更新' : '发布' }}
+            </el-button>
+          </div>
+        </div>
+
+        <div v-loading="loading" class="editor-container">
           <el-form :model="form" label-position="top">
-            <el-form-item label="标题" required>
-              <el-input 
-                v-model="form.title" 
-                placeholder="请输入文章标题"
-                size="large"
-                maxlength="100"
-                show-word-limit
-              />
-            </el-form-item>
-            
-            <el-form-item label="分类">
-              <el-select v-model="form.category" placeholder="选择分类" style="width: 100%">
-                <el-option 
-                  v-for="cat in categories" 
-                  :key="cat" 
-                  :label="cat" 
-                  :value="cat" 
+            <div class="section-label">// META</div>
+
+            <div class="meta-row">
+              <el-form-item label="标题" required class="meta-title">
+                <el-input
+                  v-model="form.title"
+                  placeholder="请输入文章标题"
+                  size="large"
+                  maxlength="100"
+                  show-word-limit
                 />
-              </el-select>
-            </el-form-item>
-            
-            <el-form-item label="标签">
-              <el-select 
-                v-model="form.tags" 
-                multiple 
-                placeholder="选择标签"
-                style="width: 100%"
-              >
-                <el-option 
-                  v-for="tag in tags" 
-                  :key="tag" 
-                  :label="tag" 
-                  :value="tag" 
+              </el-form-item>
+
+              <el-form-item label="分类" class="meta-category">
+                <el-select v-model="form.category" placeholder="选择或输入分类" style="width: 100%" filterable allow-create default-first-option>
+                  <el-option
+                    v-for="cat in categories"
+                    :key="cat"
+                    :label="cat"
+                    :value="cat"
+                  />
+                </el-select>
+              </el-form-item>
+            </div>
+
+            <div class="meta-row">
+              <el-form-item label="标签" class="meta-tags">
+                <el-select
+                  v-model="form.tags"
+                  multiple
+                  filterable
+                  allow-create
+                  default-first-option
+                  placeholder="选择或输入标签"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="tag in tags"
+                    :key="tag"
+                    :label="tag"
+                    :value="tag"
+                  />
+                </el-select>
+              </el-form-item>
+
+              <el-form-item label="摘要" class="meta-excerpt">
+                <el-input
+                  v-model="form.excerpt"
+                  placeholder="文章摘要（可选）"
+                  maxlength="200"
                 />
-              </el-select>
+              </el-form-item>
+            </div>
+
+            <div class="editor-separator" aria-hidden="true"></div>
+            <div class="section-label">// CONTENT</div>
+
+            <el-form-item label="正文" required>
+              <div id="vditor-editor" class="vditor-wrap"></div>
             </el-form-item>
-            
-            <el-form-item label="摘要">
-              <el-input 
-                v-model="form.excerpt" 
-                type="textarea" 
-                :rows="3"
-                placeholder="请输入文章摘要（可选）"
-                maxlength="200"
-                show-word-limit
-              />
-            </el-form-item>
-            
-            <el-form-item label="内容 (Markdown)" required>
-              <el-input 
-                v-model="form.content" 
-                type="textarea" 
-                :rows="20"
-                placeholder="请输入 Markdown 内容..."
-                class="content-editor"
-              />
-            </el-form-item>
+
+            <div class="editor-stats">
+              <span>WORDS {{ contentStats.words }}</span>
+              <span>CHARS {{ contentStats.chars }}</span>
+            </div>
           </el-form>
         </div>
-
-        <div v-else class="preview-container">
-          <h2 class="preview-title">{{ form.title || '无标题' }}</h2>
-          <div 
-            class="preview-content markdown-body"
-            v-html="renderedPreview"
-          ></div>
-        </div>
-      </div>
+      </section>
     </main>
   </div>
 </template>
@@ -207,11 +344,51 @@ onMounted(() => {
   box-sizing: border-box;
 }
 
+.editor-shell {
+  position: relative;
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  border-radius: 16px;
+  background: linear-gradient(165deg, rgba(10, 20, 38, 0.72), rgba(8, 16, 31, 0.48));
+  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.06), var(--shadow);
+  padding: 24px;
+}
+
+.editor-corners {
+  position: absolute;
+  inset: 8px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.editor-corners::before,
+.editor-corners::after {
+  content: '';
+  position: absolute;
+  width: 28px;
+  height: 18px;
+  border-top: 1px solid var(--accent-border);
+  border-left: 1px solid var(--accent-border);
+  opacity: 0.7;
+}
+
+.editor-corners::before {
+  left: 0;
+  top: 0;
+}
+
+.editor-corners::after {
+  right: 0;
+  bottom: 0;
+  transform: rotate(180deg);
+}
+
 .editor-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .editor-title {
@@ -228,20 +405,51 @@ onMounted(() => {
 
 .header-actions .el-button--primary {
   background: var(--accent);
-  border: none;
-  box-shadow: 0 0 15px rgba(170, 59, 255, 0.3);
+  border: 1px solid rgba(0, 240, 255, 0.28);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.32);
 }
 
 .editor-container {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.section-label {
+  margin: 4px 0 14px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.editor-separator {
+  margin: 8px 0 16px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.32), transparent);
+}
+
+.meta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.meta-title {
+  grid-column: 1;
+}
+
+.meta-category {
+  grid-column: 2;
 }
 
 :deep(.el-form-item__label) {
   color: var(--text-h);
   font-weight: 500;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
 }
 
 :deep(.el-input__wrapper),
@@ -252,9 +460,7 @@ onMounted(() => {
 }
 
 :deep(.el-input__wrapper:hover),
-:deep(.el-input__wrapper.is-focus),
-:deep(.el-textarea__inner:hover),
-:deep(.el-textarea__inner:focus) {
+:deep(.el-input__wrapper.is-focus) {
   border-color: var(--accent);
 }
 
@@ -263,80 +469,128 @@ onMounted(() => {
   color: var(--text-h);
 }
 
-:deep(.el-input__inner::placeholder),
-:deep(.el-textarea__inner::placeholder) {
-  color: var(--text);
-}
-
 :deep(.el-select .el-input__wrapper) {
   background: var(--code-bg);
 }
 
-.content-editor :deep(.el-textarea__inner) {
+.vditor-wrap {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.editor-stats {
+  margin-top: 10px;
+  display: flex;
+  gap: 18px;
+  color: rgba(114, 255, 220, 0.88);
   font-family: var(--mono);
-  font-size: 14px;
-  line-height: 1.6;
-  min-height: 400px;
+  font-size: 12px;
+  letter-spacing: 0.7px;
 }
 
-.preview-container {
-  padding: 24px;
+:deep(.vditor) {
+  --panel-background-color: #0b1728 !important;
+  --toolbar-background-color: rgba(8, 16, 31, 0.95) !important;
+  --textarea-background-color: #0b1728 !important;
+  border: 1px solid rgba(0, 240, 255, 0.22) !important;
+  border-radius: 10px !important;
 }
 
-.preview-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text-h);
-  margin: 0 0 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
+:deep(.vditor-toolbar) {
+  background: rgba(8, 16, 31, 0.95) !important;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.15) !important;
+  padding: 6px 8px !important;
 }
 
-.preview-content {
-  font-size: 16px;
-  line-height: 1.8;
-  color: var(--text);
+:deep(.vditor-toolbar__item) {
+  border-radius: 6px !important;
 }
 
-:deep(.markdown-body) {
-  color: var(--text);
+:deep(.vditor-toolbar__item:hover) {
+  background: rgba(0, 240, 255, 0.1) !important;
 }
 
-:deep(.markdown-body h1),
-:deep(.markdown-body h2),
-:deep(.markdown-body h3) {
-  color: var(--text-h);
-  margin: 24px 0 16px;
+:deep(.vditor-toolbar__item--current) {
+  background: rgba(0, 240, 255, 0.15) !important;
+  color: #00f0ff !important;
 }
 
-:deep(.markdown-body p) {
-  margin: 16px 0;
+:deep(.vditor-toolbar svg) {
+  color: #97a8b8 !important;
+  fill: #97a8b8 !important;
 }
 
-:deep(.markdown-body code) {
-  background: var(--code-bg);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-family: var(--mono);
+:deep(.vditor-toolbar__item:hover svg),
+:deep(.vditor-toolbar__item--current svg) {
+  color: #00f0ff !important;
+  fill: #00f0ff !important;
 }
 
-:deep(.markdown-body pre) {
-  background: var(--code-bg);
-  padding: 16px;
-  border-radius: 8px;
-  overflow-x: auto;
+:deep(.vditor-ir .vditor-reset) {
+  color: #c8dce8 !important;
+  font-family: var(--sans) !important;
+  font-size: 15px !important;
+  line-height: 1.8 !important;
+  padding: 24px !important;
 }
 
-:deep(.markdown-body pre code) {
-  background: none;
-  padding: 0;
+:deep(.vditor-ir .vditor-reset h1),
+:deep(.vditor-ir .vditor-reset h2),
+:deep(.vditor-ir .vditor-reset h3) {
+  color: #e9f8ff !important;
+  font-family: var(--heading) !important;
 }
 
-:deep(.empty) {
-  color: var(--text);
-  opacity: 0.5;
-  text-align: center;
-  padding: 40px;
+:deep(.vditor-ir .vditor-reset pre.vditor-reset) {
+  background: #081022 !important;
+  border: 1px solid rgba(0, 240, 255, 0.15) !important;
+  border-radius: 8px !important;
+}
+
+:deep(.vditor-ir .vditor-reset code) {
+  background: rgba(0, 240, 255, 0.08) !important;
+  color: #00f0ff !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-family: var(--mono) !important;
+}
+
+:deep(.vditor-ir .vditor-reset blockquote) {
+  border-left: 4px solid #00f0ff !important;
+  background: rgba(0, 240, 255, 0.05) !important;
+  padding: 8px 16px !important;
+}
+
+:deep(.vditor-ir .vditor-reset a) {
+  color: #00f0ff !important;
+}
+
+:deep(.vditor-ir .vditor-reset table td),
+:deep(.vditor-ir .vditor-reset table th) {
+  border-color: rgba(0, 240, 255, 0.2) !important;
+}
+
+:deep(.vditor-ir .vditor-reset table th) {
+  background: rgba(0, 240, 255, 0.06) !important;
+}
+
+:deep(.vditor-outline) {
+  background: rgba(8, 16, 31, 0.9) !important;
+  border-left: 1px solid rgba(0, 240, 255, 0.15) !important;
+}
+
+:deep(.vditor-hint),
+:deep(.vditor-tip) {
+  background: rgba(8, 16, 31, 0.96) !important;
+  border: 1px solid rgba(0, 240, 255, 0.2) !important;
+  color: #c8dce8 !important;
+}
+
+:deep(.vditor-input) {
+  background: #0b1728 !important;
+  color: #e9f8ff !important;
+  border-color: rgba(0, 240, 255, 0.22) !important;
 }
 
 @media (max-width: 768px) {
@@ -345,7 +599,15 @@ onMounted(() => {
     gap: 16px;
     align-items: flex-start;
   }
-  
+
+  .meta-row {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-shell {
+    padding: 18px;
+  }
+
   .main-content {
     padding: 24px 16px;
   }

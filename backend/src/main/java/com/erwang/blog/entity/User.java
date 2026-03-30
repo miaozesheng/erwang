@@ -2,6 +2,7 @@ package com.erwang.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,6 +16,10 @@ public class User {
     private String nickname;
     private String avatar;
     private String email;
+    private LocalDate birthday;
+    private String phone;
+    private String address;
+    private String role;
     
     @TableField("status")
     private Integer status;

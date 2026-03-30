@@ -1,0 +1,16 @@
+[Unit]
+Description=Erwang Blog Spring Boot Service
+After=network.target mysqld.service mariadb.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/www/wwwroot/erwang/backend
+EnvironmentFile=/www/wwwroot/erwang/deploy/erwang-backend.env
+ExecStart=/usr/bin/java -jar /www/wwwroot/erwang/backend/app.jar --spring.profiles.active=${SPRING_PROFILES_ACTIVE}
+SuccessExitStatus=143
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

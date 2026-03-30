@@ -1,0 +1,163 @@
+Total messages: 28 (Errors: 2, Warnings: 21)
+Returning 23 messages for level "info"
+
+[WARNING] [Vue warn]: Property "syncPasswordVisible" was accessed during render but is not defined on instance. 
+  at <ElFormItem> 
+  at <ElForm model= {username: , password: } class="login-form" onSubmit=fn > 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Property "syncPasswordVisible" was accessed during render but is not defined on instance. 
+  at <ElFormItem> 
+  at <ElForm model= {username: , password: } class="login-form" onSubmit=fn > 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Property "syncPasswordVisible" was accessed during render but is not defined on instance. 
+  at <ElFormItem> 
+  at <ElForm model= {username: , password: } class="login-form" onSubmit=fn > 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Property "syncPasswordVisible" was accessed during render but is not defined on instance. 
+  at <ElFormItem> 
+  at <ElForm model= {username: , password: } class="login-form" onSubmit=fn > 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Property "syncPasswordVisible" was accessed during render but is not defined on instance. 
+  at <ElFormItem> 
+  at <ElForm model= {username: , password: } class="login-form" onSubmit=fn > 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Property "isPasswordVisible" was accessed during render but is not defined on instance. 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Property "isPasswordVisible" was accessed during render but is not defined on instance. 
+  at <Login onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/login" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< null > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Header
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+[WARNING] [Vue warn]: Failed to resolve component: Footer
+If this is a native custom element, make sure to exclude it from component resolution via compilerOptions.isCustomElement. 
+  at <Profile onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< Proxy(Object) > key="/profile" > 
+  at <BaseTransition mode="out-in" appear=false persisted=false  ... > 
+  at <Transition name="fade-slide" mode="out-in" > 
+  at <RouterView> 
+  at <App> @ http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1735
+TypeError: navItems.findIndex is not a function
+    at ComputedRefImpl.fn (http://localhost:5173/src/components/Header.vue?t=1774583968387:64:26)
+    at refreshComputed (http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:532:26)
+    at get value (http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1519:3)
+    at updateIndicator (http://localhost:5173/src/components/Header.vue?t=1774583968387:82:50)
+TypeError: navItems.findIndex is not a function
+    at ComputedRefImpl.fn (http://localhost:5173/src/components/Header.vue?t=1774583968387:64:26)
+    at refreshComputed (http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:532:26)
+    at get value (http://localhost:5173/node_modules/.vite/deps/vue.runtime.esm-bundler-lRCzm0bN.js?v=e5a61cf6:1519:3)
+    at updateIndicator (http://localhost:5173/src/components/Header.vue?t=1774583968387:82:50)

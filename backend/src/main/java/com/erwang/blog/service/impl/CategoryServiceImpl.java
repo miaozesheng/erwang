@@ -26,4 +26,14 @@ public class CategoryServiceImpl implements CategoryService {
     public Category getById(Long id) {
         return categoryMapper.selectById(id);
     }
+
+    @Override
+    public Long createByName(String name) {
+        Category category = new Category();
+        category.setName(name);
+        category.setSlug(name.toLowerCase().replace(" ", "-"));
+        category.setSort(0);
+        categoryMapper.insert(category);
+        return category.getId();
+    }
 }

@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS `user` (
     `nickname` VARCHAR(50) DEFAULT NULL COMMENT '昵称',
     `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像',
     `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
+    `phone` VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+    `birthday` DATE DEFAULT NULL COMMENT '生日',
+    `address` VARCHAR(255) DEFAULT NULL COMMENT '地址',
+    `role` VARCHAR(20) DEFAULT 'user' COMMENT '角色: admin/user',
     `status` TINYINT DEFAULT 1 COMMENT '状态 0禁用 1正常',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -61,8 +65,39 @@ CREATE TABLE IF NOT EXISTS `article_tag` (
     UNIQUE KEY `uk_article_tag` (`article_id`, `tag_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章标签关联表';
 
-INSERT INTO `user` (username, password, nickname, email) VALUES 
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 'Erwang', 'hello@erwang.top');
+CREATE TABLE IF NOT EXISTS `article_like` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `article_id` BIGINT NOT NULL COMMENT '文章ID',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`article_id`) REFERENCES `article`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `uk_user_article_like` (`user_id`, `article_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章点赞表';
+
+CREATE TABLE IF NOT EXISTS `article_favorite` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `article_id` BIGINT NOT NULL COMMENT '文章ID',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`article_id`) REFERENCES `article`(`id`) ON DELETE CASCADE,
+    UNIQUE KEY `uk_user_article_favorite` (`user_id`, `article_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章收藏表';
+
+CREATE TABLE IF NOT EXISTS `quick_link` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `icon` VARCHAR(255) DEFAULT NULL COMMENT '图标',
+    `label` VARCHAR(100) NOT NULL COMMENT '标题',
+    `url` VARCHAR(500) NOT NULL COMMENT '链接地址',
+    `sort` INT DEFAULT 0 COMMENT '排序',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `deleted` TINYINT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='快捷链接表';
+
+INSERT INTO `user` (username, password, nickname, email, role) VALUES 
+('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 'Erwang', 'hello@erwang.top', 'admin');
 
 INSERT INTO `category` (name, slug, description, sort) VALUES 
 ('技术', 'tech', '技术相关文章', 1),
