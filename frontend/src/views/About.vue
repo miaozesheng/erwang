@@ -62,7 +62,7 @@ const socials = [
           <h2 class="section-title">联系方式</h2>
           <p class="contact-item">Email: your-email@example.com</p>
           <p class="contact-item">WeChat: your-wechat-id</p>
-          <p class="contact-item">Location: 请配置你的位置</p>
+          <p class="contact-item">Location: 陕西省西安市</p>
         </section>
       </section>
     </main>

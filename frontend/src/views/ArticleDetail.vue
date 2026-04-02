@@ -1,15 +1,15 @@
 <script setup>
-import { ref, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, computed, onMounted, nextTick, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
 import DOMPurify from 'dompurify'
 import { ElMessage } from 'element-plus'
-import { getArticle, toggleLike, toggleFavorite, getInteractionStatus } from '../api'
+import { getArticle, toggleLike, toggleFavorite, getInteractionStatus, getArticles } from '../api'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
-import { ArrowLeft, Folder, Calendar, View } from '@element-plus/icons-vue'
+import { ArrowLeft, Folder, Calendar, View, Document, Clock, Star, Close } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -22,6 +22,64 @@ const liked = ref(false)
 const favorited = ref(false)
 const likeCount = ref(0)
 const favoriteCount = ref(0)
+
+// Reading workbench state
+const openedArticles = ref([])
+const recentArticles = ref([])
+const relatedArticles = ref([])
+const activeTabId = ref(null)
+
+const addToOpened = (art) => {
+  if (!art || !art.id) return
+  const existing = openedArticles.value.find(a => a.id === art.id)
+  if (existing) {
+    // Move to front
+    openedArticles.value = [existing, ...openedArticles.value.filter(a => a.id !== art.id)]
+  } else {
+    openedArticles.value = [{ id: art.id, title: art.title, path: route.fullPath }, ...openedArticles.value]
+  }
+  // Keep max 8 articles
+  if (openedArticles.value.length > 8) {
+    openedArticles.value = openedArticles.value.slice(0, 8)
+  }
+  activeTabId.value = art.id
+}
+
+const closeOpenedArticle = (id, event) => {
+  event.stopPropagation()
+  const idx = openedArticles.value.findIndex(a => a.id === id)
+  if (idx > -1) {
+    openedArticles.value.splice(idx, 1)
+    // If closed active, switch to first
+    if (activeTabId.value === id) {
+      activeTabId.value = openedArticles.value[0]?.id || null
+    }
+  }
+}
+
+const switchToArticle = (art) => {
+  if (art.id === article.value?.id) return
+  router.push(`/article/${art.id}`)
+}
+
+const fetchRelatedArticles = async (categoryId, excludeId) => {
+  try {
+    const res = await getArticles({ category: categoryId, size: 5, page: 1 })
+    relatedArticles.value = ((res.data.data?.list || [])).filter(a => a.id != excludeId).slice(0, 5)
+  } catch (e) {
+    console.error('Failed to fetch related articles:', e)
+  }
+}
+
+const fetchRecentArticles = async () => {
+  try {
+    const res = await getArticles({ size: 5, page: 1 })
+    const list = (res.data.data?.list || []).slice(0, 5)
+    recentArticles.value = list.map(a => ({ id: a.id, title: a.title }))
+  } catch (e) {
+    console.error('Failed to fetch recent articles:', e)
+  }
+}
 let headingObserver = null
 
 const resolveInteractionState = (data = {}) => {
@@ -81,6 +139,16 @@ const fetchArticle = async () => {
     await nextTick()
     collectHeadings()
     observeHeadingScroll()
+    // Add to opened articles workbench
+    if (article.value) {
+      addToOpened(article.value)
+      // Fetch related articles
+      if (article.value.category) {
+        fetchRelatedArticles(article.value.category, articleId)
+      } else if (article.value.categoryId) {
+        fetchRelatedArticles(article.value.categoryId, articleId)
+      }
+    }
   } catch (e) {
     console.error('Failed to fetch article:', e)
     ElMessage.error('加载文章失败')
@@ -171,6 +239,7 @@ const observeHeadingScroll = () => {
 
 onMounted(() => {
   fetchArticle()
+  fetchRecentArticles()
 })
 
 onUnmounted(() => {
@@ -194,6 +263,65 @@ onUnmounted(() => {
       <el-skeleton :rows="10" animated v-if="loading" />
 
       <div v-else-if="article" class="content-layout">
+        <!-- Left Reading Workbench -->
+        <aside class="workbench-sidebar">
+          <div class="workbench-section">
+            <h3 class="workbench-title">
+              <el-icon><Document /></el-icon>
+              阅读工作台
+            </h3>
+            <div v-if="openedArticles.length" class="opened-tabs">
+              <div
+                v-for="tab in openedArticles"
+                :key="tab.id"
+                class="opened-tab"
+                :class="{ active: tab.id === article.id }"
+                @click="switchToArticle(tab)"
+              >
+                <span class="tab-title">{{ tab.title }}</span>
+                <button class="tab-close" @click="closeOpenedArticle(tab.id, $event)">
+                  <el-icon><Close /></el-icon>
+                </button>
+              </div>
+            </div>
+            <p v-else class="workbench-empty">暂无打开的文章</p>
+          </div>
+
+          <div class="workbench-section">
+            <h3 class="workbench-title">
+              <el-icon><Clock /></el-icon>
+              最近阅读
+            </h3>
+            <ul v-if="recentArticles.length" class="recent-list">
+              <li
+                v-for="item in recentArticles"
+                :key="item.id"
+                class="recent-item"
+                @click="switchToArticle(item)"
+              >
+                {{ item.title }}
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="relatedArticles.length" class="workbench-section">
+            <h3 class="workbench-title">
+              <el-icon><Star /></el-icon>
+              相关推荐
+            </h3>
+            <ul class="related-list">
+              <li
+                v-for="item in relatedArticles"
+                :key="item.id"
+                class="related-item"
+                @click="switchToArticle(item)"
+              >
+                {{ item.title }}
+              </li>
+            </ul>
+          </div>
+        </aside>
+
         <article class="article-detail">
           <div class="article-corners" aria-hidden="true"></div>
           <header class="article-header">
@@ -284,9 +412,125 @@ onUnmounted(() => {
 
 .content-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-columns: 240px minmax(0, 1fr) 280px;
   gap: 24px;
   align-items: flex-start;
+}
+
+.workbench-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workbench-section {
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(170deg, rgba(10, 20, 38, 0.78), rgba(8, 16, 31, 0.62));
+  padding: 14px;
+}
+
+.workbench-title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--text-h);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.workbench-title .el-icon {
+  color: var(--accent);
+}
+
+.workbench-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+
+.opened-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.opened-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 240, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(0, 240, 255, 0.04);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.opened-tab:hover {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.opened-tab.active {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.16);
+  box-shadow: inset 2px 0 0 0 var(--accent);
+}
+
+.tab-title {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.tab-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tab-close:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.12);
+}
+
+.recent-list,
+.related-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-item,
+.related-item {
+  font-size: 13px;
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.recent-item:hover,
+.related-item:hover {
+  color: var(--accent);
+  background: rgba(0, 240, 255, 0.08);
 }
 
 .back-btn {
@@ -606,6 +850,10 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .content-layout {
     grid-template-columns: 1fr;
+  }
+
+  .workbench-sidebar {
+    display: none;
   }
 
   .toc-sidebar {

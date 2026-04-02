@@ -44,15 +44,31 @@ const handleLogin = async () => {
   loading.value = true
   try {
     const res = await login(form)
-    const data = res.data.data || {}
-    localStorage.setItem('token', data.token || '')
-    if (data.role) {
-      localStorage.setItem('userRole', data.role)
+    if (res.data?.code !== 200) {
+      throw new Error(res.data?.message || '登录失败')
     }
+
+    const data = res.data?.data || {}
+    const token = data.token
+    const role = data.user?.role || data.role || ''
+
+    if (!token) {
+      throw new Error('登录凭证缺失')
+    }
+
+    localStorage.setItem('token', token)
+    if (role) {
+      localStorage.setItem('userRole', role.toLowerCase())
+    } else {
+      localStorage.removeItem('userRole')
+    }
+
+    window.dispatchEvent(new Event('auth-changed'))
+
     ElMessage.success('登录成功')
     router.push('/')
   } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '用户名或密码错误')
+    ElMessage.error(e?.response?.data?.message || e?.message || '用户名或密码错误')
   } finally {
     loading.value = false
   }

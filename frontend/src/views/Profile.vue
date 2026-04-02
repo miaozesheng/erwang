@@ -1,8 +1,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { Lock, UserFilled } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Lock, UserFilled, Star, StarFilled, Setting, SwitchButton, HomeFilled } from '@element-plus/icons-vue'
 import { changePassword, getUserInfo, updateProfile, uploadAvatar, resolveFileUrl } from '../api'
 const router = useRouter()
 
@@ -16,6 +16,40 @@ const profileEditing = ref(false)
 const profileSavedFlash = ref(false)
 const securitySavedFlash = ref(false)
 const logoutCountdown = ref(0)
+
+const userRole = computed(() => (localStorage.getItem('userRole') || '').toLowerCase())
+
+const workspaceNav = computed(() => [
+  { key: 'profile', label: '个人资料', icon: UserFilled, path: '/profile' },
+  { key: 'favorites', label: '我的收藏', icon: Star, path: '/favorites' },
+  { key: 'likes', label: '我的喜欢', icon: StarFilled, path: '/likes' },
+  ...(userRole.value === 'admin' ? [{ key: 'admin', label: '管理后台', icon: Setting, path: '/admin' }] : []),
+  { key: 'logout', label: '退出登录', icon: SwitchButton, action: 'logout' }
+])
+
+const handleWorkspaceAction = async (item) => {
+  if (item.action === 'logout') {
+    try {
+      await ElMessageBox.confirm('确定要退出登录吗？', '退出确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      localStorage.removeItem('token')
+      localStorage.removeItem('userRole')
+      ElMessage.success('已退出登录')
+      router.push('/login')
+    } catch {
+      // User cancelled
+    }
+  } else if (item.path) {
+    if (item.key === 'profile') {
+      // Already on profile, do nothing
+    } else {
+      router.push(item.path)
+    }
+  }
+}
 
 let logoutCountdownTimer = null
 
@@ -259,6 +293,22 @@ onUnmounted(() => {
     <Header />
 
     <main class="main-content">
+      <!-- Workspace Navigation Cluster -->
+      <nav class="workspace-nav">
+        <div class="workspace-nav-inner">
+          <button
+            v-for="item in workspaceNav"
+            :key="item.key"
+            class="workspace-nav-item"
+            :class="{ 'is-logout': item.action === 'logout' }"
+            @click="handleWorkspaceAction(item)"
+          >
+            <el-icon><component :is="item.icon" /></el-icon>
+            <span>{{ item.label }}</span>
+          </button>
+        </div>
+      </nav>
+
       <section class="profile-shell" v-loading="loading">
         <article class="identity-hero terminal-card section-card">
           <div class="hero-grid" aria-hidden="true"></div>
@@ -653,6 +703,49 @@ onUnmounted(() => {
   box-shadow: 0 0 18px rgba(95, 255, 137, 0.24);
 }
 
+.profile-switch-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.profile-switch-btn {
+  border: 1px solid rgba(0, 240, 255, 0.16);
+  background: rgba(6, 14, 28, 0.45);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-switch-btn:hover,
+.profile-switch-btn.active {
+  color: var(--accent);
+  border-color: rgba(0, 240, 255, 0.36);
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.12);
+}
+
+.hero-actions {
+  margin-top: 12px;
+}
+
+.logout-btn {
+  border-color: rgba(255, 117, 117, 0.3);
+  background: rgba(255, 117, 117, 0.08);
+  color: #ff9a9a;
+}
+
+.logout-btn:hover {
+  border-color: rgba(255, 117, 117, 0.48);
+  background: rgba(255, 117, 117, 0.14);
+  color: #ffd4d4;
+}
+
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -665,418 +758,70 @@ onUnmounted(() => {
 }
 
 .stat-item:last-child {
-  border-right: 0;
+  border-bottom: 0;
 }
 
-.stat-label {
-  margin: 0;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.9px;
-  opacity: 0.8;
+.workspace-nav {
+  margin-bottom: 24px;
+  border: 1px solid rgba(0, 240, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(170deg, rgba(10, 20, 38, 0.82), rgba(8, 16, 31, 0.68));
+  padding: 4px;
 }
 
-.stat-value {
-  margin: 6px 0 0;
-  color: var(--text-h);
-  font-family: var(--mono);
-  font-size: 16px;
-  letter-spacing: 0.6px;
+.workspace-nav-inner {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
-.profile-card,
-.password-card {
-  padding: 22px;
-}
-
-.section-header {
-  position: relative;
+.workspace-nav-item {
+  flex: 1;
+  min-width: 100px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
-}
-
-.section-header::after {
-  content: '';
-  position: absolute;
-  left: -38%;
-  top: 0;
-  width: 32%;
-  height: 100%;
-  background: linear-gradient(105deg, transparent, rgba(0, 240, 255, 0.2), transparent);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.section-card:hover .section-header::after {
-  opacity: 1;
-  animation: header-sweep 0.9s ease-out;
-}
-
-.section-header-security {
-  border-bottom-color: rgba(255, 170, 0, 0.36);
-}
-
-.card-title {
-  margin: 0;
-  font-size: 21px;
-  letter-spacing: 0.9px;
-  font-family: var(--heading);
-}
-
-.edit-btn {
-  border-color: rgba(0, 240, 255, 0.35);
-  color: var(--accent);
-  background: rgba(0, 240, 255, 0.08);
-  font-family: var(--heading);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-}
-
-.security-lock {
-  color: var(--security);
-  font-size: 20px;
-  filter: drop-shadow(0 0 10px var(--security-glow));
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 14px;
-}
-
-.security-grid {
-  gap: 10px 14px;
-}
-
-.data-field {
-  margin-bottom: 4px;
-  padding: 9px 12px 2px;
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  border-left: 2px solid var(--accent);
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: 10px;
-  background: rgba(8, 16, 30, 0.62);
-  transition: border-color 300ms ease, box-shadow 300ms ease;
-}
-
-.data-field:hover {
-  border-color: rgba(0, 240, 255, 0.35);
-}
-
-.data-field-wide {
-  grid-column: span 2;
-}
-
-.field-readonly {
-  margin: 0;
-  min-height: 34px;
-  display: flex;
-  align-items: center;
-  color: var(--text-h);
-  font-family: var(--mono);
-  letter-spacing: 0.5px;
+  color: var(--text);
+  font-family: var(--heading);
   font-size: 14px;
-}
-
-.actions-row {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 8px;
-}
-
-.pulse-btn {
-  animation: button-pulse 1.8s ease-in-out infinite;
-}
-
-.password-card {
-  --security: #ffaa00;
-  --security-glow: rgba(255, 170, 0, 0.3);
-  border-color: rgba(255, 170, 0, 0.32);
-  background:
-    linear-gradient(160deg, rgba(40, 28, 8, 0.76), rgba(26, 18, 6, 0.54)),
-    radial-gradient(circle at 90% 12%, rgba(255, 170, 0, 0.14), transparent 45%);
-}
-
-.password-card.section-card::before,
-.password-card.section-card::after {
-  border-top-color: rgba(255, 170, 0, 0.58);
-  border-left-color: rgba(255, 170, 0, 0.58);
-}
-
-.password-card .card-title {
-  color: #ffcd64;
-}
-
-.strength-box {
-  margin-top: 4px;
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 170, 0, 0.26);
-  border-radius: 10px;
-  background: rgba(255, 170, 0, 0.07);
-}
-
-.strength-title {
-  margin: 0;
-  font-size: 12px;
-  font-family: var(--mono);
-  color: #ffda8a;
-  letter-spacing: 0.8px;
-}
-
-.strength-bar {
-  margin-top: 8px;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
-}
-
-.strength-segment {
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255, 170, 0, 0.14);
-  border: 1px solid rgba(255, 170, 0, 0.2);
-  transition: all 300ms ease;
-}
-
-.strength-segment.active.is-weak {
-  background: rgba(255, 131, 61, 0.7);
-  box-shadow: 0 0 10px rgba(255, 131, 61, 0.3);
-}
-
-.strength-segment.active.is-medium {
-  background: rgba(255, 187, 75, 0.86);
-  box-shadow: 0 0 10px rgba(255, 187, 75, 0.34);
-}
-
-.strength-segment.active.is-strong {
-  background: rgba(255, 214, 113, 0.95);
-  box-shadow: 0 0 12px rgba(255, 214, 113, 0.38);
-}
-
-.strength-label {
-  margin: 8px 0 0;
-  font-size: 12px;
-  font-family: var(--mono);
   letter-spacing: 0.6px;
+  cursor: pointer;
+  transition: all 0.24s ease;
 }
 
-.strength-label.is-none {
-  color: var(--text);
+.workspace-nav-item .el-icon {
+  font-size: 16px;
+  color: var(--accent);
 }
 
-.strength-label.is-weak {
-  color: #ff9f6d;
-}
-
-.strength-label.is-medium {
-  color: #ffca71;
-}
-
-.strength-label.is-strong {
-  color: #ffe19d;
-}
-
-.security-btn {
-  background: linear-gradient(135deg, #ffb523, #ff9800);
-  border-color: transparent;
-  color: #231300;
-  box-shadow: 0 0 18px rgba(255, 170, 0, 0.32);
-  font-family: var(--heading);
-  text-transform: uppercase;
-  letter-spacing: 0.7px;
-}
-
-.security-btn:hover {
-  box-shadow: 0 0 24px rgba(255, 170, 0, 0.42);
-}
-
-.countdown-box {
-  margin-top: 12px;
-  border: 1px solid rgba(255, 170, 0, 0.35);
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: rgba(255, 170, 0, 0.1);
-  overflow: hidden;
-  position: relative;
-}
-
-.countdown-box p {
-  margin: 0;
-  color: #ffdb93;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.6px;
-}
-
-.countdown-bar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 2px;
-  width: 100%;
-  background: linear-gradient(90deg, #ffd282, #ffaa00);
-  transform-origin: left;
-  animation: countdown linear forwards;
-  animation-duration: var(--count-seconds);
-}
-
-.is-flash-success {
-  animation: success-flash 680ms ease;
-}
-
-.hidden-file-input {
-  display: none;
-}
-
-:deep(.el-form-item__label) {
-  color: var(--text-h);
-  font-weight: 500;
-  font-family: var(--mono);
-  letter-spacing: 0.6px;
-}
-
-:deep(.el-input__wrapper),
-:deep(.el-textarea__inner),
-:deep(.el-date-editor.el-input__wrapper) {
-  background: rgba(8, 16, 30, 0.86);
-  border: 1px solid var(--border);
-  box-shadow: none;
-  transition: border-color 300ms ease, box-shadow 300ms ease;
-}
-
-:deep(.el-input__wrapper:hover),
-:deep(.el-input__wrapper.is-focus),
-:deep(.el-textarea__inner:hover),
-:deep(.el-textarea__inner:focus),
-:deep(.el-date-editor.el-input__wrapper:hover),
-:deep(.el-date-editor.el-input__wrapper.is-focus) {
-  border-color: var(--accent);
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.24), inset 0 0 0 1px rgba(0, 240, 255, 0.22);
-}
-
-.password-card :deep(.el-input__wrapper:hover),
-.password-card :deep(.el-input__wrapper.is-focus) {
-  border-color: rgba(255, 170, 0, 0.66);
-  box-shadow: 0 0 14px rgba(255, 170, 0, 0.26), inset 0 0 0 1px rgba(255, 170, 0, 0.32);
-}
-
-:deep(.el-input__inner),
-:deep(.el-textarea__inner) {
+.workspace-nav-item:hover {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.22);
   color: var(--text-h);
 }
 
-:deep(.el-input__inner::placeholder),
-:deep(.el-textarea__inner::placeholder) {
-  color: var(--text);
+.workspace-nav-item.is-logout {
+  color: #ff6b6b;
 }
 
-@keyframes avatar-pulse {
-  0%,
-  100% {
-    transform: scale(0.98);
-    opacity: 0.82;
-  }
-  50% {
-    transform: scale(1.02);
-    opacity: 1;
-  }
+.workspace-nav-item.is-logout .el-icon {
+  color: #ff6b6b;
 }
 
-@keyframes grid-shift {
-  0% {
-    background-position: 0 0, 0 0;
-  }
-  100% {
-    background-position: 0 32px, 32px 0;
-  }
-}
-
-@keyframes particle-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(0.9);
-    opacity: 0.25;
-  }
-  50% {
-    transform: translate3d(-8px, -20px, 0) scale(1.14);
-    opacity: 0.95;
-  }
-}
-
-@keyframes header-sweep {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(420%);
-  }
-}
-
-@keyframes button-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 14px rgba(0, 240, 255, 0.26);
-  }
-  50% {
-    box-shadow: 0 0 24px rgba(0, 240, 255, 0.44);
-  }
-}
-
-@keyframes success-flash {
-  0% {
-    box-shadow: 0 0 0 rgba(102, 255, 148, 0);
-  }
-  30% {
-    box-shadow: 0 0 0 1px rgba(102, 255, 148, 0.5), 0 0 26px rgba(102, 255, 148, 0.46);
-  }
-  100% {
-    box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.06), var(--shadow);
-  }
-}
-
-@keyframes countdown {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0);
-  }
-}
-
-@media (max-width: 900px) {
-  .hero-content {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 20px;
-  }
-
-  .avatar-trigger {
-    transform: none;
-  }
-
-  .avatar-trigger:hover {
-    transform: scale(1.04);
-  }
-
-  .identity-name {
-    font-size: 32px;
-  }
-
-  .stats-bar {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .stat-item:nth-child(2n) {
-    border-right: 0;
-  }
+.workspace-nav-item.is-logout:hover {
+  background: rgba(255, 107, 107, 0.12);
+  border-color: rgba(255, 107, 107, 0.32);
 }
 
 @media (max-width: 768px) {
+  .workspace-nav {
+    display: none;
+  }
   .main-content {
     padding: 24px 16px;
   }

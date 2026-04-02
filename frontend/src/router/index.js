@@ -82,7 +82,7 @@ router.beforeEach((to, from, next) => {
       return
     }
     if (to.meta.requiresAdmin) {
-      const role = localStorage.getItem('userRole')
+      const role = (localStorage.getItem('userRole') || '').toLowerCase()
       if (role !== 'admin') {
         next('/')
         return

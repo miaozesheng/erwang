@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const currentYear = new Date().getFullYear()
-const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin')
+const isAdmin = computed(() => (localStorage.getItem('userRole') || '').toLowerCase() === 'admin')
 </script>
 
 <template>

@@ -6,15 +6,18 @@ import { getUserInfo, resolveFileUrl } from '../api'
 
 const router = useRouter()
 
-const isLoggedIn = ref(!!localStorage.getItem('token'))
-const userRole = ref(localStorage.getItem('userRole') || '')
+const normalizeRole = (role) => (role || '').toLowerCase()
+const hasToken = () => !!localStorage.getItem('token')
+
+const isLoggedIn = ref(hasToken())
+const userRole = ref(normalizeRole(localStorage.getItem('userRole') || ''))
 const userInfo = ref({
   avatar: ''
 })
 
 const displayAvatar = computed(() => resolveFileUrl(userInfo.value.avatar))
 
-const isAdmin = computed(() => userRole.value === 'admin')
+const isAdmin = computed(() => normalizeRole(userRole.value) === 'admin')
 
 const navItems = computed(() => {
   const base = [
@@ -116,6 +119,7 @@ const navigateTo = (path) => {
 }
 
 const fetchUserInfo = async () => {
+  isLoggedIn.value = hasToken()
   if (!isLoggedIn.value) return
   try {
     const res = await getUserInfo()
@@ -126,11 +130,21 @@ const fetchUserInfo = async () => {
       avatar: user.avatar || ''
     }
     if (user.role) {
-      userRole.value = user.role
-      localStorage.setItem('userRole', user.role)
+      userRole.value = normalizeRole(user.role)
+      localStorage.setItem('userRole', normalizeRole(user.role))
     }
   } catch (error) {
     console.error('Failed to fetch user info:', error)
+  }
+}
+
+const syncAuthState = () => {
+  isLoggedIn.value = hasToken()
+  userRole.value = normalizeRole(localStorage.getItem('userRole') || '')
+  if (isLoggedIn.value) {
+    fetchUserInfo()
+  } else {
+    userInfo.value = { avatar: '' }
   }
 }
 
@@ -140,6 +154,7 @@ const handleLogout = () => {
   isLoggedIn.value = false
   userRole.value = ''
   userInfo.value = { avatar: '' }
+  window.dispatchEvent(new Event('auth-changed'))
   router.push('/')
 }
 
@@ -152,9 +167,11 @@ const goToProfile = () => {
 }
 
 onMounted(() => {
-  fetchUserInfo()
+  syncAuthState()
   updateIndicator()
   window.addEventListener('resize', updateIndicator)
+  window.addEventListener('storage', syncAuthState)
+  window.addEventListener('auth-changed', syncAuthState)
 })
 
 watch(currentPath, () => {
@@ -163,6 +180,8 @@ watch(currentPath, () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateIndicator)
+  window.removeEventListener('storage', syncAuthState)
+  window.removeEventListener('auth-changed', syncAuthState)
   if (activationTimer.value) clearTimeout(activationTimer.value)
   if (fadeTimer.value) clearTimeout(fadeTimer.value)
   if (dischargeTimer.value) clearTimeout(dischargeTimer.value)

@@ -72,6 +72,7 @@ public class AuthController {
             
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);
+            data.put("role", user.getRole());
             data.put("user", user);
             
             return Result.success(data);
@@ -96,6 +97,7 @@ public class AuthController {
             
             Map<String, Object> data = new HashMap<>();
             data.put("token", token);
+            data.put("role", user.getRole());
             data.put("user", user);
             
             return Result.success(data);

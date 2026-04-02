@@ -97,10 +97,15 @@ CREATE TABLE IF NOT EXISTS `quick_link` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='快捷链接表';
 
 INSERT INTO `user` (username, password, nickname, email, role) VALUES 
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 'Erwang', 'hello@erwang.top', 'admin');
+('admin', '$2y$10$Uom/bv1SRMLiU8g31Vcr5ejwMMX/Ev9ETHzLBFAHz9wSKo/ZFWUl.', 'Erwang', 'hello@erwang.top', 'admin');
 
 INSERT INTO `category` (name, slug, description, sort) VALUES 
 ('技术', 'tech', '技术相关文章', 1),
 ('生活', 'life', '生活随笔', 2);
 
 INSERT INTO `tag` (name) VALUES ('Java'), ('Spring Boot'), ('Vue'), ('Docker');
+
+INSERT INTO `quick_link` (`icon`, `label`, `url`, `sort`) VALUES
+('🐙', 'GitHub', 'https://github.com', 1),
+('⚡', '掘金', 'https://juejin.cn', 2),
+('✍', '知乎', 'https://zhihu.com', 3);

@@ -12,6 +12,7 @@ com/erwang/blog/controller/AdminController.class
 com/erwang/blog/controller/ArticleController.class
 com/erwang/blog/service/impl/UserServiceImpl.class
 com/erwang/blog/BlogApplication.class
+com/erwang/blog/config/MybatisPlusConfig.class
 com/erwang/blog/common/Result.class
 com/erwang/blog/mapper/ArticleLikeMapper.class
 com/erwang/blog/mapper/QuickLinkMapper.class

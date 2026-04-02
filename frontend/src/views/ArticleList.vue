@@ -215,27 +215,9 @@ onUnmounted(() => {
           </div>
           <div class="hero-hud-panel">
             <div class="hud-header">
-              <span class="hud-title">博客概览</span>
+              <span class="hud-title">快捷操作</span>
             </div>
             <div class="hud-content">
-              <div class="hud-blog-summary">
-                <div class="summary-item">
-                  <span class="summary-value">{{ totalArticleCount }}</span>
-                  <span class="summary-label">篇文章</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-value">{{ featuredCount }}</span>
-                  <span class="summary-label">篇精选</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-value">{{ categoryCount }}</span>
-                  <span class="summary-label">个分类</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-value">{{ tagCount }}</span>
-                  <span class="summary-label">个标签</span>
-                </div>
-              </div>
               <div class="hud-quick-nav">
                 <button 
                   class="hud-nav-btn"
@@ -277,42 +259,72 @@ onUnmounted(() => {
 
       <div class="articles-layout">
         <aside class="articles-sidebar-left">
-          <div class="info-card info-card-categories">
+          <!-- 博客概览 -->
+          <div class="info-card info-card-overview">
             <div class="info-card-header">
               <span class="info-card-icon">◈</span>
-              <span class="info-card-title">分类导航</span>
+              <span class="info-card-title">博客概览</span>
             </div>
-            <ul class="info-card-list">
-              <li 
-                v-for="category in categories" 
+            <div class="overview-stats">
+              <div class="overview-stat">
+                <span class="overview-value">{{ totalArticleCount }}</span>
+                <span class="overview-label">文章</span>
+              </div>
+              <div class="overview-stat">
+                <span class="overview-value">{{ featuredCount }}</span>
+                <span class="overview-label">精选</span>
+              </div>
+              <div class="overview-stat">
+                <span class="overview-value">{{ categoryCount }}</span>
+                <span class="overview-label">分类</span>
+              </div>
+              <div class="overview-stat">
+                <span class="overview-value">{{ tagCount }}</span>
+                <span class="overview-label">标签</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 分类统计 -->
+          <div class="info-card info-card-category-stats">
+            <div class="info-card-header">
+              <span class="info-card-icon">▤</span>
+              <span class="info-card-title">分类统计</span>
+            </div>
+            <div class="category-stats-list">
+              <div 
+                v-for="(category, index) in categories" 
                 :key="category"
-                class="info-card-item"
+                class="category-stat-item"
                 :class="{ active: selectedCategory === category }"
                 @click="handleCategoryFilter(category)"
               >
-                <span class="item-marker">▸</span>
-                <span class="item-text">{{ category }}</span>
-              </li>
+                <span class="category-name">{{ category }}</span>
+                <span class="category-bar">
+                  <span class="category-bar-fill" :style="{ width: `${30 + (index * 15)}%` }"></span>
+                </span>
+              </div>
               <li v-if="categories.length === 0" class="info-card-empty">加载中...</li>
-            </ul>
+            </div>
           </div>
-          <div class="info-card info-card-tags">
+          
+          <!-- 热门文章 -->
+          <div class="info-card info-card-hot">
             <div class="info-card-header">
-              <span class="info-card-icon">#</span>
-              <span class="info-card-title">标签云</span>
+              <span class="info-card-icon">★</span>
+              <span class="info-card-title">热门文章</span>
             </div>
-            <div class="info-card-tags-list">
-              <span 
-                v-for="tag in tags" 
-                :key="tag"
-                class="info-tag"
-                :class="{ active: selectedTag === tag }"
-                @click="handleTagFilter(tag)"
+            <ul class="hot-articles-list">
+              <li 
+                v-for="article in (featuredArticles.length ? featuredArticles : articles.slice(0, 5))" 
+                :key="article.id"
+                class="hot-article-item"
               >
-                {{ tag }}
-              </span>
-              <span v-if="tags.length === 0" class="info-card-empty">加载中...</span>
-            </div>
+                <span class="hot-article-title">{{ article.title }}</span>
+                <span class="hot-article-meta" v-if="article.category">{{ article.category }} · {{ article.views || 0 }}阅读</span>
+              </li>
+              <li v-if="!featuredArticles.length && !articles.length" class="info-card-empty">暂无文章</li>
+            </ul>
           </div>
         </aside>
 
@@ -422,57 +434,6 @@ onUnmounted(() => {
             />
           </div>
         </section>
-
-        <aside class="articles-sidebar-right">
-          <div class="info-card info-card-hot">
-            <div class="info-card-header">
-              <span class="info-card-icon">★</span>
-              <span class="info-card-title">热门文章</span>
-            </div>
-            <ul class="hot-articles-list">
-              <li 
-                v-for="article in (featuredArticles.length ? featuredArticles : articles.slice(0, 5))" 
-                :key="article.id"
-                class="hot-article-item"
-              >
-                <span class="hot-article-title">{{ article.title }}</span>
-                <span class="hot-article-meta" v-if="article.category">{{ article.category }}</span>
-              </li>
-              <li v-if="!featuredArticles.length && !articles.length" class="info-card-empty">暂无文章</li>
-            </ul>
-          </div>
-          <div class="info-card info-card-category-stats">
-            <div class="info-card-header">
-              <span class="info-card-icon">▤</span>
-              <span class="info-card-title">分类统计</span>
-            </div>
-            <div class="category-stats-list">
-              <div 
-                v-for="(category, index) in categories" 
-                :key="category"
-                class="category-stat-item"
-                :class="{ active: selectedCategory === category }"
-                @click="handleCategoryFilter(category)"
-              >
-                <span class="category-name">{{ category }}</span>
-                <span class="category-bar">
-                  <span class="category-bar-fill" :style="{ width: `${30 + (index * 15)}%` }"></span>
-                </span>
-              </div>
-              <li v-if="categories.length === 0" class="info-card-empty">加载中...</li>
-            </div>
-          </div>
-          <div class="info-card info-card-current-page" v-if="total > 0">
-            <div class="info-card-header">
-              <span class="info-card-icon">◷</span>
-              <span class="info-card-title">分页信息</span>
-            </div>
-            <div class="page-info-display">
-              <span class="page-info-text">第 {{ currentPage }} / {{ Math.ceil(total / pageSize) }} 页</span>
-              <span class="page-info-detail">共 {{ total }} 篇</span>
-            </div>
-          </div>
-        </aside>
       </div>
     </main>
 
@@ -1217,21 +1178,19 @@ onUnmounted(() => {
   align-items: start;
 }
 
-.articles-sidebar-left,
-.articles-sidebar-right {
+.articles-sidebar-left {
   display: flex;
   flex-direction: column;
   gap: 18px;
-}
-
-.articles-sidebar-left {
   position: sticky;
   top: 100px;
+  width: 280px;
+  flex-shrink: 0;
 }
 
-.articles-sidebar-right {
-  position: sticky;
-  top: 100px;
+.articles-section {
+  flex: 1;
+  min-width: 0;
 }
 
 .info-card {
@@ -1319,7 +1278,40 @@ onUnmounted(() => {
   padding: 12px 0;
 }
 
-.info-card-tags-list {
+/* Overview stats in left sidebar */
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.overview-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px;
+  background: rgba(0, 240, 255, 0.04);
+  border: 1px solid rgba(0, 240, 255, 0.08);
+  border-radius: 6px;
+}
+
+.overview-value {
+  font-family: var(--heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.overview-label {
+  font-size: 10px;
+  color: var(--text);
+  opacity: 0.6;
+  font-family: var(--mono);
+}
+
+/* Hot articles in left sidebar */
+.hot-articles-list {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;

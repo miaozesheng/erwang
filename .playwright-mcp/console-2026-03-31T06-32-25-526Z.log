@@ -1,0 +1,33 @@
+[    1406ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/quick-links:0
+[    1407ms] [ERROR] Failed to fetch quick links: AxiosError: Request failed with status code 502
+    at G_ (https://erwang.me/assets/api-CvMNnW40.js:4:1071)
+    at XMLHttpRequest.g (https://erwang.me/assets/api-CvMNnW40.js:4:5647)
+    at Pv.request (https://erwang.me/assets/api-CvMNnW40.js:6:1994)
+    at async https://erwang.me/assets/index-C80i5IzD.js:50:47567 @ https://erwang.me/assets/index-C80i5IzD.js:49
+[    1520ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/categories:0
+[    1521ms] [ERROR] Failed to fetch filters: AxiosError: Request failed with status code 502
+    at G_ (https://erwang.me/assets/api-CvMNnW40.js:4:1071)
+    at XMLHttpRequest.g (https://erwang.me/assets/api-CvMNnW40.js:4:5647)
+    at Pv.request (https://erwang.me/assets/api-CvMNnW40.js:6:1994)
+    at async Promise.all (index 0)
+    at async mt (https://erwang.me/assets/ArticleList-CpMGiD8R.js:1:4087) @ https://erwang.me/assets/ArticleList-CpMGiD8R.js:0
+[    1522ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/tags:0
+[    1522ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/articles?page=1&size=10:0
+[    1522ms] [ERROR] Failed to fetch articles: AxiosError: Request failed with status code 502
+    at G_ (https://erwang.me/assets/api-CvMNnW40.js:4:1071)
+    at XMLHttpRequest.g (https://erwang.me/assets/api-CvMNnW40.js:4:5647)
+    at Pv.request (https://erwang.me/assets/api-CvMNnW40.js:6:1994)
+    at async J (https://erwang.me/assets/ArticleList-CpMGiD8R.js:1:3617) @ https://erwang.me/assets/ArticleList-CpMGiD8R.js:0
+[  196977ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/auth/register:0
+[  196977ms] [ERROR] Register failed: AxiosError: Request failed with status code 502
+    at G_ (https://erwang.me/assets/api-CvMNnW40.js:4:1071)
+    at XMLHttpRequest.g (https://erwang.me/assets/api-CvMNnW40.js:4:5647)
+    at Pv.request (https://erwang.me/assets/api-CvMNnW40.js:6:1994)
+    at async L (https://erwang.me/assets/Register-1xHQEqa7.js:1:1253) @ https://erwang.me/assets/Register-1xHQEqa7.js:0
+[  224838ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/auth/register:0
+[  224839ms] [ERROR] Register failed: AxiosError: Request failed with status code 502
+    at G_ (https://erwang.me/assets/api-CvMNnW40.js:4:1071)
+    at XMLHttpRequest.g (https://erwang.me/assets/api-CvMNnW40.js:4:5647)
+    at Pv.request (https://erwang.me/assets/api-CvMNnW40.js:6:1994)
+    at async L (https://erwang.me/assets/Register-1xHQEqa7.js:1:1253) @ https://erwang.me/assets/Register-1xHQEqa7.js:0
+[  227522ms] [ERROR] Failed to load resource: the server responded with a status of 502 () @ https://erwang.me/api/auth/login:0
