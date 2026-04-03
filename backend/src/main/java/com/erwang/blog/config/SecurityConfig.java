@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,8 +18,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+import org.springframework.http.HttpMethod;
+
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
     
@@ -34,12 +38,14 @@ public class SecurityConfig {
             .cors().and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/auth/info").authenticated()
                 .antMatchers("/api/articles").permitAll()
                 .antMatchers("/api/articles/*").permitAll()
                 .antMatchers("/api/categories").permitAll()
                 .antMatchers("/api/tags").permitAll()
-                .antMatchers("/api/files/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/files/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/files/**").authenticated()
                 .antMatchers("/api/quick-links").permitAll()
                 .antMatchers("/api/interaction/status/**").permitAll()
                 .antMatchers("/api/admin/**").hasRole("ADMIN")

@@ -5,6 +5,8 @@ import com.erwang.blog.common.Result;
 import com.erwang.blog.entity.*;
 import com.erwang.blog.mapper.ArticleFavoriteMapper;
 import com.erwang.blog.mapper.ArticleLikeMapper;
+import com.erwang.blog.mapper.ArticleMapper;
+import com.erwang.blog.mapper.ArticleTagMapper;
 import com.erwang.blog.service.ArticleService;
 import com.erwang.blog.service.CategoryService;
 import com.erwang.blog.service.TagService;
@@ -22,6 +24,8 @@ public class InteractionController {
 
     private final ArticleLikeMapper likeMapper;
     private final ArticleFavoriteMapper favoriteMapper;
+    private final ArticleMapper articleMapper;
+    private final ArticleTagMapper articleTagMapper;
     private final ArticleService articleService;
     private final CategoryService categoryService;
     private final TagService tagService;
@@ -113,11 +117,23 @@ public class InteractionController {
 
     private List<Map<String, Object>> buildArticleListByIds(List<Long> ids) {
         if (ids.isEmpty()) return new ArrayList<>();
+
+        List<Article> articles = articleMapper.selectBatchIds(ids);
+        Map<Long, Article> articleMap = articles.stream().collect(Collectors.toMap(Article::getId, a -> a));
+
         Map<Long, String> catMap = categoryService.listAll().stream().collect(Collectors.toMap(Category::getId, Category::getName));
         Map<Long, String> tagMap = tagService.listAll().stream().collect(Collectors.toMap(Tag::getId, Tag::getName));
+
+        LambdaQueryWrapper<ArticleTag> tagWrapper = new LambdaQueryWrapper<>();
+        tagWrapper.in(ArticleTag::getArticleId, ids);
+        List<ArticleTag> allTags = articleTagMapper.selectList(tagWrapper);
+        Map<Long, List<String>> tagsByArticle = allTags.stream()
+                .collect(Collectors.groupingBy(ArticleTag::getArticleId,
+                        Collectors.mapping(at -> tagMap.get(at.getTagId()), Collectors.toList())));
+
         List<Map<String, Object>> result = new ArrayList<>();
         for (Long id : ids) {
-            Article article = articleService.getById(id);
+            Article article = articleMap.get(id);
             if (article == null) continue;
             Map<String, Object> item = new HashMap<>();
             item.put("id", article.getId());
@@ -126,8 +142,8 @@ public class InteractionController {
             item.put("category", catMap.get(article.getCategoryId()));
             item.put("created_at", article.getCreatedAt());
             item.put("views", article.getViews());
-            List<Long> tagIds = articleService.getTagIdsByArticleId(article.getId());
-            item.put("tags", tagIds.stream().map(tagMap::get).filter(Objects::nonNull).collect(Collectors.toList()));
+            List<String> articleTags = tagsByArticle.getOrDefault(article.getId(), Collections.emptyList());
+            item.put("tags", articleTags.stream().filter(Objects::nonNull).collect(Collectors.toList()));
             result.add(item);
         }
         return result;

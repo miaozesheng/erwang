@@ -142,23 +142,11 @@ const clearAllFilters = () => {
   fetchArticles()
 }
 
-const activeFiltersCount = computed(() => {
-  let count = 0
-  if (keyword.value) count++
-  if (selectedCategory.value) count++
-  if (selectedTag.value) count++
-  return count
-})
-
 const featuredCount = computed(() => featuredArticles.value.length)
 const totalArticleCount = computed(() => total.value)
 const categoryCount = computed(() => categories.value.length)
 const tagCount = computed(() => tags.value.length)
 const currentYear = new Date().getFullYear()
-const systemTime = computed(() => {
-  const now = new Date()
-  return now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-})
 
 onMounted(() => {
   typewriterTimer = useTypewriter(terminalText, typedTerminalText)
@@ -304,7 +292,7 @@ onUnmounted(() => {
                   <span class="category-bar-fill" :style="{ width: `${30 + (index * 15)}%` }"></span>
                 </span>
               </div>
-              <li v-if="categories.length === 0" class="info-card-empty">加载中...</li>
+              <div v-if="categories.length === 0" class="info-card-empty">加载中...</div>
             </div>
           </div>
           
@@ -1173,7 +1161,7 @@ onUnmounted(() => {
 /* Articles Layout - Left/Right Sidebars */
 .articles-layout {
   display: grid;
-  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr) minmax(260px, 300px);
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
   gap: 32px;
   align-items: start;
 }
@@ -1462,13 +1450,7 @@ onUnmounted(() => {
   letter-spacing: 1px;
 }
 
-/* New right sidebar content styles */
-.hot-articles-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
+/* Hot article items */
 .hot-article-item {
   display: flex;
   flex-direction: column;

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getMyFavorites, getMyLikes } from '../api'
 import Header from '../components/Header.vue'
@@ -25,6 +25,10 @@ const fetchData = async () => {
     loading.value = false
   }
 }
+
+watch(() => route.path, () => {
+  fetchData()
+})
 
 onMounted(fetchData)
 </script>

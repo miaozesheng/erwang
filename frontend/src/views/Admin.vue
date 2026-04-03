@@ -5,6 +5,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Edit, Delete, View } from '@element-plus/icons-vue'
 import { getArticles, deleteArticle, getStats, getCategories, getTags, createCategory, createTag, getQuickLinks, createQuickLink, updateQuickLink, deleteQuickLink } from '../api'
 import Header from '../components/Header.vue'
+import Footer from '../components/Footer.vue'
 
 const router = useRouter()
 const activeTab = ref('articles')
@@ -296,6 +297,7 @@ onMounted(() => {
         </div>
       </section>
     </main>
+    <Footer />
   </div>
 </template>
 

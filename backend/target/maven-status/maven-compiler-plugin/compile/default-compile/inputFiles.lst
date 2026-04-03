@@ -21,6 +21,7 @@
 /Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/mapper/ArticleTagMapper.java
 /Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/service/CategoryService.java
 /Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/entity/Article.java
+/Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/config/GlobalExceptionHandler.java
 /Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/service/ArticleService.java
 /Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/controller/ArticleController.java
 /Users/miaozesheng/study/erwang/backend/src/main/java/com/erwang/blog/BlogApplication.java

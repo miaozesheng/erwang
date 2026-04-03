@@ -1,3 +1,4 @@
+com/erwang/blog/config/GlobalExceptionHandler.class
 com/erwang/blog/service/TagService.class
 com/erwang/blog/mapper/ArticleTagMapper.class
 com/erwang/blog/service/UserService.class

@@ -66,7 +66,8 @@ const handleLogin = async () => {
     window.dispatchEvent(new Event('auth-changed'))
 
     ElMessage.success('登录成功')
-    router.push('/')
+    const redirect = route.query.redirect || '/'
+    router.push(redirect)
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || e?.message || '用户名或密码错误')
   } finally {
@@ -87,8 +88,8 @@ const handleLogin = async () => {
           <div
             class="login-bot"
             :class="{
-              'is-password-focused': isUsernameFocused,
-              'is-username-focused': isPasswordFocused
+            'is-password-focused': isPasswordFocused,
+            'is-username-focused': isUsernameFocused
             }"
             aria-hidden="true"
           >

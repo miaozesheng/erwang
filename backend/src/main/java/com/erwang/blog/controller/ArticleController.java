@@ -42,7 +42,7 @@ public class ArticleController {
                 && isBlank(tag);
 
         int pageNo = page == null ? 1 : page;
-        int pageSize = size == null ? 10 : size;
+        int pageSize = size == null ? 10 : Math.min(size, 100);
 
         IPage<Article> articlePage = articleService.listPage(pageNo, pageSize, keyword, category, tag);
         List<Article> articles = articlePage.getRecords();
@@ -88,7 +88,7 @@ public class ArticleController {
     }
     
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<Article> create(@RequestBody Map<String, Object> params) {
         Article article = new Article();
         article.setTitle((String) params.get("title"));
@@ -114,7 +114,7 @@ public class ArticleController {
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<Article> update(@PathVariable Long id, @RequestBody Map<String, Object> params) {
         Article article = articleService.getById(id);
         if (article == null) {
@@ -148,7 +148,7 @@ public class ArticleController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<Void> delete(@PathVariable Long id) {
         articleService.delete(id);
         return Result.success();

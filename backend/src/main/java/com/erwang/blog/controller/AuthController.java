@@ -15,9 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.UUID;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,6 +32,10 @@ public class AuthController {
 
     @Value("${app.upload-dir:./uploads}")
     private String uploadDirPath;
+
+    private static final Set<String> ALLOWED_AVATAR_EXTENSIONS = new HashSet<>(Arrays.asList(
+            ".jpg", ".jpeg", ".png", ".gif", ".webp"
+    ));
     
     @PostMapping("/register")
     public Result<Map<String, Object>> register(@RequestBody Map<String, String> params) {
@@ -172,11 +179,20 @@ public class AuthController {
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+            }
+
+            if (!ALLOWED_AVATAR_EXTENSIONS.contains(extension)) {
+                return Result.error("不支持的文件类型，仅允许上传图片文件");
             }
 
             String filename = UUID.randomUUID() + extension;
-            Path target = uploadDir.resolve(filename);
+            Path target = uploadDir.resolve(filename).normalize();
+
+            if (!target.startsWith(uploadDir)) {
+                return Result.error("非法文件路径");
+            }
+
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
             String url = "/api/files/" + filename;

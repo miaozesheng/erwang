@@ -24,6 +24,7 @@ const goToDetail = () => {
 }
 
 const fetchStatus = async () => {
+  if (!localStorage.getItem('token')) return
   try {
     const res = await getInteractionStatus(props.article.id)
     const d = res.data?.data || {}

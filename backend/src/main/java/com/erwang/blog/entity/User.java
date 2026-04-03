@@ -1,6 +1,7 @@
 package com.erwang.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +13,8 @@ public class User {
     private Long id;
     
     private String username;
+
+    @JsonIgnore
     private String password;
     private String nickname;
     private String avatar;

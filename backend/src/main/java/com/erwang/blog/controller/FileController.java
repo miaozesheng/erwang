@@ -17,8 +17,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +31,10 @@ public class FileController {
 
     @Value("${app.upload-dir:./uploads}")
     private String uploadDirPath;
+
+    private static final Set<String> ALLOWED_EXTENSIONS = new HashSet<>(Arrays.asList(
+            ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico", ".bmp"
+    ));
 
     @PostMapping("/upload")
     public Result<Map<String, String>> upload(@RequestParam("file") MultipartFile file) {
@@ -44,11 +51,20 @@ public class FileController {
             String originalFilename = file.getOriginalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                extension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+            }
+
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                return Result.error("不支持的文件类型，仅允许上传图片文件");
             }
 
             String filename = UUID.randomUUID() + extension;
-            Path target = uploadDir.resolve(filename);
+            Path target = uploadDir.resolve(filename).normalize();
+
+            if (!target.startsWith(uploadDir)) {
+                return Result.error("非法文件路径");
+            }
+
             Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
 
             Map<String, String> data = new HashMap<>();
@@ -62,7 +78,13 @@ public class FileController {
     @GetMapping("/{filename:.+}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(uploadDirPath).toAbsolutePath().normalize().resolve(filename).normalize();
+            Path uploadDir = Paths.get(uploadDirPath).toAbsolutePath().normalize();
+            Path filePath = uploadDir.resolve(filename).normalize();
+
+            if (!filePath.startsWith(uploadDir)) {
+                return ResponseEntity.badRequest().build();
+            }
+
             Resource resource = new UrlResource(filePath.toUri());
             if (!resource.exists() || !resource.isReadable()) {
                 return ResponseEntity.notFound().build();

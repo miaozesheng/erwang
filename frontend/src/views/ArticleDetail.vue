@@ -242,6 +242,18 @@ onMounted(() => {
   fetchRecentArticles()
 })
 
+watch(() => route.params.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    article.value = null
+    headings.value = []
+    activeHeadingId.value = ''
+    if (headingObserver) {
+      headingObserver.disconnect()
+    }
+    fetchArticle()
+  }
+})
+
 onUnmounted(() => {
   if (headingObserver) {
     headingObserver.disconnect()

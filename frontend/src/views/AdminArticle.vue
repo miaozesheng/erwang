@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getArticle, createArticle, updateArticle, getCategories, getTags, uploadFile, resolveFileUrl } from '../api'
 import Header from '../components/Header.vue'
+import Footer from '../components/Footer.vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 
@@ -324,6 +325,7 @@ onBeforeUnmount(() => {
         </div>
       </section>
     </main>
+    <Footer />
   </div>
 </template>
 

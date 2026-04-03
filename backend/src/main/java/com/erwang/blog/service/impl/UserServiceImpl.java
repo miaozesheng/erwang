@@ -51,10 +51,10 @@ public class UserServiceImpl implements UserService {
     public User login(String username, String password) {
         User user = getUserByUsername(username);
         if (user == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("用户名或密码错误");
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("密码错误");
+            throw new RuntimeException("用户名或密码错误");
         }
         if (user.getStatus() == 0) {
             throw new RuntimeException("用户已被禁用");

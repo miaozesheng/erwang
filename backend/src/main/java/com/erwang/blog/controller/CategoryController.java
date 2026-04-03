@@ -4,6 +4,7 @@ import com.erwang.blog.common.Result;
 import com.erwang.blog.entity.Category;
 import com.erwang.blog.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<Long> create(@RequestBody Map<String, String> params) {
         String name = params.get("name");
         if (name == null || name.trim().isEmpty()) {

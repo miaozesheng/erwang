@@ -25,14 +25,14 @@ public class QuickLinkController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<QuickLink> create(@RequestBody QuickLink link) {
         quickLinkMapper.insert(link);
         return Result.success(link);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<QuickLink> update(@PathVariable Long id, @RequestBody QuickLink link) {
         link.setId(id);
         quickLinkMapper.updateById(link);
@@ -40,7 +40,7 @@ public class QuickLinkController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public Result<Void> delete(@PathVariable Long id) {
         quickLinkMapper.deleteById(id);
         return Result.success();

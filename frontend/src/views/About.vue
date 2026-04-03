@@ -6,15 +6,15 @@ const techStack = [
   'Vue 3',
   'Vite',
   'Element Plus',
+  'Spring Boot',
+  'MyBatis-Plus',
+  'MySQL',
   'JavaScript',
-  'Node.js',
-  'MySQL'
+  'Java'
 ]
 
 const socials = [
-  { name: 'GitHub', link: 'https://github.com' },
-  { name: '掘金', link: 'https://juejin.cn' },
-  { name: '知乎', link: 'https://zhihu.com' }
+  { name: 'GitHub', link: 'https://github.com/erwang-blog' }
 ]
 </script>
 
@@ -30,9 +30,8 @@ const socials = [
         <div class="terminal-box">
           <p>&gt; user.init_profile()</p>
           <p>&gt; status: ONLINE</p>
-          <p>&gt; role: Full-Stack Developer (placeholder)</p>
+          <p>&gt; role: Full-Stack Developer</p>
           <p>&gt; mission: 记录技术实践，分享学习路径，持续迭代成长。</p>
-          <p>&gt; note: 请在 About.vue 中配置你的真实信息</p>
         </div>
 
         <section class="about-section">
@@ -60,9 +59,14 @@ const socials = [
 
         <section class="about-section">
           <h2 class="section-title">联系方式</h2>
-          <p class="contact-item">Email: your-email@example.com</p>
-          <p class="contact-item">WeChat: your-wechat-id</p>
           <p class="contact-item">Location: 陕西省西安市</p>
+        </section>
+
+        <section class="about-section">
+          <h2 class="section-title">关于本站</h2>
+          <p class="contact-item">本站基于 Vue 3 + Spring Boot 构建，采用赛博朋克风格设计。</p>
+          <p class="contact-item">前端使用 Vite 构建，Element Plus 组件库，Markdown 渲染支持代码高亮。</p>
+          <p class="contact-item">后端使用 Spring Boot + MyBatis-Plus + MySQL，JWT 认证鉴权。</p>
         </section>
       </section>
     </main>
