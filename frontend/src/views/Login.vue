@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { login } from '../api'
@@ -10,11 +10,27 @@ import { User, Lock } from '@element-plus/icons-vue'
 const router = useRouter()
 const route = useRoute()
 const loading = ref(false)
+const focusedField = ref('')
 
 const form = reactive({
   username: '',
   password: ''
 })
+
+const botState = computed(() => ({
+  'is-username-focused': focusedField.value === 'username',
+  'is-password-focused': focusedField.value === 'password'
+}))
+
+const setFocusedField = (field) => {
+  focusedField.value = field
+}
+
+const clearFocusedField = (field) => {
+  if (focusedField.value === field) {
+    focusedField.value = ''
+  }
+}
 
 onMounted(() => {
   if (route.query.username) {
@@ -30,7 +46,7 @@ const handleLogin = async () => {
     ElMessage.warning('请输入用户名和密码')
     return
   }
-  
+
   loading.value = true
   try {
     const res = await login(form)
@@ -69,40 +85,91 @@ const handleLogin = async () => {
 <template>
   <div class="page-container">
     <Header />
-    
+
     <main class="main-content auth-page">
-      <div class="auth-container">
-        <div class="login-header">
-          <h1 class="login-title">登录</h1>
-          <p class="login-subtitle">欢迎回来，请登录您的账户</p>
-        </div>
-        
+      <section class="auth-container">
+        <div class="auth-sheen" aria-hidden="true"></div>
+
+        <header class="login-header">
+          <div class="login-bot" :class="botState" aria-hidden="true">
+            <svg class="login-bot-svg" viewBox="0 0 180 180" role="img">
+              <defs>
+                <linearGradient id="loginBotShell" x1="18%" y1="14%" x2="82%" y2="92%">
+                  <stop offset="0%" stop-color="#fffdf8" />
+                  <stop offset="100%" stop-color="#f0ece5" />
+                </linearGradient>
+                <linearGradient id="loginBotFace" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f7f4ee" />
+                  <stop offset="100%" stop-color="#ebe5da" />
+                </linearGradient>
+              </defs>
+
+              <circle cx="90" cy="88" r="58" fill="rgba(45, 90, 74, 0.07)" />
+
+              <g transform="translate(90 26)">
+                <rect x="-2" y="0" width="4" height="18" rx="2" fill="rgba(45, 90, 74, 0.4)" />
+                <circle class="bot-antenna-tip" cx="0" cy="-4" r="5" fill="var(--accent)" />
+              </g>
+
+              <g class="bot-body" transform="translate(30 38)">
+                <rect x="18" y="76" width="84" height="40" rx="20" fill="rgba(45, 90, 74, 0.08)" />
+                <rect x="8" y="12" width="104" height="86" rx="34" fill="url(#loginBotShell)" stroke="rgba(45, 90, 74, 0.18)" stroke-width="2" />
+                <rect class="bot-face" x="22" y="24" width="76" height="48" rx="24" fill="url(#loginBotFace)" stroke="rgba(45, 90, 74, 0.1)" />
+                <circle class="bot-eye bot-eye-left" cx="50" cy="48" r="7.5" fill="var(--accent)" />
+                <circle class="bot-eye bot-eye-right" cx="70" cy="48" r="7.5" fill="var(--accent)" />
+                <path d="M48 66c6 5 18 5 24 0" stroke="rgba(87, 72, 58, 0.72)" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="35" cy="60" r="4" fill="rgba(184, 135, 112, 0.18)" />
+                <circle cx="85" cy="60" r="4" fill="rgba(184, 135, 112, 0.18)" />
+              </g>
+
+              <g class="bot-arm bot-arm-left" transform="translate(42 104)">
+                <rect x="0" y="0" width="18" height="54" rx="9" fill="#e8dfd1" stroke="rgba(45, 90, 74, 0.14)" stroke-width="1.5" />
+                <circle cx="9" cy="56" r="8" fill="#f3ede3" stroke="rgba(45, 90, 74, 0.14)" stroke-width="1.2" />
+              </g>
+
+              <g class="bot-arm bot-arm-right" transform="translate(120 104)">
+                <rect x="0" y="0" width="18" height="54" rx="9" fill="#e8dfd1" stroke="rgba(45, 90, 74, 0.14)" stroke-width="1.5" />
+                <circle cx="9" cy="56" r="8" fill="#f3ede3" stroke="rgba(45, 90, 74, 0.14)" stroke-width="1.2" />
+              </g>
+            </svg>
+          </div>
+
+          <p class="login-kicker">账户登录</p>
+          <h1 class="login-title">欢迎回来</h1>
+          <p class="login-subtitle">继续阅读、整理收藏，或回到你的个人主页。</p>
+        </header>
+
         <el-form :model="form" class="login-form" @submit.prevent="handleLogin">
           <el-form-item>
-            <el-input 
-              v-model="form.username" 
+            <el-input
+              v-model="form.username"
+              class="auth-input"
               placeholder="用户名"
               size="large"
               :prefix-icon="User"
+              @focus="setFocusedField('username')"
+              @blur="clearFocusedField('username')"
             />
           </el-form-item>
-          
+
           <el-form-item>
-            <el-input 
-              class="password-input"
-              v-model="form.password" 
+            <el-input
+              v-model="form.password"
+              class="auth-input password-input"
               type="password"
               placeholder="密码"
               size="large"
               :prefix-icon="Lock"
               show-password
+              @focus="setFocusedField('password')"
+              @blur="clearFocusedField('password')"
               @keyup.enter="handleLogin"
             />
           </el-form-item>
-          
-          <el-button 
-            type="primary" 
-            size="large" 
+
+          <el-button
+            type="primary"
+            size="large"
             :loading="loading"
             @click="handleLogin"
             class="login-btn"
@@ -115,7 +182,7 @@ const handleLogin = async () => {
             <router-link to="/register" class="register-link">立即注册</router-link>
           </p>
         </el-form>
-      </div>
+      </section>
     </main>
 
     <Footer />
@@ -134,37 +201,57 @@ const handleLogin = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: clamp(32px, 6vw, 72px) 24px;
 }
 
 .auth-page {
+  position: relative;
   background: var(--bg);
-  min-height: 100vh;
 }
 
 .auth-container {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 56px;
-  width: 100%;
-  max-width: 440px;
-  animation: slideUp 0.4s ease;
+  position: relative;
+  width: min(100%, 480px);
+  padding: clamp(30px, 5vw, 48px);
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 84%, white 16%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 245, 239, 0.94));
+  box-shadow: var(--shadow-lg);
+}
+
+.auth-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+}
+
+.auth-sheen {
+  position: absolute;
+  inset: -80px auto auto -40px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45, 90, 74, 0.12), rgba(45, 90, 74, 0));
+  pointer-events: none;
 }
 
 .login-header {
-  text-align: center;
-  margin-bottom: 32px;
   position: relative;
   z-index: 1;
+  text-align: center;
+  margin-bottom: 28px;
 }
 
 .login-bot {
-  width: 170px;
-  height: 165px;
-  margin: 0 auto 16px;
-  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.38));
-  animation: botFloat 3.2s ease-in-out infinite;
+  width: 172px;
+  height: 168px;
+  margin: 0 auto 18px;
+  filter: drop-shadow(0 18px 26px rgba(113, 92, 68, 0.14));
+  animation: bot-float 3.2s ease-in-out infinite;
 }
 
 .login-bot.is-password-focused {
@@ -178,182 +265,189 @@ const handleLogin = async () => {
 }
 
 .bot-body {
-  transform-origin: 66px 56px;
-  transition: transform 0.38s ease;
+  transform-origin: 82px 92px;
+  transition: transform var(--duration-slow) var(--ease-emphasis);
 }
 
 .bot-face {
-  transition: transform 0.3s ease;
+  transition: transform var(--duration-normal) var(--ease-out);
 }
 
 .bot-eye {
   transform-origin: center;
-  transition: transform 0.28s ease, opacity 0.28s ease, filter 0.28s ease;
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.8));
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    opacity var(--duration-normal) var(--ease-out),
+    filter var(--duration-normal) var(--ease-out);
+  filter: drop-shadow(0 2px 8px rgba(45, 90, 74, 0.28));
 }
 
 .bot-antenna-tip {
-  animation: botPulse 1.8s ease-in-out infinite;
+  animation: bot-pulse 1.8s ease-in-out infinite;
 }
 
 .bot-arm {
   transform-box: fill-box;
-  transform-origin: center top;
-  transition: transform 0.36s cubic-bezier(0.32, 0.84, 0.32, 1.08);
+  transform-origin: center 8px;
+  transition: transform var(--duration-slow) var(--ease-emphasis);
 }
 
 .bot-arm-left {
-  transform: rotate(12deg);
+  transform: rotate(10deg);
 }
 
 .bot-arm-right {
-  transform: rotate(-12deg);
+  transform: rotate(-10deg);
 }
 
 .login-bot.is-username-focused .bot-face {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .login-bot.is-username-focused .bot-eye {
-  transform: scale(1.15);
-  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 1));
-}
-
-.login-bot.is-username-focused .bot-arm-right {
-  transform: rotate(-18deg);
+  transform: scale(1.12);
+  filter: drop-shadow(0 2px 10px rgba(45, 90, 74, 0.4));
 }
 
 .login-bot.is-username-focused .bot-arm-left {
-  transform: rotate(18deg);
+  transform: rotate(16deg) translateY(-1px);
+}
+
+.login-bot.is-username-focused .bot-arm-right {
+  transform: rotate(-16deg) translateY(-1px);
 }
 
 .login-bot.is-password-focused .bot-body {
-  transform: rotate(-4deg) translateY(2px);
+  transform: rotate(-2deg) translateY(2px);
 }
 
 .login-bot.is-password-focused .bot-arm-left {
-  transform: translate(34px, -72px) rotate(-128deg);
+  transform: translate(32px, -68px) rotate(-118deg);
 }
 
 .login-bot.is-password-focused .bot-arm-right {
-  transform: translate(-34px, -72px) rotate(128deg);
+  transform: translate(-32px, -68px) rotate(118deg);
 }
 
 .login-bot.is-password-focused .bot-eye {
-  transform: scaleY(0.1);
-  opacity: 0.01;
+  transform: scaleY(0.12);
+  opacity: 0.04;
   filter: none;
 }
 
-@keyframes botFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes botPulse {
-  0%, 100% { opacity: 0.72; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.14); }
-}
-
-@keyframes botWave {
-  from { transform: translate(-8px, -10px) rotate(-44deg); }
-  to { transform: translate(-12px, -8px) rotate(-24deg); }
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 32px;
+.login-kicker {
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .login-title {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: clamp(30px, 4vw, 36px);
+  letter-spacing: -0.03em;
   color: var(--text-h);
-  margin: 0;
-  font-family: var(--heading);
 }
 
 .login-subtitle {
-  margin: 8px 0 0;
-  color: var(--text);
-  font-size: 14px;
+  margin: 12px auto 0;
+  max-width: 28ch;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .login-form {
-  margin-top: 24px;
   position: relative;
   z-index: 1;
 }
 
-:deep(.el-input__wrapper) {
-  background: #ffffff !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: none !important;
+.login-form :deep(.el-form-item) {
+  margin-bottom: 16px;
 }
 
-:deep(.el-input__wrapper:hover),
-:deep(.el-input__wrapper.is-focus) {
-  border-color: var(--accent) !important;
+.auth-input :deep(.el-input__wrapper) {
+  min-height: 52px;
+  padding-inline: 14px;
 }
 
-:deep(.el-input__inner) {
-  color: var(--text-h);
-}
-
-:deep(.el-input__inner::placeholder) {
-  color: var(--text-dimmed, #9ca3af);
+.auth-input :deep(.el-input__prefix) {
+  color: var(--text-muted);
 }
 
 .login-btn {
   width: 100%;
-  height: 48px;
-  background: var(--accent);
-  border-color: var(--accent);
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 16px;
-  color: #ffffff;
-  letter-spacing: 0.8px;
-  font-family: var(--heading);
-  transition: all var(--duration-normal) ease;
-}
-
-.login-btn:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.login-btn:active {
-  transform: scale(0.97);
+  min-height: 52px;
+  margin-top: 6px;
+  font-size: 15px;
+  letter-spacing: 0.08em;
 }
 
 .register-entry {
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   text-align: center;
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 13px;
-  letter-spacing: 0.3px;
 }
 
 .register-link {
-  color: var(--accent);
   margin-left: 4px;
   font-family: var(--heading);
-  letter-spacing: 0.6px;
 }
 
-.register-link:hover {
-  color: var(--accent-hover);
+@keyframes bot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
-@media (max-width: 480px) {
-  .login-card {
-    padding: 32px 24px;
+@keyframes bot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .main-content {
+    padding-inline: 16px;
+  }
+
+  .auth-container {
+    border-radius: 24px;
+    padding: 28px 22px;
   }
 
   .login-bot {
-    width: 130px;
-    height: 126px;
+    width: 146px;
+    height: 144px;
+    margin-bottom: 14px;
+  }
+
+  .login-subtitle {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-bot,
+  .bot-body,
+  .bot-face,
+  .bot-eye,
+  .bot-arm,
+  .bot-antenna-tip {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>

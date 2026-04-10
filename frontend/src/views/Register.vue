@@ -6,6 +6,7 @@ import { Lock, Message, Phone, User } from '@element-plus/icons-vue'
 import { register as registerUser } from '../api'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
+import BrandMark from '../components/BrandMark.vue'
 
 const router = useRouter()
 const loading = ref(false)
@@ -19,8 +20,13 @@ const form = reactive({
 })
 
 const accountLabel = computed(() => (registerMode.value === 'email' ? '邮箱' : '手机号'))
-const accountPlaceholder = computed(() => (registerMode.value === 'email' ? '请输入邮箱地址' : '请输入手机号'))
+const accountPlaceholder = computed(() => (registerMode.value === 'email' ? '常用邮箱地址' : '常用手机号'))
 const accountIcon = computed(() => (registerMode.value === 'email' ? Message : Phone))
+const accountHint = computed(() => (
+  registerMode.value === 'email'
+    ? '用来识别你的账号；只在必要时联系你。'
+    : '适合想尽快开始阅读和收藏的你。'
+))
 
 const switchMode = (mode) => {
   if (registerMode.value === mode) return
@@ -33,32 +39,32 @@ const handleRegister = async () => {
   const account = form.account.trim()
 
   if (!username) {
-    ElMessage.warning('请输入用户名')
+    ElMessage.warning('请先填写用户名')
     return
   }
 
   if (!account) {
-    ElMessage.warning(`请输入${accountLabel.value}`)
+    ElMessage.warning(`请填写${accountLabel.value}`)
     return
   }
 
   if (registerMode.value === 'email' && !/^\S+@\S+\.\S+$/.test(account)) {
-    ElMessage.warning('邮箱格式不正确')
+    ElMessage.warning('邮箱格式看起来不太对')
     return
   }
 
   if (registerMode.value === 'phone' && !/^1\d{10}$/.test(account)) {
-    ElMessage.warning('手机号格式不正确')
+    ElMessage.warning('手机号格式看起来不太对')
     return
   }
 
   if (!form.password || !form.confirmPassword) {
-    ElMessage.warning('请输入密码并确认密码')
+    ElMessage.warning('请设置密码，并再确认一次')
     return
   }
 
   if (form.password !== form.confirmPassword) {
-    ElMessage.warning('两次输入的密码不一致')
+    ElMessage.warning('两次输入的密码还不一致')
     return
   }
 
@@ -71,11 +77,10 @@ const handleRegister = async () => {
       phone: registerMode.value === 'phone' ? account : undefined
     }
     await registerUser(payload)
-    ElMessage.success('注册成功，请登录')
+    ElMessage.success('账号创建成功，请登录')
     router.push({ path: '/login', query: { registered: '1', username } })
   } catch (error) {
-    console.error('Register failed:', error)
-    ElMessage.error(error?.response?.data?.message || '注册失败，请稍后重试')
+    ElMessage.error(error?.response?.data?.message || '注册暂时没有完成，请稍后再试')
   } finally {
     loading.value = false
   }
@@ -86,51 +91,22 @@ const handleRegister = async () => {
   <div class="page-container">
     <Header />
 
-    <main class="main-content">
-      <section class="register-card">
+    <main class="main-content auth-page">
+      <section class="auth-container register-shell">
+        <div class="auth-sheen" aria-hidden="true"></div>
+
         <header class="register-header">
-          <div class="register-bot" aria-hidden="true">
-            <svg class="register-bot-svg" viewBox="0 0 180 170" role="img">
-              <defs>
-                <radialGradient id="registerBotCore" cx="50%" cy="35%" r="86%">
-                  <stop offset="0%" stop-color="rgba(0, 240, 255, 0.24)" />
-                  <stop offset="100%" stop-color="rgba(8, 17, 33, 0.95)" />
-                </radialGradient>
-                <linearGradient id="registerBotShell" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#143052" />
-                  <stop offset="100%" stop-color="#0a1b33" />
-                </linearGradient>
-              </defs>
-
-              <g transform="translate(90 16)">
-                <rect x="-2" y="0" width="4" height="18" rx="2" fill="rgba(140, 245, 255, 0.72)" />
-                <circle class="bot-signal" cx="0" cy="-4" r="5" fill="var(--accent)" />
-              </g>
-
-              <g transform="translate(22 30)">
-                <rect x="0" y="0" width="136" height="106" rx="34" fill="url(#registerBotShell)" stroke="var(--accent)" stroke-opacity="0.66" stroke-width="2" />
-                <rect x="10" y="10" width="116" height="86" rx="28" fill="url(#registerBotCore)" />
-
-                <g transform="translate(68 52)">
-                  <rect x="-44" y="-20" width="88" height="40" rx="20" fill="#031120" stroke="rgba(0, 240, 255, 0.34)" stroke-width="1.5" />
-                  <circle class="eye eye-left" cx="-20" cy="0" r="8" fill="var(--accent)" />
-                  <circle class="eye eye-right" cx="20" cy="0" r="8" fill="var(--accent-secondary)" />
-                </g>
-              </g>
-
-              <g class="register-bot-arm left" transform="translate(30 94)">
-                <rect x="0" y="0" width="20" height="52" rx="10" fill="#112540" stroke="rgba(0, 240, 255, 0.45)" stroke-width="1.5" />
-                <circle cx="10" cy="54" r="8" fill="#102239" stroke="rgba(0, 240, 255, 0.58)" stroke-width="1.4" />
-              </g>
-              <g class="register-bot-arm right" transform="translate(130 94)">
-                <rect x="0" y="0" width="20" height="52" rx="10" fill="#112540" stroke="rgba(0, 240, 255, 0.45)" stroke-width="1.5" />
-                <circle cx="10" cy="54" r="8" fill="#102239" stroke="rgba(0, 240, 255, 0.58)" stroke-width="1.4" />
-              </g>
-            </svg>
+          <div class="register-emblem" aria-hidden="true">
+            <span class="register-emblem-ring ring-outer"></span>
+            <span class="register-emblem-ring ring-inner"></span>
+            <span class="register-note note-left"></span>
+            <span class="register-note note-right"></span>
+            <BrandMark class="register-mark" :size="72" />
           </div>
 
-          <h1 class="register-title">注册</h1>
-          <p class="register-terminal">新身份写入协议 / CREATE-CREW-ID</p>
+          <p class="register-kicker">新读者加入</p>
+          <h1 class="register-title">把名字留在这里</h1>
+          <p class="register-subtitle">用邮箱或手机号创建账号，之后就能收藏文章、继续阅读，也更容易找到你真正想回看的内容。</p>
         </header>
 
         <div class="register-mode-switch" role="tablist" aria-label="注册方式">
@@ -140,7 +116,7 @@ const handleRegister = async () => {
             :class="{ active: registerMode === 'email' }"
             @click="switchMode('email')"
           >
-            邮箱注册
+            用邮箱
           </button>
           <button
             type="button"
@@ -148,15 +124,18 @@ const handleRegister = async () => {
             :class="{ active: registerMode === 'phone' }"
             @click="switchMode('phone')"
           >
-            手机号注册
+            用手机号
           </button>
         </div>
+
+        <p class="register-hint">{{ accountHint }}</p>
 
         <el-form :model="form" class="register-form" @submit.prevent="handleRegister">
           <el-form-item>
             <el-input
               v-model="form.username"
-              placeholder="用户名"
+              class="auth-input"
+              placeholder="你想被怎么称呼"
               size="large"
               :prefix-icon="User"
             />
@@ -165,6 +144,7 @@ const handleRegister = async () => {
           <el-form-item>
             <el-input
               v-model="form.account"
+              class="auth-input"
               :placeholder="accountPlaceholder"
               size="large"
               :prefix-icon="accountIcon"
@@ -174,8 +154,9 @@ const handleRegister = async () => {
           <el-form-item>
             <el-input
               v-model="form.password"
+              class="auth-input"
               type="password"
-              placeholder="密码"
+              placeholder="设置登录密码"
               size="large"
               :prefix-icon="Lock"
               show-password
@@ -185,8 +166,9 @@ const handleRegister = async () => {
           <el-form-item>
             <el-input
               v-model="form.confirmPassword"
+              class="auth-input"
               type="password"
-              placeholder="确认密码"
+              placeholder="再输入一次密码"
               size="large"
               :prefix-icon="Lock"
               show-password
@@ -201,12 +183,12 @@ const handleRegister = async () => {
             :loading="loading"
             @click="handleRegister"
           >
-            提交注册
+            创建账号
           </el-button>
 
           <p class="login-entry">
-            已有账号？
-            <router-link to="/login" class="login-link">立即登录</router-link>
+            已经有账号了？
+            <router-link to="/login" class="login-link">回到登录</router-link>
           </p>
         </el-form>
       </section>
@@ -228,240 +210,272 @@ const handleRegister = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 24px;
+  padding: clamp(32px, 6vw, 72px) 24px;
+}
+
+.auth-page {
   position: relative;
   background: var(--bg);
 }
 
-.register-card {
-  width: 100%;
-  max-width: 432px;
+.auth-container {
   position: relative;
+  width: min(100%, 500px);
+  padding: clamp(30px, 5vw, 48px);
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 84%, white 16%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 245, 239, 0.94));
   box-shadow: var(--shadow-lg);
-  padding: 40px;
-  animation: register-slide-up 0.42s ease;
+}
+
+.auth-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+}
+
+.auth-sheen {
+  position: absolute;
+  inset: -86px auto auto -48px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(45, 90, 74, 0.12), rgba(45, 90, 74, 0));
+  pointer-events: none;
 }
 
 .register-header {
-  text-align: center;
-  margin-bottom: 22px;
   position: relative;
   z-index: 1;
+  text-align: center;
+  margin-bottom: 26px;
 }
 
-.register-bot {
-  width: 136px;
-  height: 128px;
-  margin: 0 auto 12px;
-  animation: register-bot-float 3.4s ease-in-out infinite;
+.register-emblem {
+  position: relative;
+  width: 172px;
+  height: 150px;
+  margin: 0 auto 20px;
+  display: grid;
+  place-items: center;
+  animation: emblem-float 4s ease-in-out infinite;
 }
 
-.register-bot-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+.register-mark {
+  position: relative;
+  z-index: 2;
+  box-shadow: var(--shadow-sm);
 }
 
-.bot-signal {
-  animation: register-bot-pulse 1.8s ease-in-out infinite;
+.register-emblem-ring,
+.register-note {
+  position: absolute;
+  border-radius: 999px;
 }
 
-.eye {
-  transform-origin: center;
-  animation: register-eye-blink 4.2s ease-in-out infinite;
+.register-emblem-ring {
+  inset: 26px;
+  border: 1px solid rgba(45, 90, 74, 0.12);
 }
 
-.register-bot-arm {
-  transform-origin: 10px 10px;
-  animation: register-arm-swing 2.5s ease-in-out infinite alternate;
+.register-emblem-ring.ring-outer {
+  inset: 10px;
+  border-style: dashed;
+  opacity: 0.7;
 }
 
-.register-bot-arm.right {
-  animation-delay: 0.5s;
+.register-note {
+  width: 54px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 82%, white 18%);
+  box-shadow: var(--shadow-sm);
+}
+
+.register-note::before,
+.register-note::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: rgba(45, 90, 74, 0.18);
+}
+
+.register-note::before {
+  top: 5px;
+}
+
+.register-note::after {
+  top: 9px;
+}
+
+.register-note.note-left {
+  top: 34px;
+  left: 6px;
+  transform: rotate(-10deg);
+}
+
+.register-note.note-right {
+  right: 4px;
+  bottom: 28px;
+  transform: rotate(12deg);
+}
+
+.register-kicker {
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .register-title {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 700;
+  font-size: clamp(30px, 4vw, 36px);
+  letter-spacing: -0.03em;
   color: var(--text-h);
-  letter-spacing: 1px;
-  font-family: var(--heading);
 }
 
-.register-terminal {
-  margin: 10px 0 0;
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 1px;
-  opacity: 0.82;
+.register-subtitle {
+  margin: 12px auto 0;
+  max-width: 30ch;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.7;
 }
 
 .register-mode-switch {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 18px;
   position: relative;
   z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 84%, white 16%);
 }
 
 .mode-tab {
-  border: 1px solid var(--border);
-  background: #ffffff;
+  min-height: 42px;
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--text-muted);
   font-family: var(--heading);
-  font-size: 12px;
-  letter-spacing: 0.6px;
-  padding: 10px 8px;
-  border-radius: 10px;
-  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  border-radius: 14px;
   transition:
-    color var(--duration-normal) ease,
-    border-color var(--duration-normal) ease,
-    background var(--duration-normal) ease;
+    color var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .mode-tab:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  color: var(--text-h);
+  background: rgba(255, 255, 255, 0.84);
 }
 
 .mode-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #ffffff;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, white 90%);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border-strong));
+  box-shadow: var(--shadow-sm);
+}
+
+.register-hint {
+  margin: 12px 4px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .register-form {
-  margin-top: 8px;
   position: relative;
   z-index: 1;
+  margin-top: 18px;
 }
 
-:deep(.el-input__wrapper) {
-  background: #ffffff !important;
-  border: 1px solid var(--border) !important;
-  box-shadow: none;
+.register-form :deep(.el-form-item) {
+  margin-bottom: 16px;
 }
 
-:deep(.el-input__wrapper:hover),
-:deep(.el-input__wrapper.is-focus) {
-  border-color: var(--accent);
+.auth-input :deep(.el-input__wrapper) {
+  min-height: 52px;
+  padding-inline: 14px;
 }
 
-:deep(.el-input__inner) {
-  color: var(--text-h);
-}
-
-:deep(.el-input__inner::placeholder) {
+.auth-input :deep(.el-input__prefix) {
   color: var(--text-muted);
 }
 
 .register-btn {
   width: 100%;
-  height: 48px;
-  margin-top: 10px;
-  border: 1px solid transparent;
-  background: var(--accent);
-  color: #04131a;
-  font-family: var(--heading);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  transition: transform var(--duration-normal) ease, background var(--duration-normal) ease;
-}
-
-.register-btn:hover {
-  background: var(--accent-hover);
-}
-
-.register-btn:active {
-  transform: scale(0.97);
+  min-height: 52px;
+  margin-top: 6px;
+  font-size: 15px;
+  letter-spacing: 0.08em;
 }
 
 .login-entry {
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   text-align: center;
   color: var(--text-muted);
   font-size: 13px;
-  letter-spacing: 0.3px;
 }
 
 .login-link {
-  color: var(--accent);
   margin-left: 4px;
   font-family: var(--heading);
-  letter-spacing: 0.6px;
 }
 
-.login-link:hover {
-  color: var(--accent-hover);
-}
-
-@keyframes register-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes register-bot-float {
+@keyframes emblem-float {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-5px);
   }
 }
 
-@keyframes register-bot-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.72;
+@media (max-width: 560px) {
+  .main-content {
+    padding-inline: 16px;
   }
-  50% {
-    transform: scale(1.14);
-    opacity: 1;
+
+  .auth-container {
+    border-radius: 24px;
+    padding: 28px 22px;
+  }
+
+  .register-emblem {
+    width: 154px;
+    height: 138px;
+    margin-bottom: 16px;
+  }
+
+  .register-subtitle {
+    font-size: 14px;
+  }
+
+  .register-mode-switch {
+    gap: 6px;
+    padding: 5px;
   }
 }
 
-@keyframes register-eye-blink {
-  0%,
-  44%,
-  100% {
-    transform: scaleY(1);
-  }
-  46%,
-  48% {
-    transform: scaleY(0.2);
-  }
-}
-
-@keyframes register-arm-swing {
-  from {
-    transform: rotate(-10deg);
-  }
-  to {
-    transform: rotate(10deg);
-  }
-}
-
-@media (max-width: 480px) {
-  .register-card {
-    padding: 32px 24px;
+@media (prefers-reduced-motion: reduce) {
+  .register-emblem,
+  .mode-tab {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
