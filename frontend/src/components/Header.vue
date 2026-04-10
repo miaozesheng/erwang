@@ -12,17 +12,18 @@ const hasToken = () => !!localStorage.getItem('token')
 const isLoggedIn = ref(hasToken())
 const userRole = ref(normalizeRole(localStorage.getItem('userRole') || ''))
 const userInfo = ref({
-  avatar: localStorage.getItem('userAvatar') || ''
+  avatar: localStorage.getItem('userAvatar') || '',
+  avatarVersion: localStorage.getItem('avatarVersion') || ''
 })
 
-const displayAvatar = computed(() => resolveFileUrl(userInfo.value.avatar))
+const displayAvatar = computed(() => resolveFileUrl(userInfo.value.avatar, userInfo.value.avatarVersion))
 
 const isAdmin = computed(() => normalizeRole(userRole.value) === 'admin')
 
 const navItems = computed(() => {
   const base = [
     { icon: '◈', label: '首页', path: '/' },
-    { icon: '⟐', label: '关于', path: '/about' },
+    { icon: '🔥', label: 'GitHub', path: '/github' },
   ]
   if (isLoggedIn.value) {
     base.push(
@@ -124,13 +125,22 @@ const fetchUserInfo = async () => {
   try {
     const res = await getUserInfo()
     const user = res.data?.data || {}
+    const avatarVersion = user.updatedAt || user.avatarUpdatedAt || ''
     userInfo.value = {
       ...userInfo.value,
       ...user,
-      avatar: user.avatar || ''
+      avatar: user.avatar || '',
+      avatarVersion
     }
     if (user.avatar) {
       localStorage.setItem('userAvatar', user.avatar)
+    } else {
+      localStorage.removeItem('userAvatar')
+    }
+    if (avatarVersion) {
+      localStorage.setItem('avatarVersion', avatarVersion)
+    } else {
+      localStorage.removeItem('avatarVersion')
     }
     if (user.role) {
       userRole.value = normalizeRole(user.role)
@@ -147,7 +157,7 @@ const syncAuthState = () => {
   if (isLoggedIn.value) {
     fetchUserInfo()
   } else {
-    userInfo.value = { avatar: '' }
+    userInfo.value = { avatar: '', avatarVersion: '' }
   }
 }
 
@@ -155,9 +165,10 @@ const handleLogout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('userRole')
   localStorage.removeItem('userAvatar')
+  localStorage.removeItem('avatarVersion')
   isLoggedIn.value = false
   userRole.value = ''
-  userInfo.value = { avatar: '' }
+  userInfo.value = { avatar: '', avatarVersion: '' }
   window.dispatchEvent(new Event('auth-changed'))
   router.push('/')
 }

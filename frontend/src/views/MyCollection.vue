@@ -34,30 +34,31 @@ onMounted(fetchData)
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="collection-page">
     <Header />
     <main class="main-content">
-      <section class="collection-panel">
+      <div class="page-header">
         <h1 class="page-title">{{ pageTitle }}</h1>
-        <div v-loading="loading" class="articles-grid">
-          <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
-        </div>
-        <div v-if="!loading && !articles.length" class="empty-state">
-          <div class="empty-icon">{{ isFavorites ? '⭐' : '❤️' }}</div>
-          <p class="empty-title">{{ isFavorites ? '还没有收藏文章' : '还没有喜欢的文章' }}</p>
-          <p class="empty-desc">去首页看看有没有感兴趣的内容吧</p>
-        </div>
-      </section>
+      </div>
+      <div v-loading="loading" class="articles-grid">
+        <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
+      </div>
+      <div v-if="!loading && !articles.length" class="empty-state">
+        <div class="empty-icon">{{ isFavorites ? '⭐' : '❤️' }}</div>
+        <p class="empty-title">{{ isFavorites ? '还没有收藏文章' : '还没有喜欢的文章' }}</p>
+        <p class="empty-desc">去首页看看有没有感兴趣的内容吧</p>
+      </div>
     </main>
     <Footer />
   </div>
 </template>
 
 <style scoped>
-.page-container {
+.collection-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
 .main-content {
@@ -67,18 +68,20 @@ onMounted(fetchData)
   width: 100%;
   padding: var(--sp-8) var(--sp-6);
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
 }
 
-.collection-panel {
+.page-header {
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--card-bg);
-  padding: var(--sp-8);
-  box-shadow: var(--shadow);
+  padding: var(--sp-6) var(--sp-6);
 }
 
 .page-title {
-  margin: 0 0 var(--sp-6);
+  margin: 0;
   font-size: 28px;
   color: var(--text-h);
 }
@@ -94,9 +97,9 @@ onMounted(fetchData)
   place-items: center;
   text-align: center;
   padding: 60px var(--sp-6);
-  border: 1px dashed var(--border);
+  background: #ffffff;
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: var(--bg-surface);
 }
 
 .empty-icon {
@@ -123,8 +126,8 @@ onMounted(fetchData)
     padding: var(--sp-5) var(--sp-4);
   }
 
-  .collection-panel {
-    padding: var(--sp-6);
+  .page-header {
+    padding: var(--sp-5);
   }
 }
 </style>

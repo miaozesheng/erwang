@@ -76,11 +76,11 @@ onMounted(fetchQuickLinks)
   flex-direction: column;
   gap: 4px;
   padding: 8px 6px;
-  background: rgba(8, 16, 31, 0.92);
-  border: 1px solid rgba(0, 240, 255, 0.15);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
   border-radius: 12px;
   backdrop-filter: blur(14px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow);
 }
 
 .gql-item {
@@ -89,7 +89,7 @@ onMounted(fetchQuickLinks)
   gap: 8px;
   padding: 8px 10px;
   border-radius: 8px;
-  color: #97a8b8;
+  color: var(--text);
   font-size: 13px;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -97,9 +97,9 @@ onMounted(fetchQuickLinks)
 }
 
 .gql-item:hover {
-  color: #00f0ff;
-  background: rgba(0, 240, 255, 0.08);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+  color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: var(--shadow-glow);
   text-shadow: none;
 }
 

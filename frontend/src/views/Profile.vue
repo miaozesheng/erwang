@@ -71,13 +71,14 @@ const passwordForm = reactive({
 
 const userProfile = ref({
   avatar: '',
+  avatarVersion: '',
   username: '',
   role: '',
   memberSince: '',
   articlesCount: '--'
 })
 
-const displayAvatar = computed(() => resolveFileUrl(userProfile.value.avatar))
+const displayAvatar = computed(() => resolveFileUrl(userProfile.value.avatar, userProfile.value.avatarVersion))
 
 const formatDisplayDate = (value) => {
   if (!value) return '未设置'
@@ -99,7 +100,9 @@ const fillProfileForm = (user) => {
   profileForm.email = user.email || ''
   profileForm.address = user.address || ''
 
+  const avatarVersion = user.updatedAt || user.avatarUpdatedAt || ''
   userProfile.value.avatar = user.avatar || ''
+  userProfile.value.avatarVersion = avatarVersion
   userProfile.value.username = user.username || user.nickname || '未命名用户'
   userProfile.value.role = user.role || user.title || '普通成员'
   userProfile.value.memberSince = user.createdAt || user.created_at || ''
@@ -145,9 +148,19 @@ const handleAvatarUpload = async (event) => {
   avatarUploading.value = true
   try {
     const res = await uploadAvatar(file)
-    const avatarUrl = res.data?.data?.url || res.data?.url || ''
+    const data = res.data?.data || {}
+    const avatarUrl = data.url || ''
+    const avatarVersion = data.updatedAt || ''
     if (avatarUrl) {
       userProfile.value.avatar = avatarUrl
+      userProfile.value.avatarVersion = avatarVersion
+      localStorage.setItem('userAvatar', avatarUrl)
+      if (avatarVersion) {
+        localStorage.setItem('avatarVersion', avatarVersion)
+      } else {
+        localStorage.removeItem('avatarVersion')
+      }
+      window.dispatchEvent(new Event('auth-changed'))
     }
     ElMessage.success('头像上传成功')
   } catch (error) {

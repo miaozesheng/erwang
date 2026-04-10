@@ -1,10 +1,12 @@
 com/erwang/blog/config/GlobalExceptionHandler.class
 com/erwang/blog/service/TagService.class
 com/erwang/blog/mapper/ArticleTagMapper.class
+com/erwang/blog/service/impl/GithubProjectServiceImpl.class
 com/erwang/blog/service/UserService.class
 com/erwang/blog/entity/ArticleFavorite.class
 com/erwang/blog/service/impl/ArticleServiceImpl.class
 com/erwang/blog/entity/ArticleTag.class
+com/erwang/blog/mapper/GithubProjectMapper.class
 com/erwang/blog/controller/FileController.class
 com/erwang/blog/controller/InteractionController.class
 com/erwang/blog/service/CategoryService.class
@@ -21,7 +23,9 @@ com/erwang/blog/mapper/UserMapper.class
 com/erwang/blog/controller/CategoryController.class
 com/erwang/blog/mapper/ArticleFavoriteMapper.class
 com/erwang/blog/controller/TagController.class
+com/erwang/blog/entity/GithubProject.class
 com/erwang/blog/entity/Category.class
+com/erwang/blog/service/GithubProjectService.class
 com/erwang/blog/service/impl/TagServiceImpl.class
 com/erwang/blog/entity/Article.class
 com/erwang/blog/mapper/CategoryMapper.class
@@ -29,11 +33,13 @@ com/erwang/blog/service/impl/CategoryServiceImpl.class
 com/erwang/blog/entity/User.class
 com/erwang/blog/config/JwtUtil.class
 com/erwang/blog/service/ArticleService.class
+com/erwang/blog/task/GithubTrendingScheduler.class
 com/erwang/blog/controller/AuthController.class
 com/erwang/blog/entity/Tag.class
 com/erwang/blog/mapper/TagMapper.class
 com/erwang/blog/entity/QuickLink.class
 com/erwang/blog/mapper/ArticleMapper.class
+com/erwang/blog/controller/GithubProjectController.class
 com/erwang/blog/config/SecurityConfig.class
 com/erwang/blog/config/JwtAuthFilter.class
 com/erwang/blog/controller/QuickLinkController.class

@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/api/files/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/files/**").authenticated()
                 .antMatchers("/api/quick-links").permitAll()
+                .antMatchers("/api/github").permitAll()
                 .antMatchers("/api/interaction/status/**").permitAll()
                 .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

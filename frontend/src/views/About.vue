@@ -24,14 +24,16 @@ const socials = [
 
     <main class="main-content">
       <section class="about-card">
-        <h1 class="page-title">关于我</h1>
+        <header class="about-header">
+          <h1 class="page-title">关于我</h1>
+          <p class="page-subtitle">Full-Stack Developer</p>
+        </header>
 
-        <div class="terminal-box">
-          <p>&gt; user.init_profile()</p>
-          <p>&gt; status: ONLINE</p>
-          <p>&gt; role: Full-Stack Developer</p>
-          <p>&gt; mission: 记录技术实践，分享学习路径，持续迭代成长。</p>
-        </div>
+        <section class="about-section">
+          <p class="intro-text">
+            记录技术实践，分享学习路径，持续迭代成长。
+          </p>
+        </section>
 
         <section class="about-section">
           <h2 class="section-title">技术栈</h2>
@@ -63,9 +65,15 @@ const socials = [
 
         <section class="about-section">
           <h2 class="section-title">关于本站</h2>
-          <p class="contact-item">本站基于 Vue 3 + Spring Boot 构建，采用赛博朋克风格设计。</p>
-          <p class="contact-item">前端使用 Vite 构建，Element Plus 组件库，Markdown 渲染支持代码高亮。</p>
-          <p class="contact-item">后端使用 Spring Boot + MyBatis-Plus + MySQL，JWT 认证鉴权。</p>
+          <p class="about-content">
+            本站基于 Vue 3 + Spring Boot 构建，采用简洁的阅读友好设计。
+          </p>
+          <p class="about-content">
+            前端使用 Vite 构建，Element Plus 组件库，Markdown 渲染支持代码高亮。
+          </p>
+          <p class="about-content">
+            后端使用 Spring Boot + MyBatis-Plus + MySQL，JWT 认证鉴权。
+          </p>
         </section>
       </section>
     </main>
@@ -83,7 +91,7 @@ const socials = [
 
 .main-content {
   flex: 1;
-  max-width: 1000px;
+  max-width: 720px;
   margin: 0 auto;
   width: 100%;
   padding: var(--sp-8) var(--sp-6) var(--sp-12);
@@ -94,30 +102,29 @@ const socials = [
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--sp-8);
-  background: var(--card-bg);
-  box-shadow: var(--shadow);
+  background: #ffffff;
+}
+
+.about-header {
+  text-align: center;
+  padding: var(--sp-6) 0 var(--sp-8);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-6);
 }
 
 .page-title {
-  margin: 0 0 var(--sp-6);
-  font-size: 34px;
+  margin: 0 0 var(--sp-2);
+  font-size: 32px;
+  font-weight: 600;
   color: var(--text-h);
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
-.terminal-box {
-  margin-bottom: var(--sp-6);
-  padding: var(--sp-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-accent);
-  background: var(--code-bg);
-  font-family: var(--mono);
-  color: var(--accent);
-  line-height: 1.8;
-}
-
-.terminal-box p {
+.page-subtitle {
   margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
 }
 
 .about-section {
@@ -128,11 +135,21 @@ const socials = [
   margin-bottom: 0;
 }
 
+.intro-text {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+  line-height: 1.8;
+}
+
 .section-title {
   margin: 0 0 var(--sp-3);
   color: var(--text-h);
-  font-size: 20px;
-  letter-spacing: 0.8px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--border);
 }
 
 .badge-list,
@@ -143,43 +160,46 @@ const socials = [
 }
 
 .tech-badge {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
-  background: var(--accent-bg);
+  background: var(--bg-surface);
   color: var(--text);
-  font-size: 12px;
-  letter-spacing: 0.4px;
+  font-size: 13px;
 }
 
 .social-link {
-  color: var(--text-h);
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-secondary);
   text-decoration: none;
   border: 1px solid var(--border);
-  background: var(--bg-surface);
   border-radius: var(--radius-full);
-  padding: 8px 14px;
-  transition:
-    border-color var(--duration-normal) var(--ease-out),
-    background-color var(--duration-normal) var(--ease-out),
-    color var(--duration-normal) var(--ease-out),
-    transform var(--duration-normal) var(--ease-out);
+  padding: 8px 16px;
+  font-size: 14px;
+  transition: border-color var(--duration-normal) var(--ease-out),
+              color var(--duration-normal) var(--ease-out);
 }
 
 .social-link:hover {
-  color: var(--accent-hover);
-  border-color: var(--border-accent);
-  background: var(--accent-bg);
-  transform: translateY(-1px);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 .contact-item {
-  margin: 0 0 var(--sp-2);
+  margin: 0;
   color: var(--text);
-  font-family: var(--mono);
+  font-size: 14px;
 }
 
-.contact-item:last-child {
+.about-content {
+  margin: 0 0 var(--sp-2);
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.about-content:last-child {
   margin-bottom: 0;
 }
 
@@ -193,7 +213,11 @@ const socials = [
   }
 
   .page-title {
-    font-size: 28px;
+    font-size: 26px;
+  }
+
+  .about-header {
+    padding: var(--sp-4) 0 var(--sp-6);
   }
 }
 </style>

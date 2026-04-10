@@ -162,7 +162,7 @@ public class AuthController {
     }
 
     @PostMapping("/avatar")
-    public Result<Map<String, String>> uploadAvatar(Authentication authentication, @RequestParam("file") MultipartFile file) {
+    public Result<Map<String, Object>> uploadAvatar(Authentication authentication, @RequestParam("file") MultipartFile file) {
         if (authentication == null) {
             return Result.error(401, "未登录");
         }
@@ -199,10 +199,11 @@ public class AuthController {
             User currentUser = (User) authentication.getPrincipal();
             Map<String, Object> updateParams = new HashMap<>();
             updateParams.put("avatar", url);
-            userService.updateProfile(currentUser.getId(), updateParams);
+            User updatedUser = userService.updateProfile(currentUser.getId(), updateParams);
 
-            Map<String, String> data = new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
             data.put("url", url);
+            data.put("updatedAt", updatedUser.getUpdatedAt().toString());
             return Result.success(data);
         } catch (IOException e) {
             return Result.error("文件上传失败");

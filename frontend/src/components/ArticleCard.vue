@@ -74,6 +74,19 @@ const handleFav = async (e) => {
 }
 
 onMounted(fetchStatus)
+
+const goToDetail = () => {
+  router.push(`/article/${props.article.id}`)
+}
+
+const formatDate = (date) => {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 </script>
 
 <template>
@@ -83,7 +96,7 @@ onMounted(fetchStatus)
       <span v-if="article.category" class="card-category">{{ article.category }}</span>
     </div>
 
-    <p class="card-excerpt">{{ article.excerpt || article.content?.substring(0, 150) + '...' }}</p>
+    <p class="card-excerpt">{{ article.excerpt || '暂无摘要' }}</p>
 
     <div class="card-footer">
       <div class="card-meta">

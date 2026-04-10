@@ -230,7 +230,7 @@ const handleRegister = async () => {
   justify-content: center;
   padding: 48px 24px;
   position: relative;
-  overflow: hidden;
+  background: var(--bg);
 }
 
 .register-card {
@@ -240,7 +240,7 @@ const handleRegister = async () => {
   overflow: hidden;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  background: rgba(10, 20, 38, 0.85);
+  background: #ffffff;
   box-shadow: var(--shadow-lg);
   padding: 40px;
   animation: register-slide-up 0.42s ease;
@@ -257,7 +257,6 @@ const handleRegister = async () => {
   width: 136px;
   height: 128px;
   margin: 0 auto 12px;
-  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.35));
   animation: register-bot-float 3.4s ease-in-out infinite;
 }
 
@@ -274,7 +273,6 @@ const handleRegister = async () => {
 .eye {
   transform-origin: center;
   animation: register-eye-blink 4.2s ease-in-out infinite;
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.82));
 }
 
 .register-bot-arm {
@@ -315,8 +313,8 @@ const handleRegister = async () => {
 
 .mode-tab {
   border: 1px solid var(--border);
-  background: rgba(8, 17, 31, 0.8);
-  color: var(--text);
+  background: #ffffff;
+  color: var(--text-muted);
   font-family: var(--heading);
   font-size: 12px;
   letter-spacing: 0.6px;
@@ -330,14 +328,14 @@ const handleRegister = async () => {
 }
 
 .mode-tab:hover {
-  border-color: rgba(0, 240, 255, 0.42);
-  color: var(--accent-hover);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .mode-tab.active {
-  background: var(--accent-bg);
-  border-color: var(--border-accent);
-  color: var(--accent);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 .register-form {
@@ -347,8 +345,8 @@ const handleRegister = async () => {
 }
 
 :deep(.el-input__wrapper) {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
   box-shadow: none;
 }
 
@@ -362,7 +360,7 @@ const handleRegister = async () => {
 }
 
 :deep(.el-input__inner::placeholder) {
-  color: var(--text);
+  color: var(--text-muted);
 }
 
 .register-btn {
@@ -391,7 +389,7 @@ const handleRegister = async () => {
 .login-entry {
   margin: 14px 0 0;
   text-align: center;
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 13px;
   letter-spacing: 0.3px;
 }

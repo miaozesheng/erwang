@@ -31,11 +31,16 @@ api.interceptors.response.use(
   }
 )
 
-export const resolveFileUrl = (url) => {
+export const resolveFileUrl = (url, version) => {
   if (!url) return ''
   if (/^https?:\/\//.test(url)) return url
   const base = import.meta.env.VITE_FILE_BASE
-  return base ? `${base}${url}` : url
+  let resolved = base ? `${base}${url}` : url
+  if (version) {
+    const separator = resolved.includes('?') ? '&' : '?'
+    resolved = `${resolved}${separator}v=${encodeURIComponent(version)}`
+  }
+  return resolved
 }
 
 export const login = (data) => api.post('/auth/login', data)
@@ -77,6 +82,10 @@ export const getUserInfo = () => api.get('/auth/info')
 export const updateProfile = (data) => api.put('/auth/profile', data)
 
 export const changePassword = (data) => api.put('/auth/password', data)
+
+export const getGithubProjects = (params) => api.get('/github', { params })
+
+export const syncGithubProjects = () => api.post('/github/sync')
 
 export const uploadAvatar = (file) => {
   const formData = new FormData()

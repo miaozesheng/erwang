@@ -325,16 +325,16 @@ onUnmounted(() => {
 }
 
 .article-detail {
-  border: 1px solid rgba(0, 240, 255, 0.14);
-  border-radius: 14px;
-  padding: 36px;
-  background: rgba(10, 20, 38, 0.72);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
 }
 
 .article-header {
   margin-bottom: 30px;
   padding-bottom: 22px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.14);
+  border-bottom: 1px solid var(--border);
 }
 
 .article-title {
@@ -343,7 +343,6 @@ onUnmounted(() => {
   line-height: 1.3;
   font-weight: 700;
   color: var(--text-h);
-  text-shadow: 0 2px 10px rgba(0, 240, 255, 0.12);
 }
 
 .article-meta {
@@ -351,20 +350,21 @@ onUnmounted(() => {
   flex-wrap: wrap;
   gap: 14px;
   margin-top: 14px;
+  color: var(--text-secondary);
 }
 
 .meta-item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--text);
+  color: var(--text-secondary);
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 0.2px;
 }
 
 .meta-item .el-icon {
-  color: var(--accent);
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
@@ -380,10 +380,10 @@ onUnmounted(() => {
   align-items: center;
   height: 24px;
   padding: 0 10px;
-  border: 1px solid rgba(0, 240, 255, 0.24);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(0, 240, 255, 0.08);
-  color: var(--text-h);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   font-family: var(--mono);
   font-size: 11px;
 }
@@ -400,10 +400,10 @@ onUnmounted(() => {
   gap: 6px;
   height: 34px;
   padding: 0 12px;
-  border-radius: 9px;
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
   background: transparent;
-  color: var(--text);
+  color: var(--text-secondary);
   font-family: var(--mono);
   font-size: 13px;
   cursor: pointer;
@@ -414,28 +414,11 @@ onUnmounted(() => {
   transform: scale(0.97);
 }
 
-.interact-btn.like:hover {
-  color: #ff9ab0;
-  border-color: rgba(255, 103, 137, 0.45);
-  background: rgba(255, 103, 137, 0.1);
-}
-
-.interact-btn.favorite:hover {
-  color: #ffcf7c;
-  border-color: rgba(255, 187, 84, 0.45);
-  background: rgba(255, 187, 84, 0.1);
-}
-
-.interact-btn.like.active {
-  color: #ffeef2;
-  border-color: rgba(255, 92, 127, 0.95);
-  background: rgba(231, 64, 103, 0.94);
-}
-
-.interact-btn.favorite.active {
-  color: #241300;
-  border-color: rgba(255, 188, 79, 0.95);
-  background: rgba(255, 188, 79, 0.95);
+.interact-btn:hover,
+.interact-btn.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-bg);
 }
 
 .btn-icon {
@@ -452,9 +435,9 @@ onUnmounted(() => {
   position: sticky;
   top: 88px;
   width: 200px;
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: 12px;
-  background: rgba(10, 20, 38, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
   padding: 14px 10px;
 }
 
@@ -490,7 +473,7 @@ onUnmounted(() => {
   border-left: 2px solid transparent;
   border-radius: 0;
   background: transparent;
-  color: var(--text);
+  color: var(--text-secondary);
   text-align: left;
   font-family: var(--mono);
   font-size: 13px;
@@ -501,14 +484,14 @@ onUnmounted(() => {
 }
 
 .toc-link:hover {
-  color: var(--accent-hover);
-  background: rgba(0, 240, 255, 0.06);
+  color: var(--text);
+  background: var(--bg-secondary);
 }
 
 .toc-item.active .toc-link {
   color: var(--accent);
   border-left-color: var(--accent);
-  background: rgba(0, 240, 255, 0.1);
+  background: var(--accent-bg);
 }
 
 :deep(.markdown-body) {
@@ -543,8 +526,8 @@ onUnmounted(() => {
 
 :deep(.markdown-body code) {
   background: var(--code-bg);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   padding: 2px 6px;
   font-size: 14px;
   font-family: var(--mono);
@@ -554,8 +537,8 @@ onUnmounted(() => {
   margin: 1.3em 0;
   padding: 16px;
   background: var(--code-bg);
-  border: 1px solid rgba(0, 240, 255, 0.26);
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow-x: auto;
 }
 
@@ -597,14 +580,14 @@ onUnmounted(() => {
 
 :deep(.markdown-body th),
 :deep(.markdown-body td) {
-  border: 1px solid rgba(0, 240, 255, 0.24);
+  border: 1px solid var(--border);
   padding: 10px 12px;
   text-align: left;
 }
 
 :deep(.markdown-body th) {
   color: var(--text-h);
-  background: rgba(11, 23, 40, 0.9);
+  background: var(--bg-secondary);
 }
 
 @media (max-width: 768px) {

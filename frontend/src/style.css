@@ -1,26 +1,29 @@
 /* Fonts loaded via index.html link tags for non-blocking behavior */
 
 :root {
-  /* ── Color Tokens ── */
-  --text: #97a8b8;
-  --text-h: #e9f8ff;
-  --text-dim: rgba(151, 168, 184, 0.5);
-  --bg: #070b14;
-  --bg-elevated: #0c1322;
-  --bg-surface: rgba(10, 20, 38, 0.6);
-  --bg-grid-line: rgba(0, 240, 255, 0.05);
-  --border: rgba(255, 255, 255, 0.06);
-  --border-accent: rgba(0, 240, 255, 0.15);
-  --code-bg: #0b1728;
-  --card-bg: rgba(10, 20, 38, 0.6);
-  --social-bg: rgba(8, 16, 31, 0.66);
+  /* ── Color Tokens: Warm Neutral ── */
+  --bg: #faf9f7;
+  --bg-elevated: #f5f3ef;
+  --bg-surface: rgba(245, 243, 239, 0.8);
+  --bg-grid-line: rgba(45, 90, 74, 0.04);
+  --border: #e5e2dc;
+  --border-accent: rgba(45, 90, 74, 0.2);
+  --code-bg: #f0ede8;
+  --card-bg: #ffffff;
+  --social-bg: #f8f6f3;
 
-  --accent: #00f0ff;
-  --accent-hover: #58f7ff;
-  --accent-bg: rgba(0, 240, 255, 0.08);
-  --accent-border: rgba(0, 240, 255, 0.3);
-  --accent-glow: rgba(0, 240, 255, 0.25);
-  --accent-secondary: #72ffdc;
+  /* Text: Soft hierarchy */
+  --text: #5a5a5a;
+  --text-h: #1a1a1a;
+  --text-dim: rgba(90, 90, 90, 0.5);
+
+  /* Brand: No more neon cyan */
+  --accent: #2d5a4a;
+  --accent-hover: #3d7a64;
+  --accent-bg: rgba(45, 90, 74, 0.08);
+  --accent-border: rgba(45, 90, 74, 0.3);
+  --accent-glow: rgba(45, 90, 74, 0.15);
+  --accent-secondary: #6a9a7a;
 
   /* ── Spacing Scale (8px base) ── */
   --sp-1: 4px;
@@ -41,10 +44,10 @@
   --radius-xl: 20px;
   --radius-full: 999px;
 
-  /* ── Shadows ── */
-  --shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(0, 240, 255, 0.12);
+  /* ── Shadows: Softer ── */
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 2px 12px rgba(45, 90, 74, 0.1);
 
   /* ── Transitions ── */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -60,7 +63,7 @@
 
   font: 16px/170% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -81,9 +84,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 15% 5%, rgba(0, 240, 255, 0.06), transparent 50%),
-    radial-gradient(circle at 85% 90%, rgba(114, 255, 220, 0.04), transparent 55%),
-    linear-gradient(160deg, #060a12 0%, #070b14 42%, #081022 100%);
+    radial-gradient(circle at 15% 5%, rgba(45, 90, 74, 0.05), transparent 50%),
+    radial-gradient(circle at 85% 90%, rgba(106, 154, 122, 0.04), transparent 55%),
+    linear-gradient(160deg, #f8f6f3 0%, #faf9f7 42%, #f5f3ef 100%);
   color: var(--text);
   position: relative;
   opacity: 0;
@@ -99,9 +102,9 @@ body::before {
   background-image:
     linear-gradient(var(--bg-grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--bg-grid-line) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(circle at 50% 20%, black 15%, transparent 80%);
-  opacity: 0.6;
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 20%, black 10%, transparent 70%);
+  opacity: 0.5;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -176,8 +179,8 @@ code {
 }
 
 ::selection {
-  background: rgba(0, 240, 255, 0.2);
-  color: #f3fdff;
+  background: rgba(45, 90, 74, 0.2);
+  color: #1a1a1a;
 }
 
 .el-button--primary {
@@ -185,71 +188,32 @@ code {
   --el-button-border-color: var(--accent);
   --el-button-hover-bg-color: var(--accent-hover);
   --el-button-hover-border-color: var(--accent-hover);
-  --el-button-active-bg-color: var(--accent);
-  --el-button-active-border-color: var(--accent);
-  --el-button-text-color: #03131a;
-  font-family: var(--heading);
-  letter-spacing: 0.5px;
-  transition: all var(--duration-normal) ease;
-}
-
-.el-button--primary:active {
-  transform: scale(0.97);
+  --el-button-text-color: #ffffff;
 }
 
 .el-input__wrapper {
-  background: var(--code-bg) !important;
-  box-shadow: none !important;
+  background: #ffffff !important;
   border: 1px solid var(--border) !important;
-  transition: border-color var(--duration-normal) ease !important;
-}
-
-.el-input__wrapper:hover {
-  border-color: var(--border-accent) !important;
 }
 
 .el-input__wrapper.is-focus {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.08) !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 74, 0.1) !important;
 }
 
 .el-input__inner {
   color: var(--text-h) !important;
-  font-family: var(--sans) !important;
-  font-size: 14px !important;
-  letter-spacing: 0.3px !important;
-}
-
-.el-input__inner::placeholder {
-  color: var(--text) !important;
-  font-family: var(--sans) !important;
-  font-size: 14px !important;
 }
 
 .el-textarea__inner {
-  background: var(--code-bg) !important;
-  color: var(--text-h) !important;
+  background: #ffffff !important;
   border: 1px solid var(--border) !important;
-  box-shadow: none !important;
-  font-family: var(--sans) !important;
-  font-size: 14px !important;
-}
-
-.el-textarea__inner:hover {
-  border-color: var(--accent) !important;
-}
-
-.el-textarea__inner:focus {
-  border-color: var(--accent) !important;
-}
-
-.el-select .el-input__wrapper {
-  background: var(--code-bg) !important;
+  color: var(--text-h) !important;
 }
 
 .el-tag {
   --el-tag-bg-color: var(--accent-bg);
-  --el-tag-border-color: rgba(0, 240, 255, 0.28);
+  --el-tag-border-color: var(--accent-border);
   --el-tag-text-color: var(--accent);
 }
 
@@ -266,13 +230,13 @@ code {
 .el-dialog {
   --el-dialog-bg-color: var(--card-bg);
   border: 1px solid var(--border);
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.12);
+  box-shadow: var(--shadow-lg);
 }
 
 .el-message-box {
   --el-messagebox-title-color: var(--text-h);
   --el-messagebox-content-color: var(--text);
-  background: rgba(8, 16, 31, 0.95);
+  background: #ffffff;
   border: 1px solid var(--border);
 }
 
@@ -294,13 +258,12 @@ code {
 }
 
 .cyber-user-dropdown .el-dropdown-menu {
-  background: rgba(8, 16, 31, 0.96) !important;
+  background: #ffffff !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-md) !important;
   box-shadow: var(--shadow-lg) !important;
   padding: 4px !important;
   min-width: 150px !important;
-  backdrop-filter: blur(16px) !important;
 }
 
 .cyber-user-dropdown .el-dropdown-menu__item {
@@ -309,7 +272,6 @@ code {
   font-family: var(--sans) !important;
   font-size: 13px !important;
   padding: 8px 12px !important;
-  transition: all var(--duration-fast) ease !important;
 }
 
 .cyber-user-dropdown .el-dropdown-menu__item:not(.is-disabled):hover {
@@ -322,36 +284,25 @@ code {
   margin-top: 4px !important;
 }
 
-.cyber-user-dropdown .el-popper__arrow::before {
-  background: rgba(8, 16, 31, 0.96) !important;
-  border-color: var(--border) !important;
-}
-
 /* ===== Element Plus Select Dropdown ===== */
 .el-select-dropdown {
-  background: rgba(8, 16, 31, 0.98) !important;
-  border: 1px solid rgba(0, 240, 255, 0.25) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 240, 255, 0.1) !important;
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .el-select-dropdown__item {
-  color: #97a8b8 !important;
-  font-family: 'JetBrains Mono', monospace !important;
+  color: var(--text) !important;
 }
 
 .el-select-dropdown__item.is-hovering {
-  background: rgba(0, 240, 255, 0.08) !important;
-  color: #00f0ff !important;
+  background: var(--accent-bg) !important;
+  color: var(--accent) !important;
 }
 
 .el-select-dropdown__item.is-selected {
-  color: #00f0ff !important;
+  color: var(--accent) !important;
   font-weight: 600 !important;
-}
-
-.el-select-dropdown .el-popper__arrow::before {
-  background: rgba(8, 16, 31, 0.98) !important;
-  border-color: rgba(0, 240, 255, 0.25) !important;
 }
 
 .el-date-picker,
@@ -360,19 +311,19 @@ code {
 .el-date-table,
 .el-month-table,
 .el-year-table {
-  background: rgba(8, 16, 31, 0.96) !important;
+  background: #ffffff !important;
   color: var(--text) !important;
 }
 
 .el-picker-panel {
   border: 1px solid var(--border) !important;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.12) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .el-date-table td.current:not(.disabled) .el-date-table-cell__text,
 .el-date-table td.today .el-date-table-cell__text {
   background: var(--accent) !important;
-  color: #04131a !important;
+  color: #ffffff !important;
 }
 
 .el-date-picker__header-label,
@@ -385,13 +336,8 @@ code {
 }
 
 .el-popper.is-light {
-  background: rgba(8, 16, 31, 0.96) !important;
+  background: #ffffff !important;
   border: 1px solid var(--border) !important;
-}
-
-.el-popper.is-light .el-popper__arrow::before {
-  background: rgba(8, 16, 31, 0.96) !important;
-  border-color: var(--border) !important;
 }
 
 @keyframes body-boot {
@@ -448,41 +394,27 @@ code {
 }
 
 .el-message {
-  background: rgba(8, 16, 31, 0.95) !important;
-  border: 1px solid rgba(0, 240, 255, 0.2) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 240, 255, 0.1) !important;
-  backdrop-filter: blur(12px) !important;
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .el-message .el-message__content {
-  color: #c8dce8 !important;
+  color: var(--text-h) !important;
 }
 
 .el-message--success {
-  border-color: rgba(103, 255, 148, 0.3) !important;
-}
-
-.el-message--success .el-message__content {
-  color: #8dffb6 !important;
+  border-color: var(--accent) !important;
 }
 
 .el-message--error {
-  border-color: rgba(245, 108, 108, 0.3) !important;
-}
-
-.el-message--error .el-message__content {
-  color: #f89898 !important;
+  border-color: #f56c6c !important;
 }
 
 .el-message--warning {
-  border-color: rgba(255, 170, 0, 0.3) !important;
-}
-
-.el-message--warning .el-message__content {
-  color: #ffd666 !important;
+  border-color: #e6a23c !important;
 }
 
 .el-overlay {
-  background-color: rgba(0, 0, 0, 0.65) !important;
-  backdrop-filter: blur(4px) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
 }

@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ArticleController {
     
+    private static final int EXCERPT_MAX_LENGTH = 140;
+    
     private final ArticleService articleService;
     private final CategoryService categoryService;
     private final TagService tagService;
@@ -240,8 +242,9 @@ public class ArticleController {
         if (includeContent) {
             data.put("content", article.getContent());
         }
-        data.put("summary", article.getSummary());
-        data.put("excerpt", article.getSummary());
+        String excerpt = isBlank(article.getSummary()) ? deriveExcerpt(article.getContent()) : article.getSummary();
+        data.put("summary", excerpt);
+        data.put("excerpt", excerpt);
         data.put("cover", article.getCover());
         data.put("categoryId", article.getCategoryId());
         data.put("category", categoryNameById.get(article.getCategoryId()));
@@ -266,5 +269,48 @@ public class ArticleController {
 
     private boolean isBlank(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    private String deriveExcerpt(String content) {
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+        String text = content;
+        
+        text = text.replaceAll("```[\\s\\S]*?```", "");
+        text = text.replaceAll("```[^`]*```", "");
+        text = text.replaceAll("`{1,3}[^`]+`{1,3}", "");
+        text = text.replaceAll("\\*\\*(.+?)\\*\\*", "$1");
+        text = text.replaceAll("\\*(.+?)\\*", "$1");
+        text = text.replaceAll("__(.+?)__", "$1");
+        text = text.replaceAll("_(.+?)_", "$1");
+        text = text.replaceAll("~~(.+?)~~", "$1");
+        text = text.replaceAll("\\!\\[([^\\]]*)\\]\\([^)]+\\)", "");
+        text = text.replaceAll("\\[([^\\]]+)\\]\\([^)]+\\)", "$1");
+        
+        String[] lines = text.split("\n");
+        StringBuilder sb = new StringBuilder();
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.matches("^#{1,6}\\s.*") || 
+                trimmed.matches("^[-*+]\\s.*") ||
+                trimmed.matches("^\\d+\\.\\s.*") ||
+                trimmed.matches("^>\\s.*") ||
+                trimmed.matches("^---+$") ||
+                trimmed.matches("^[*-]+$")) {
+                continue;
+            }
+            sb.append(line).append("\n");
+        }
+        text = sb.toString();
+        
+        text = text.replaceAll("\\s+", " ").trim();
+
+        if (text.length() <= EXCERPT_MAX_LENGTH) {
+            return text;
+        }
+        
+        int cut = text.substring(0, EXCERPT_MAX_LENGTH).lastIndexOf(' ');
+        return cut > 50 ? text.substring(0, cut) + "..." : text.substring(0, EXCERPT_MAX_LENGTH) + "...";
     }
 }

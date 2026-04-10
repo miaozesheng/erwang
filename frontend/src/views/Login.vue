@@ -10,8 +10,6 @@ import { User, Lock } from '@element-plus/icons-vue'
 const router = useRouter()
 const route = useRoute()
 const loading = ref(false)
-const isPasswordFocused = ref(false)
-const isUsernameFocused = ref(false)
 
 const form = reactive({
   username: '',
@@ -26,14 +24,6 @@ onMounted(() => {
     ElMessage.success('注册成功，请登录')
   }
 })
-
-const handlePasswordFocus = () => {
-  isPasswordFocused.value = true
-}
-
-const handlePasswordBlur = () => {
-  isPasswordFocused.value = false
-}
 
 const handleLogin = async () => {
   if (!form.username || !form.password) {
@@ -80,61 +70,11 @@ const handleLogin = async () => {
   <div class="page-container">
     <Header />
     
-    <main class="main-content">
-      <div class="login-bg-grid" aria-hidden="true"></div>
-      <div class="login-card">
-        <div class="login-card-corners" aria-hidden="true"></div>
+    <main class="main-content auth-page">
+      <div class="auth-container">
         <div class="login-header">
-          <div
-            class="login-bot"
-            :class="{
-            'is-password-focused': isPasswordFocused,
-            'is-username-focused': isUsernameFocused
-            }"
-            aria-hidden="true"
-          >
-            <svg class="login-bot-svg" viewBox="0 0 180 170" role="img">
-              <defs>
-                <radialGradient id="botCore" cx="50%" cy="30%" r="85%">
-                  <stop offset="0%" stop-color="rgba(0, 240, 255, 0.2)" />
-                  <stop offset="100%" stop-color="rgba(7, 18, 34, 0.96)" />
-                </radialGradient>
-                <linearGradient id="botShell" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#10243d" />
-                  <stop offset="100%" stop-color="#09172a" />
-                </linearGradient>
-              </defs>
-
-              <g class="bot-antenna" transform="translate(90 14)">
-                <rect x="-2.5" y="0" width="5" height="20" rx="2.5" fill="rgba(140, 245, 255, 0.7)" />
-                <circle class="bot-antenna-tip" cx="0" cy="-3" r="6" fill="var(--accent)" />
-              </g>
-
-              <g class="bot-body" transform="translate(24 30)">
-                <rect x="0" y="0" width="132" height="108" rx="38" fill="url(#botShell)" stroke="var(--accent)" stroke-opacity="0.65" stroke-width="2" />
-                <rect x="10" y="10" width="112" height="88" rx="30" fill="url(#botCore)" />
-
-                <g class="bot-face" transform="translate(66 52)">
-                  <circle cx="-26" cy="0" r="17" fill="#04111f" stroke="rgba(0, 240, 255, 0.38)" stroke-width="1.6" />
-                  <circle cx="26" cy="0" r="17" fill="#04111f" stroke="rgba(0, 240, 255, 0.38)" stroke-width="1.6" />
-                  <circle class="bot-eye bot-eye-left" cx="-26" cy="0" r="7" fill="var(--accent)" />
-                  <circle class="bot-eye bot-eye-right" cx="26" cy="0" r="7" fill="var(--accent)" />
-                  <rect x="-18" y="27" width="36" height="5" rx="2.5" fill="rgba(0, 240, 255, 0.65)" />
-                </g>
-              </g>
-
-              <g class="bot-arm bot-arm-left" transform="translate(33 95)">
-                <rect x="0" y="0" width="20" height="56" rx="10" fill="#0f2136" stroke="rgba(0, 240, 255, 0.48)" stroke-width="1.5" />
-                <circle cx="10" cy="58" r="9" fill="#0f2136" stroke="rgba(0, 240, 255, 0.55)" stroke-width="1.5" />
-              </g>
-              <g class="bot-arm bot-arm-right" transform="translate(127 95)">
-                <rect x="0" y="0" width="20" height="56" rx="10" fill="#0f2136" stroke="rgba(0, 240, 255, 0.48)" stroke-width="1.5" />
-                <circle cx="10" cy="58" r="9" fill="#0f2136" stroke="rgba(0, 240, 255, 0.55)" stroke-width="1.5" />
-              </g>
-            </svg>
-          </div>
           <h1 class="login-title">登录</h1>
-          <p class="login-terminal">身份认证协议 / AUTH-CHANNEL</p>
+          <p class="login-subtitle">欢迎回来，请登录您的账户</p>
         </div>
         
         <el-form :model="form" class="login-form" @submit.prevent="handleLogin">
@@ -144,8 +84,6 @@ const handleLogin = async () => {
               placeholder="用户名"
               size="large"
               :prefix-icon="User"
-              @focus="isUsernameFocused = true"
-              @blur="isUsernameFocused = false"
             />
           </el-form-item>
           
@@ -158,8 +96,6 @@ const handleLogin = async () => {
               size="large"
               :prefix-icon="Lock"
               show-password
-              @focus="handlePasswordFocus"
-              @blur="handlePasswordBlur"
               @keyup.enter="handleLogin"
             />
           </el-form-item>
@@ -199,73 +135,21 @@ const handleLogin = async () => {
   align-items: center;
   justify-content: center;
   padding: 48px 24px;
-  position: relative;
-  overflow: hidden;
 }
 
-.login-bg-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 100%);
-  opacity: 0.5;
+.auth-page {
+  background: var(--bg);
+  min-height: 100vh;
 }
 
-.login-card {
-  background: linear-gradient(170deg, rgba(10, 20, 38, 0.9), rgba(8, 16, 31, 0.7));
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  border-radius: 16px;
+.auth-container {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 56px;
   width: 100%;
   max-width: 440px;
   animation: slideUp 0.4s ease;
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  overflow: hidden;
-}
-
-.login-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.06), transparent 42%, rgba(114, 255, 220, 0.07));
-  pointer-events: none;
-}
-
-.login-card-corners {
-  position: absolute;
-  inset: 10px;
-  pointer-events: none;
-}
-
-.login-card-corners::before,
-.login-card-corners::after {
-  content: '';
-  position: absolute;
-  width: 24px;
-  height: 14px;
-  border-top: 1px solid var(--accent-border);
-  border-left: 1px solid var(--accent-border);
-}
-
-.login-card-corners::before {
-  top: 0;
-  left: 0;
-}
-
-.login-card-corners::after {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .login-header {
@@ -376,22 +260,23 @@ const handleLogin = async () => {
   to { transform: translate(-12px, -8px) rotate(-24deg); }
 }
 
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
 .login-title {
-  font-size: 30px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 600;
   color: var(--text-h);
   margin: 0;
   font-family: var(--heading);
-  letter-spacing: 1px;
 }
 
-.login-terminal {
-  margin: 10px 0 0;
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 1px;
-  opacity: 0.82;
+.login-subtitle {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 14px;
 }
 
 .login-form {
@@ -401,14 +286,14 @@ const handleLogin = async () => {
 }
 
 :deep(.el-input__wrapper) {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  box-shadow: none;
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
 }
 
 :deep(.el-input__wrapper:hover),
 :deep(.el-input__wrapper.is-focus) {
-  border-color: var(--accent);
+  border-color: var(--accent) !important;
 }
 
 :deep(.el-input__inner) {
@@ -416,18 +301,18 @@ const handleLogin = async () => {
 }
 
 :deep(.el-input__inner::placeholder) {
-  color: var(--text);
+  color: var(--text-dimmed, #9ca3af);
 }
 
 .login-btn {
   width: 100%;
   height: 48px;
   background: var(--accent);
-  border: 1px solid transparent;
+  border-color: var(--accent);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   margin-top: 16px;
-  color: #04131a;
+  color: #ffffff;
   letter-spacing: 0.8px;
   font-family: var(--heading);
   transition: all var(--duration-normal) ease;
@@ -435,6 +320,7 @@ const handleLogin = async () => {
 
 .login-btn:hover {
   background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .login-btn:active {

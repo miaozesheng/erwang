@@ -349,8 +349,8 @@ onUnmounted(() => {
   min-height: 240px;
   max-height: 280px;
   border: 1px solid var(--border);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(10, 20, 38, 0.52) 0%, rgba(8, 16, 31, 0.24) 100%);
+  border-radius: var(--radius-lg);
+  background: #ffffff;
   overflow: hidden;
 }
 
@@ -358,12 +358,11 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.22;
+  opacity: 0.06;
   background-image:
-    linear-gradient(rgba(0, 240, 255, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.12) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
-  mask-image: radial-gradient(circle at 50% 42%, black 28%, transparent 92%);
 }
 
 .hero-particles {
@@ -390,7 +389,7 @@ onUnmounted(() => {
   font-family: var(--mono);
   font-size: 12px;
   letter-spacing: 1.4px;
-  color: var(--accent-secondary);
+  color: var(--accent);
   opacity: 0.9;
 }
 
@@ -400,16 +399,13 @@ onUnmounted(() => {
   font-size: clamp(34px, 6vw, 54px);
   line-height: 1.08;
   letter-spacing: -0.02em;
-  background: linear-gradient(90deg, var(--text-h) 10%, var(--accent) 90%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-h);
 }
 
 .hero-subtitle {
   margin: 0;
   color: var(--text);
-  font-size: clamp(14px, 2.1vw, 17px);
+  font-size: clamp(16px, 2.1vw, 19px);
   letter-spacing: 0.2px;
 }
 
@@ -418,19 +414,19 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 9px 14px;
-  border: 1px solid rgba(114, 255, 220, 0.2);
-  border-radius: 10px;
-  background: rgba(7, 14, 20, 0.72);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #ffffff;
   font-family: var(--mono);
   font-size: 12px;
 }
 
 .terminal-prompt {
-  color: var(--accent-secondary);
+  color: var(--accent);
 }
 
 .terminal-text {
-  color: rgba(233, 248, 255, 0.86);
+  color: var(--text);
   letter-spacing: 0.6px;
 }
 
@@ -455,8 +451,8 @@ onUnmounted(() => {
   position: sticky;
   top: 80px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  background: #ffffff;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -486,7 +482,7 @@ onUnmounted(() => {
 
 .sidebar-pill {
   border: 1px solid var(--border);
-  background: rgba(0, 240, 255, 0.06);
+  background: transparent;
   color: var(--text);
   border-radius: 999px;
   padding: 5px 11px;
@@ -499,21 +495,21 @@ onUnmounted(() => {
 }
 
 .sidebar-pill:hover {
-  border-color: rgba(0, 240, 255, 0.42);
+  border-color: var(--accent);
   color: var(--accent);
 }
 
 .sidebar-pill.active {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(0, 240, 255, 0.14);
+  background: var(--accent-bg);
 }
 
 .clear-filter-btn {
   width: fit-content;
-  border: 1px solid rgba(114, 255, 220, 0.32);
-  background: rgba(114, 255, 220, 0.08);
-  color: var(--accent-secondary);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 11px;
@@ -523,14 +519,14 @@ onUnmounted(() => {
 }
 
 .clear-filter-btn:hover {
-  border-color: var(--accent-secondary);
-  background: rgba(114, 255, 220, 0.14);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 :deep(.search-input .el-input__wrapper) {
-  border-radius: 10px;
-  border-color: rgba(0, 240, 255, 0.18);
-  background: rgba(7, 11, 20, 0.82);
+  border-radius: var(--radius-md);
+  border-color: var(--border);
+  background: #ffffff !important;
   box-shadow: none;
 }
 
@@ -539,14 +535,14 @@ onUnmounted(() => {
 }
 
 :deep(.search-input .el-input-group__append) {
-  border-color: rgba(0, 240, 255, 0.18);
+  border-color: var(--border);
   background: transparent;
 }
 
 .search-btn {
   border: none;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.88), rgba(0, 210, 225, 0.84));
-  color: #041319;
+  background: var(--accent);
+  color: #ffffff;
   font-family: var(--heading);
   letter-spacing: 0.3px;
 }
@@ -580,7 +576,7 @@ onUnmounted(() => {
   bottom: 4px;
   left: calc(var(--date-col) + (var(--axis-col) / 2));
   width: 1px;
-  background: rgba(0, 240, 255, 0.15);
+  background: var(--border);
   transform: translateX(-0.5px);
 }
 
@@ -629,8 +625,11 @@ onUnmounted(() => {
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.11);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease;
+}
+
+.timeline-row:hover .timeline-dot {
+  transform: scale(1.1);
 }
 
 .timeline-row:hover .timeline-dot {
@@ -677,13 +676,13 @@ onUnmounted(() => {
 :deep(.el-pagination.is-background .btn-next),
 :deep(.el-pagination.is-background .btn-prev),
 :deep(.el-pagination.is-background .el-pager li) {
-  background: rgba(7, 11, 20, 0.86);
-  border: 1px solid rgba(0, 240, 255, 0.18);
+  background: #ffffff;
+  border: 1px solid var(--border);
   color: var(--text);
 }
 
 :deep(.el-pagination.is-background .el-pager li.is-active) {
-  background: rgba(0, 240, 255, 0.14);
+  background: var(--accent-bg);
   color: var(--accent);
   border-color: var(--accent);
 }
@@ -699,8 +698,7 @@ onUnmounted(() => {
 :deep(.hero-particle) {
   position: absolute;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 35%, rgba(114, 255, 220, 0.95), rgba(0, 240, 255, 0.2));
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  background: var(--border);
   animation-name: hero-particle-float;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   animation-iteration-count: infinite;

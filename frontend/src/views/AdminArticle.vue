@@ -94,7 +94,7 @@ const initVditor = () => {
   vditorInstance = new Vditor('vditor-editor', {
     mode: 'ir',
     lang: 'zh_CN',
-    theme: 'dark',
+    theme: 'light',
     height: 500,
     placeholder: '开始编写 Markdown 内容...',
     value: form.content,
@@ -335,6 +335,10 @@ onBeforeUnmount(() => {
   background: var(--bg);
 }
 
+.editor-page {
+  background: var(--bg);
+}
+
 .main-content {
   flex: 1;
   max-width: 1200px;
@@ -348,9 +352,15 @@ onBeforeUnmount(() => {
   position: relative;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  background: var(--card-bg);
+  background: #ffffff;
   box-shadow: var(--shadow);
   padding: 24px;
+}
+
+.editor-container {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
 }
 
 .editor-header {
@@ -376,7 +386,7 @@ onBeforeUnmount(() => {
 
 .header-actions .el-button--primary {
   background: var(--accent);
-  border: 1px solid var(--border-accent);
+  border-color: var(--accent);
   box-shadow: none;
 }
 
@@ -425,8 +435,8 @@ onBeforeUnmount(() => {
 
 :deep(.el-input__wrapper),
 :deep(.el-textarea__inner) {
-  background: var(--code-bg);
-  border: 1px solid var(--border);
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
   box-shadow: none;
 }
 
@@ -441,7 +451,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(.el-select .el-input__wrapper) {
-  background: var(--code-bg);
+  background: #ffffff !important;
 }
 
 .vditor-wrap {
@@ -461,16 +471,16 @@ onBeforeUnmount(() => {
 }
 
 :deep(.vditor) {
-  --panel-background-color: #0b1728 !important;
-  --toolbar-background-color: rgba(8, 16, 31, 0.95) !important;
-  --textarea-background-color: #0b1728 !important;
-  border: 1px solid rgba(0, 240, 255, 0.22) !important;
+  --panel-background-color: #ffffff !important;
+  --toolbar-background-color: #f5f5f5 !important;
+  --textarea-background-color: #ffffff !important;
+  border: 1px solid var(--border) !important;
   border-radius: 10px !important;
 }
 
 :deep(.vditor-toolbar) {
-  background: rgba(8, 16, 31, 0.95) !important;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.15) !important;
+  background: #f5f5f5 !important;
+  border-bottom: 1px solid var(--border) !important;
   padding: 6px 8px !important;
 }
 
@@ -479,27 +489,27 @@ onBeforeUnmount(() => {
 }
 
 :deep(.vditor-toolbar__item:hover) {
-  background: rgba(0, 240, 255, 0.1) !important;
+  background: rgba(45, 90, 74, 0.08) !important;
 }
 
 :deep(.vditor-toolbar__item--current) {
-  background: rgba(0, 240, 255, 0.15) !important;
-  color: #00f0ff !important;
+  background: rgba(45, 90, 74, 0.12) !important;
+  color: var(--accent) !important;
 }
 
 :deep(.vditor-toolbar svg) {
-  color: #97a8b8 !important;
-  fill: #97a8b8 !important;
+  color: #666666 !important;
+  fill: #666666 !important;
 }
 
 :deep(.vditor-toolbar__item:hover svg),
 :deep(.vditor-toolbar__item--current svg) {
-  color: #00f0ff !important;
-  fill: #00f0ff !important;
+  color: var(--accent) !important;
+  fill: var(--accent) !important;
 }
 
 :deep(.vditor-ir .vditor-reset) {
-  color: #c8dce8 !important;
+  color: #333333 !important;
   font-family: var(--sans) !important;
   font-size: 15px !important;
   line-height: 1.8 !important;
@@ -509,59 +519,59 @@ onBeforeUnmount(() => {
 :deep(.vditor-ir .vditor-reset h1),
 :deep(.vditor-ir .vditor-reset h2),
 :deep(.vditor-ir .vditor-reset h3) {
-  color: #e9f8ff !important;
+  color: #1a1a1a !important;
   font-family: var(--heading) !important;
 }
 
 :deep(.vditor-ir .vditor-reset pre.vditor-reset) {
-  background: #081022 !important;
-  border: 1px solid rgba(0, 240, 255, 0.15) !important;
+  background: #f5f5f5 !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
 }
 
 :deep(.vditor-ir .vditor-reset code) {
-  background: rgba(0, 240, 255, 0.08) !important;
-  color: #00f0ff !important;
+  background: rgba(45, 90, 74, 0.08) !important;
+  color: var(--accent) !important;
   border-radius: 4px !important;
   padding: 2px 6px !important;
   font-family: var(--mono) !important;
 }
 
 :deep(.vditor-ir .vditor-reset blockquote) {
-  border-left: 4px solid #00f0ff !important;
-  background: rgba(0, 240, 255, 0.05) !important;
+  border-left: 4px solid var(--accent) !important;
+  background: rgba(45, 90, 74, 0.05) !important;
   padding: 8px 16px !important;
 }
 
 :deep(.vditor-ir .vditor-reset a) {
-  color: #00f0ff !important;
+  color: var(--accent) !important;
 }
 
 :deep(.vditor-ir .vditor-reset table td),
 :deep(.vditor-ir .vditor-reset table th) {
-  border-color: rgba(0, 240, 255, 0.2) !important;
+  border-color: var(--border) !important;
 }
 
 :deep(.vditor-ir .vditor-reset table th) {
-  background: rgba(0, 240, 255, 0.06) !important;
+  background: #f5f5f5 !important;
 }
 
 :deep(.vditor-outline) {
-  background: rgba(8, 16, 31, 0.9) !important;
-  border-left: 1px solid rgba(0, 240, 255, 0.15) !important;
+  background: #fafafa !important;
+  border-left: 1px solid var(--border) !important;
 }
 
 :deep(.vditor-hint),
 :deep(.vditor-tip) {
-  background: rgba(8, 16, 31, 0.96) !important;
-  border: 1px solid rgba(0, 240, 255, 0.2) !important;
-  color: #c8dce8 !important;
+  background: #ffffff !important;
+  border: 1px solid var(--border) !important;
+  color: #333333 !important;
 }
 
 :deep(.vditor-input) {
-  background: #0b1728 !important;
-  color: #e9f8ff !important;
-  border-color: rgba(0, 240, 255, 0.22) !important;
+  background: #ffffff !important;
+  color: #333333 !important;
+  border-color: var(--border) !important;
 }
 
 @media (max-width: 768px) {

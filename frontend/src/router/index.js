@@ -8,6 +8,12 @@ const routes = [
     meta: { title: '首页' }
   },
   {
+    path: '/github',
+    name: 'Github',
+    component: () => import('../views/GithubTrending.vue'),
+    meta: { title: 'GitHub热门' }
+  },
+  {
     path: '/article/:id',
     name: 'ArticleDetail',
     component: () => import('../views/ArticleDetail.vue'),

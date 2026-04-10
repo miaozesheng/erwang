@@ -98,6 +98,7 @@ public class FileController {
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000")
                     .body(resource);
         } catch (MalformedURLException e) {
             return ResponseEntity.notFound().build();
