@@ -217,13 +217,13 @@ const handleLogin = async () => {
 
 .login-card {
   background: linear-gradient(170deg, rgba(10, 20, 38, 0.9), rgba(8, 16, 31, 0.7));
-  border: 1px solid var(--border);
+  border: 1px solid rgba(0, 240, 255, 0.15);
   border-radius: 16px;
   padding: 56px;
   width: 100%;
   max-width: 440px;
   animation: slideUp 0.4s ease;
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42), 0 0 30px rgba(0, 240, 255, 0.14);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
 }
@@ -327,24 +327,24 @@ const handleLogin = async () => {
 }
 
 .login-bot.is-username-focused .bot-face {
-  transform: translateY(-6px);
+  transform: translateY(-3px);
 }
 
 .login-bot.is-username-focused .bot-eye {
-  transform: translateY(-4px);
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 1));
 }
 
 .login-bot.is-username-focused .bot-arm-right {
-  transform: translate(2px, -4px) rotate(-18deg);
-  animation: none;
+  transform: rotate(-18deg);
 }
 
 .login-bot.is-username-focused .bot-arm-left {
-  transform: translate(-1px, -2px) rotate(10deg);
+  transform: rotate(18deg);
 }
 
 .login-bot.is-password-focused .bot-body {
-  transform: rotate(-6deg) translateY(4px);
+  transform: rotate(-4deg) translateY(2px);
 }
 
 .login-bot.is-password-focused .bot-arm-left {
@@ -356,8 +356,9 @@ const handleLogin = async () => {
 }
 
 .login-bot.is-password-focused .bot-eye {
-  transform: scaleY(0.2);
+  transform: scaleY(0.1);
   opacity: 0.01;
+  filter: none;
 }
 
 @keyframes botFloat {
@@ -426,16 +427,18 @@ const handleLogin = async () => {
   font-size: 16px;
   font-weight: 700;
   margin-top: 16px;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
   color: #04131a;
   letter-spacing: 0.8px;
   font-family: var(--heading);
-  text-transform: uppercase;
+  transition: all var(--duration-normal) ease;
 }
 
 .login-btn:hover {
   background: var(--accent-hover);
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+
+.login-btn:active {
+  transform: scale(0.97);
 }
 
 .register-entry {

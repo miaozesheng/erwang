@@ -12,7 +12,6 @@ const router = useRouter()
 
     <main class="main-content">
       <section class="not-found-card">
-        <div class="card-corners" aria-hidden="true"></div>
         <h1 class="glitch" data-text="404">404</h1>
         <p class="terminal-msg">&gt; ERROR_NOT_FOUND: 请求的页面不存在或已被迁移。</p>
         <p class="sub-msg">信号丢失，请返回主站继续探索。</p>
@@ -38,47 +37,18 @@ const router = useRouter()
   width: 100%;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: var(--sp-6);
   box-sizing: border-box;
 }
 
 .not-found-card {
   width: min(680px, 100%);
-  position: relative;
   text-align: center;
-  border-radius: 16px;
-  border: 1px solid rgba(0, 240, 255, 0.22);
-  background: linear-gradient(165deg, rgba(10, 20, 38, 0.82), rgba(8, 16, 31, 0.62));
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.05), var(--shadow);
-  padding: 42px 24px;
-}
-
-.card-corners {
-  position: absolute;
-  inset: 10px;
-  pointer-events: none;
-}
-
-.card-corners::before,
-.card-corners::after {
-  content: '';
-  position: absolute;
-  width: 28px;
-  height: 18px;
-  border-top: 1px solid var(--accent-border);
-  border-left: 1px solid var(--accent-border);
-  opacity: 0.66;
-}
-
-.card-corners::before {
-  left: 0;
-  top: 0;
-}
-
-.card-corners::after {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  padding: 42px var(--sp-6);
 }
 
 .glitch {
@@ -126,16 +96,27 @@ const router = useRouter()
 }
 
 .home-btn {
-  border: 1px solid transparent;
-  background: linear-gradient(130deg, rgba(0, 240, 255, 0.9), rgba(0, 210, 225, 0.84));
+  border: 1px solid var(--accent);
+  background: var(--accent);
   color: #04131a;
   font-family: var(--heading);
   letter-spacing: 0.7px;
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out);
 }
 
 .home-btn:hover {
-  box-shadow: 0 0 18px rgba(0, 240, 255, 0.34);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 18px var(--accent-glow);
   transform: translateY(-1px);
+}
+
+.home-btn:active {
+  transform: scale(0.97);
 }
 
 @keyframes glitch-shift {
@@ -154,11 +135,11 @@ const router = useRouter()
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 16px;
+    padding: var(--sp-4);
   }
 
   .not-found-card {
-    padding: 32px 18px;
+    padding: var(--sp-8) var(--sp-5);
   }
 }
 </style>

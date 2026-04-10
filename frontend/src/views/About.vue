@@ -24,7 +24,6 @@ const socials = [
 
     <main class="main-content">
       <section class="about-card">
-        <div class="card-corners" aria-hidden="true"></div>
         <h1 class="page-title">关于我</h1>
 
         <div class="terminal-box">
@@ -87,62 +86,31 @@ const socials = [
   max-width: 1000px;
   margin: 0 auto;
   width: 100%;
-  padding: 28px 24px 48px;
+  padding: var(--sp-8) var(--sp-6) var(--sp-12);
   box-sizing: border-box;
 }
 
 .about-card {
-  position: relative;
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  border-radius: 16px;
-  padding: 28px;
-  background: linear-gradient(165deg, rgba(10, 20, 38, 0.78), rgba(8, 16, 31, 0.56));
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.04), var(--shadow);
-  overflow: hidden;
-}
-
-.card-corners {
-  position: absolute;
-  inset: 10px;
-  pointer-events: none;
-}
-
-.card-corners::before,
-.card-corners::after {
-  content: '';
-  position: absolute;
-  width: 28px;
-  height: 18px;
-  border-top: 1px solid var(--accent-border);
-  border-left: 1px solid var(--accent-border);
-  opacity: 0.66;
-}
-
-.card-corners::before {
-  left: 0;
-  top: 0;
-}
-
-.card-corners::after {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-8);
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
 }
 
 .page-title {
-  margin: 0 0 18px;
+  margin: 0 0 var(--sp-6);
   font-size: 34px;
   color: var(--text-h);
   letter-spacing: 1px;
-  text-shadow: 0 0 16px rgba(0, 240, 255, 0.2);
 }
 
 .terminal-box {
-  margin-bottom: 24px;
-  padding: 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 240, 255, 0.22);
-  background: rgba(6, 13, 24, 0.82);
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-accent);
+  background: var(--code-bg);
   font-family: var(--mono);
   color: var(--accent);
   line-height: 1.8;
@@ -153,7 +121,7 @@ const socials = [
 }
 
 .about-section {
-  margin-bottom: 24px;
+  margin-bottom: var(--sp-6);
 }
 
 .about-section:last-child {
@@ -161,7 +129,7 @@ const socials = [
 }
 
 .section-title {
-  margin: 0 0 12px;
+  margin: 0 0 var(--sp-3);
   color: var(--text-h);
   font-size: 20px;
   letter-spacing: 0.8px;
@@ -171,48 +139,57 @@ const socials = [
 .link-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--sp-2);
 }
 
 .tech-badge {
   padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 240, 255, 0.24);
-  background: rgba(0, 240, 255, 0.08);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: var(--accent-bg);
   color: var(--text);
   font-size: 12px;
   letter-spacing: 0.4px;
 }
 
 .social-link {
-  color: var(--accent);
+  color: var(--text-h);
   text-decoration: none;
-  border: 1px solid rgba(0, 240, 255, 0.24);
-  background: rgba(0, 240, 255, 0.05);
-  border-radius: 8px;
-  padding: 8px 12px;
-  transition: all 0.25s ease;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  padding: 8px 14px;
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
 }
 
 .social-link:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+  color: var(--accent-hover);
+  border-color: var(--border-accent);
+  background: var(--accent-bg);
   transform: translateY(-1px);
 }
 
 .contact-item {
-  margin: 0 0 8px;
+  margin: 0 0 var(--sp-2);
   color: var(--text);
   font-family: var(--mono);
 }
 
+.contact-item:last-child {
+  margin-bottom: 0;
+}
+
 @media (max-width: 768px) {
   .main-content {
-    padding: 20px 16px 32px;
+    padding: var(--sp-5) var(--sp-4) var(--sp-8);
   }
 
   .about-card {
-    padding: 20px;
+    padding: var(--sp-6);
   }
 
   .page-title {

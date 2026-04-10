@@ -3,6 +3,7 @@ package com.erwang.blog.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.erwang.blog.common.Result;
 import com.erwang.blog.entity.Article;
+import com.erwang.blog.entity.ArticleTag;
 import com.erwang.blog.entity.Category;
 import com.erwang.blog.entity.Tag;
 import com.erwang.blog.service.ArticleService;
@@ -13,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,7 @@ public class ArticleController {
 
         IPage<Article> articlePage = articleService.listPage(pageNo, pageSize, keyword, category, tag);
         List<Article> articles = articlePage.getRecords();
+        
         List<Category> categories = categoryService.listAll();
         List<Tag> tags = tagService.listAll();
 
@@ -53,10 +57,19 @@ public class ArticleController {
                 .collect(Collectors.toMap(Category::getId, Category::getName));
         Map<Long, String> tagNameById = tags.stream()
                 .collect(Collectors.toMap(Tag::getId, Tag::getName));
+        
+        List<Long> articleIds = articles.stream().map(Article::getId).collect(Collectors.toList());
+        Map<Long, List<Long>> tagIdsByArticleId = new HashMap<>();
+        if (!articleIds.isEmpty()) {
+            List<ArticleTag> allArticleTags = articleService.getTagIdsByArticleIds(articleIds);
+            tagIdsByArticleId = allArticleTags.stream()
+                    .collect(Collectors.groupingBy(ArticleTag::getArticleId, 
+                            Collectors.mapping(ArticleTag::getTagId, Collectors.toList())));
+        }
 
         List<Map<String, Object>> list = new ArrayList<>();
         for (Article article : articles) {
-            Map<String, Object> item = buildArticleResponse(article, categoryNameById, tagNameById, true);
+            Map<String, Object> item = buildArticleResponse(article, categoryNameById, tagNameById, tagIdsByArticleId, false);
             list.add(item);
         }
 
@@ -82,8 +95,14 @@ public class ArticleController {
                 .collect(Collectors.toMap(Category::getId, Category::getName));
         Map<Long, String> tagNameById = tags.stream()
                 .collect(Collectors.toMap(Tag::getId, Tag::getName));
+        
+        Map<Long, List<Long>> tagIdsByArticleId = new HashMap<>();
+        List<ArticleTag> articleTags = articleService.getTagIdsByArticleIds(Arrays.asList(id));
+        tagIdsByArticleId = articleTags.stream()
+                .collect(Collectors.groupingBy(ArticleTag::getArticleId, 
+                        Collectors.mapping(ArticleTag::getTagId, Collectors.toList())));
 
-        Map<String, Object> data = buildArticleResponse(article, categoryNameById, tagNameById, true);
+        Map<String, Object> data = buildArticleResponse(article, categoryNameById, tagNameById, tagIdsByArticleId, true);
         return Result.success(data);
     }
     
@@ -212,12 +231,15 @@ public class ArticleController {
     private Map<String, Object> buildArticleResponse(Article article,
                                                      Map<Long, String> categoryNameById,
                                                      Map<Long, String> tagNameById,
-                                                     boolean includeTagNames) {
+                                                     Map<Long, List<Long>> tagIdsByArticleId,
+                                                     boolean includeContent) {
         Map<String, Object> data = new HashMap<>();
         data.put("id", article.getId());
         data.put("title", article.getTitle());
         data.put("slug", article.getSlug());
-        data.put("content", article.getContent());
+        if (includeContent) {
+            data.put("content", article.getContent());
+        }
         data.put("summary", article.getSummary());
         data.put("excerpt", article.getSummary());
         data.put("cover", article.getCover());
@@ -231,15 +253,13 @@ public class ArticleController {
         data.put("created_at", article.getCreatedAt());
         data.put("updated_at", article.getUpdatedAt());
 
-        if (includeTagNames) {
-            List<Long> tagIds = articleService.getTagIdsByArticleId(article.getId());
-            List<String> tagNames = tagIds.stream()
-                    .map(tagNameById::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            data.put("tags", tagNames);
-            data.put("tagIds", tagIds);
-        }
+        List<Long> tagIds = tagIdsByArticleId.getOrDefault(article.getId(), Collections.emptyList());
+        List<String> tagNames = tagIds.stream()
+                .map(tagNameById::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        data.put("tags", tagNames);
+        data.put("tagIds", tagIds);
 
         return data;
     }

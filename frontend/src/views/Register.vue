@@ -87,10 +87,7 @@ const handleRegister = async () => {
     <Header />
 
     <main class="main-content">
-      <div class="register-bg-grid" aria-hidden="true"></div>
       <section class="register-card">
-        <div class="register-card-corners" aria-hidden="true"></div>
-
         <header class="register-header">
           <div class="register-bot" aria-hidden="true">
             <svg class="register-bot-svg" viewBox="0 0 180 170" role="img">
@@ -236,64 +233,17 @@ const handleRegister = async () => {
   overflow: hidden;
 }
 
-.register-bg-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image: radial-gradient(circle at 50% 50%, black 35%, transparent 100%);
-  opacity: 0.48;
-}
-
 .register-card {
   width: 100%;
   max-width: 432px;
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  background: linear-gradient(168deg, rgba(10, 20, 38, 0.9), rgba(8, 16, 31, 0.72));
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45), 0 0 34px rgba(0, 240, 255, 0.15);
+  background: rgba(10, 20, 38, 0.85);
+  box-shadow: var(--shadow-lg);
   padding: 40px;
   animation: register-slide-up 0.42s ease;
-}
-
-.register-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(132deg, rgba(0, 240, 255, 0.06), transparent 48%, rgba(114, 255, 220, 0.08));
-}
-
-.register-card-corners {
-  position: absolute;
-  inset: 10px;
-  pointer-events: none;
-}
-
-.register-card-corners::before,
-.register-card-corners::after {
-  content: '';
-  position: absolute;
-  width: 24px;
-  height: 14px;
-  border-top: 1px solid var(--accent-border);
-  border-left: 1px solid var(--accent-border);
-}
-
-.register-card-corners::before {
-  top: 0;
-  left: 0;
-}
-
-.register-card-corners::after {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
 }
 
 .register-header {
@@ -364,7 +314,7 @@ const handleRegister = async () => {
 }
 
 .mode-tab {
-  border: 1px solid rgba(0, 240, 255, 0.22);
+  border: 1px solid var(--border);
   background: rgba(8, 17, 31, 0.8);
   color: var(--text);
   font-family: var(--heading);
@@ -373,7 +323,10 @@ const handleRegister = async () => {
   padding: 10px 8px;
   border-radius: 10px;
   cursor: pointer;
-  transition: color 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, background 0.24s ease;
+  transition:
+    color var(--duration-normal) ease,
+    border-color var(--duration-normal) ease,
+    background var(--duration-normal) ease;
 }
 
 .mode-tab:hover {
@@ -382,10 +335,9 @@ const handleRegister = async () => {
 }
 
 .mode-tab.active {
+  background: var(--accent-bg);
+  border-color: var(--border-accent);
   color: var(--accent);
-  border-color: rgba(0, 240, 255, 0.64);
-  background: rgba(0, 240, 255, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.15), 0 0 16px rgba(0, 240, 255, 0.18);
 }
 
 .register-form {
@@ -425,12 +377,15 @@ const handleRegister = async () => {
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  transition: transform var(--duration-normal) ease, background var(--duration-normal) ease;
 }
 
 .register-btn:hover {
   background: var(--accent-hover);
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+
+.register-btn:active {
+  transform: scale(0.97);
 }
 
 .login-entry {

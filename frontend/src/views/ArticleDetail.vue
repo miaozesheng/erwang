@@ -6,10 +6,10 @@ import { markedHighlight } from 'marked-highlight'
 import hljs from 'highlight.js'
 import DOMPurify from 'dompurify'
 import { ElMessage } from 'element-plus'
-import { getArticle, toggleLike, toggleFavorite, getInteractionStatus, getArticles } from '../api'
+import { getArticle, toggleLike, toggleFavorite, getInteractionStatus } from '../api'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
-import { ArrowLeft, Folder, Calendar, View, Document, Clock, Star, Close } from '@element-plus/icons-vue'
+import { ArrowLeft, Folder, Calendar, View } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -23,63 +23,6 @@ const favorited = ref(false)
 const likeCount = ref(0)
 const favoriteCount = ref(0)
 
-// Reading workbench state
-const openedArticles = ref([])
-const recentArticles = ref([])
-const relatedArticles = ref([])
-const activeTabId = ref(null)
-
-const addToOpened = (art) => {
-  if (!art || !art.id) return
-  const existing = openedArticles.value.find(a => a.id === art.id)
-  if (existing) {
-    // Move to front
-    openedArticles.value = [existing, ...openedArticles.value.filter(a => a.id !== art.id)]
-  } else {
-    openedArticles.value = [{ id: art.id, title: art.title, path: route.fullPath }, ...openedArticles.value]
-  }
-  // Keep max 8 articles
-  if (openedArticles.value.length > 8) {
-    openedArticles.value = openedArticles.value.slice(0, 8)
-  }
-  activeTabId.value = art.id
-}
-
-const closeOpenedArticle = (id, event) => {
-  event.stopPropagation()
-  const idx = openedArticles.value.findIndex(a => a.id === id)
-  if (idx > -1) {
-    openedArticles.value.splice(idx, 1)
-    // If closed active, switch to first
-    if (activeTabId.value === id) {
-      activeTabId.value = openedArticles.value[0]?.id || null
-    }
-  }
-}
-
-const switchToArticle = (art) => {
-  if (art.id === article.value?.id) return
-  router.push(`/article/${art.id}`)
-}
-
-const fetchRelatedArticles = async (categoryId, excludeId) => {
-  try {
-    const res = await getArticles({ category: categoryId, size: 5, page: 1 })
-    relatedArticles.value = ((res.data.data?.list || [])).filter(a => a.id != excludeId).slice(0, 5)
-  } catch (e) {
-    console.error('Failed to fetch related articles:', e)
-  }
-}
-
-const fetchRecentArticles = async () => {
-  try {
-    const res = await getArticles({ size: 5, page: 1 })
-    const list = (res.data.data?.list || []).slice(0, 5)
-    recentArticles.value = list.map(a => ({ id: a.id, title: a.title }))
-  } catch (e) {
-    console.error('Failed to fetch recent articles:', e)
-  }
-}
 let headingObserver = null
 
 const resolveInteractionState = (data = {}) => {
@@ -139,16 +82,6 @@ const fetchArticle = async () => {
     await nextTick()
     collectHeadings()
     observeHeadingScroll()
-    // Add to opened articles workbench
-    if (article.value) {
-      addToOpened(article.value)
-      // Fetch related articles
-      if (article.value.category) {
-        fetchRelatedArticles(article.value.category, articleId)
-      } else if (article.value.categoryId) {
-        fetchRelatedArticles(article.value.categoryId, articleId)
-      }
-    }
   } catch (e) {
     console.error('Failed to fetch article:', e)
     ElMessage.error('加载文章失败')
@@ -239,7 +172,6 @@ const observeHeadingScroll = () => {
 
 onMounted(() => {
   fetchArticle()
-  fetchRecentArticles()
 })
 
 watch(() => route.params.id, (newId, oldId) => {
@@ -267,117 +199,56 @@ onUnmounted(() => {
     <Header />
     
     <main class="main-content">
-      <el-button class="back-btn" @click="router.push('/')">
-        <el-icon><ArrowLeft /></el-icon>
-        返回首页
-      </el-button>
-
       <el-skeleton :rows="10" animated v-if="loading" />
 
       <div v-else-if="article" class="content-layout">
-        <!-- Left Reading Workbench -->
-        <aside class="workbench-sidebar">
-          <div class="workbench-section">
-            <h3 class="workbench-title">
-              <el-icon><Document /></el-icon>
-              阅读工作台
-            </h3>
-            <div v-if="openedArticles.length" class="opened-tabs">
-              <div
-                v-for="tab in openedArticles"
-                :key="tab.id"
-                class="opened-tab"
-                :class="{ active: tab.id === article.id }"
-                @click="switchToArticle(tab)"
-              >
-                <span class="tab-title">{{ tab.title }}</span>
-                <button class="tab-close" @click="closeOpenedArticle(tab.id, $event)">
-                  <el-icon><Close /></el-icon>
+        <section class="reader-column">
+          <button type="button" class="back-btn" @click="router.push('/')">
+            <el-icon><ArrowLeft /></el-icon>
+            返回首页
+          </button>
+
+          <article class="article-detail">
+            <header class="article-header">
+              <h1 class="article-title">{{ article.title }}</h1>
+              <div class="article-meta">
+                <span v-if="article.category" class="meta-item">
+                  <el-icon><Folder /></el-icon>
+                  {{ article.category }}
+                </span>
+                <span class="meta-item">
+                  <el-icon><Calendar /></el-icon>
+                  {{ formatDate(article.created_at) }}
+                </span>
+                <span v-if="article.views" class="meta-item">
+                  <el-icon><View /></el-icon>
+                  {{ article.views }} 阅读
+                </span>
+              </div>
+
+              <div v-if="article.tags?.length" class="article-tags">
+                <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
+              </div>
+
+              <div class="interaction-bar">
+                <button type="button" class="interact-btn like" :class="{ active: liked }" @click="handleLike">
+                  <span class="btn-icon" aria-hidden="true">❤</span>
+                  <span>{{ likeCount }}</span>
+                </button>
+                <button type="button" class="interact-btn favorite" :class="{ active: favorited }" @click="handleFavorite">
+                  <span class="btn-icon" aria-hidden="true">★</span>
+                  <span>{{ favoriteCount }}</span>
                 </button>
               </div>
-            </div>
-            <p v-else class="workbench-empty">暂无打开的文章</p>
-          </div>
+            </header>
 
-          <div class="workbench-section">
-            <h3 class="workbench-title">
-              <el-icon><Clock /></el-icon>
-              最近阅读
-            </h3>
-            <ul v-if="recentArticles.length" class="recent-list">
-              <li
-                v-for="item in recentArticles"
-                :key="item.id"
-                class="recent-item"
-                @click="switchToArticle(item)"
-              >
-                {{ item.title }}
-              </li>
-            </ul>
-          </div>
-
-          <div v-if="relatedArticles.length" class="workbench-section">
-            <h3 class="workbench-title">
-              <el-icon><Star /></el-icon>
-              相关推荐
-            </h3>
-            <ul class="related-list">
-              <li
-                v-for="item in relatedArticles"
-                :key="item.id"
-                class="related-item"
-                @click="switchToArticle(item)"
-              >
-                {{ item.title }}
-              </li>
-            </ul>
-          </div>
-        </aside>
-
-        <article class="article-detail">
-          <div class="article-corners" aria-hidden="true"></div>
-          <header class="article-header">
-            <h1 class="article-title">{{ article.title }}</h1>
-            <div class="article-meta">
-              <span v-if="article.category" class="meta-category">
-                <el-icon><Folder /></el-icon>
-                {{ article.category }}
-              </span>
-              <span class="meta-date">
-                <el-icon><Calendar /></el-icon>
-                {{ formatDate(article.created_at) }}
-              </span>
-              <span v-if="article.views" class="meta-views">
-                <el-icon><View /></el-icon>
-                {{ article.views }} 阅读
-              </span>
-            </div>
-            <div v-if="article.tags?.length" class="article-tags">
-              <el-tag
-                v-for="tag in article.tags"
-                :key="tag"
-                class="tag"
-              >
-                {{ tag }}
-              </el-tag>
-            </div>
-
-            <div class="interaction-bar">
-              <button class="interact-btn" :class="{ active: liked }" @click="handleLike">
-                ❤ {{ likeCount }}
-              </button>
-              <button class="interact-btn favorite" :class="{ active: favorited }" @click="handleFavorite">
-                ⭐ {{ favoriteCount }}
-              </button>
-            </div>
-          </header>
-
-          <div
-            ref="contentRef"
-            class="article-content markdown-body"
-            v-html="renderedContent"
-          ></div>
-        </article>
+            <div
+              ref="contentRef"
+              class="article-content markdown-body"
+              v-html="renderedContent"
+            ></div>
+          </article>
+        </section>
 
         <aside v-if="headings.length" class="toc-sidebar">
           <h3 class="toc-title">目录</h3>
@@ -415,282 +286,184 @@ onUnmounted(() => {
 
 .main-content {
   flex: 1;
-  max-width: 1200px;
+  max-width: 1160px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 32px 24px 44px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .content-layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 280px;
-  gap: 24px;
-  align-items: flex-start;
+  grid-template-columns: minmax(0, 760px) 200px;
+  gap: 40px;
+  justify-content: center;
+  align-items: start;
 }
 
-.workbench-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.workbench-section {
-  border: 1px solid rgba(0, 240, 255, 0.18);
-  border-radius: 12px;
-  background: linear-gradient(170deg, rgba(10, 20, 38, 0.78), rgba(8, 16, 31, 0.62));
-  padding: 14px;
-}
-
-.workbench-title {
-  margin: 0 0 12px;
-  font-size: 14px;
-  color: var(--text-h);
-  letter-spacing: 0.8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.workbench-title .el-icon {
-  color: var(--accent);
-}
-
-.workbench-empty {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-dim);
-  font-family: var(--mono);
-}
-
-.opened-tabs {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.opened-tab {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border: 1px solid rgba(0, 240, 255, 0.12);
-  border-radius: 8px;
-  background: rgba(0, 240, 255, 0.04);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.opened-tab:hover {
-  border-color: var(--accent);
-  background: rgba(0, 240, 255, 0.1);
-}
-
-.opened-tab.active {
-  border-color: var(--accent);
-  background: rgba(0, 240, 255, 0.16);
-  box-shadow: inset 2px 0 0 0 var(--accent);
-}
-
-.tab-title {
-  font-size: 13px;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  margin-right: 8px;
-}
-
-.tab-close {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.tab-close:hover {
-  color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.12);
-}
-
-.recent-list,
-.related-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.recent-item,
-.related-item {
-  font-size: 13px;
-  color: var(--text);
-  padding: 8px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.recent-item:hover,
-.related-item:hover {
-  color: var(--accent);
-  background: rgba(0, 240, 255, 0.08);
+.reader-column {
+  width: 100%;
 }
 
 .back-btn {
-  margin-bottom: 24px;
-  background: linear-gradient(180deg, rgba(10, 23, 40, 0.88), rgba(8, 16, 31, 0.78));
-  border: 1px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
   color: var(--text);
-  font-family: var(--heading);
-  letter-spacing: 0.6px;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 0;
+  margin: 0 0 20px;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .back-btn:hover {
-  border-color: var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.22);
 }
 
 .article-detail {
-  animation: fadeIn 0.5s ease;
-  border: 1px solid rgba(0, 240, 255, 0.18);
-  border-radius: 16px;
-  padding: 30px;
-  background: linear-gradient(170deg, rgba(10, 20, 38, 0.82), rgba(8, 16, 31, 0.58));
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.04), var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  border: 1px solid rgba(0, 240, 255, 0.14);
+  border-radius: 14px;
+  padding: 36px;
+  background: rgba(10, 20, 38, 0.72);
 }
 
 .article-header {
-  margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-  z-index: 1;
+  margin-bottom: 30px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.14);
 }
 
 .article-title {
-  font-size: 36px;
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.3;
   font-weight: 700;
   color: var(--text-h);
-  margin: 0 0 16px;
-  line-height: 1.3;
-  letter-spacing: 1px;
-  text-shadow: 0 0 14px rgba(0, 240, 255, 0.16);
+  text-shadow: 0 2px 10px rgba(0, 240, 255, 0.12);
 }
 
 .article-meta {
   display: flex;
-  gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-top: 14px;
 }
 
-.meta-category,
-.meta-date,
-.meta-views {
-  display: flex;
+.meta-item {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   color: var(--text);
-  font-size: 14px;
   font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.2px;
 }
 
-.meta-category .el-icon,
-.meta-date .el-icon,
-.meta-views .el-icon {
+.meta-item .el-icon {
   color: var(--accent);
+  font-size: 13px;
 }
 
 .article-tags {
+  margin-top: 12px;
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 .tag {
-  background: var(--accent-bg);
-  color: var(--accent);
-  border: 1px solid rgba(0, 240, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 240, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(0, 240, 255, 0.08);
+  color: var(--text-h);
   font-family: var(--mono);
+  font-size: 11px;
+}
+
+.interaction-bar {
+  margin-top: 18px;
+  display: flex;
+  gap: 10px;
+}
+
+.interact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 9px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.interact-btn:active {
+  transform: scale(0.97);
+}
+
+.interact-btn.like:hover {
+  color: #ff9ab0;
+  border-color: rgba(255, 103, 137, 0.45);
+  background: rgba(255, 103, 137, 0.1);
+}
+
+.interact-btn.favorite:hover {
+  color: #ffcf7c;
+  border-color: rgba(255, 187, 84, 0.45);
+  background: rgba(255, 187, 84, 0.1);
+}
+
+.interact-btn.like.active {
+  color: #ffeef2;
+  border-color: rgba(255, 92, 127, 0.95);
+  background: rgba(231, 64, 103, 0.94);
+}
+
+.interact-btn.favorite.active {
+  color: #241300;
+  border-color: rgba(255, 188, 79, 0.95);
+  background: rgba(255, 188, 79, 0.95);
+}
+
+.btn-icon {
+  font-size: 12px;
 }
 
 .article-content {
   font-size: 16px;
-  line-height: 1.9;
+  line-height: 1.8;
   color: var(--text);
-  position: relative;
-  z-index: 1;
-}
-
-.interaction-bar {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.interact-btn {
-  border: 1px solid rgba(0, 240, 255, 0.38);
-  background: rgba(0, 240, 255, 0.06);
-  color: var(--accent);
-  font-family: var(--mono);
-  border-radius: 10px;
-  padding: 8px 14px;
-  cursor: pointer;
-  letter-spacing: 0.6px;
-  transition: all 0.24s ease;
-}
-
-.interact-btn:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.26);
-}
-
-.interact-btn.active {
-  color: #ffe8ef;
-  background: linear-gradient(135deg, rgba(255, 67, 112, 0.86), rgba(196, 22, 67, 0.88));
-  border-color: rgba(255, 83, 124, 0.95);
-  box-shadow: 0 0 16px rgba(255, 59, 108, 0.4), inset 0 0 10px rgba(255, 210, 224, 0.16);
-}
-
-.interact-btn.favorite.active {
-  color: #fff4dc;
-  background: linear-gradient(135deg, rgba(255, 184, 57, 0.9), rgba(223, 129, 0, 0.86));
-  border-color: rgba(255, 191, 74, 0.96);
-  box-shadow: 0 0 16px rgba(255, 185, 69, 0.42), inset 0 0 10px rgba(255, 240, 192, 0.18);
 }
 
 .toc-sidebar {
   position: sticky;
   top: 88px;
-  border: 1px solid rgba(0, 240, 255, 0.18);
+  width: 200px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
   border-radius: 12px;
-  background: linear-gradient(170deg, rgba(10, 20, 38, 0.78), rgba(8, 16, 31, 0.62));
-  padding: 14px 12px;
+  background: rgba(10, 20, 38, 0.6);
+  padding: 14px 10px;
 }
 
 .toc-title {
   margin: 0 0 10px;
-  font-size: 16px;
   color: var(--text-h);
-  letter-spacing: 0.8px;
+  font-size: 13px;
+  font-family: var(--mono);
+  letter-spacing: 0.4px;
 }
 
 .toc-list {
@@ -700,7 +473,7 @@ onUnmounted(() => {
 }
 
 .toc-item {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .toc-item.level-2 .toc-link {
@@ -713,56 +486,29 @@ onUnmounted(() => {
 
 .toc-link {
   width: 100%;
-  text-align: left;
-  border: none;
-  border-radius: 8px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 0;
   background: transparent;
   color: var(--text);
+  text-align: left;
   font-family: var(--mono);
   font-size: 13px;
   line-height: 1.4;
-  padding: 8px 10px;
+  padding: 6px 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .toc-link:hover {
   color: var(--accent-hover);
-  background: rgba(0, 240, 255, 0.08);
+  background: rgba(0, 240, 255, 0.06);
 }
 
 .toc-item.active .toc-link {
   color: var(--accent);
-  background: rgba(0, 240, 255, 0.14);
-  box-shadow: inset 2px 0 0 0 var(--accent);
-}
-
-.article-corners {
-  position: absolute;
-  inset: 10px;
-  pointer-events: none;
-}
-
-.article-corners::before,
-.article-corners::after {
-  content: '';
-  position: absolute;
-  width: 28px;
-  height: 18px;
-  border-top: 1px solid var(--accent-border);
-  border-left: 1px solid var(--accent-border);
-  opacity: 0.66;
-}
-
-.article-corners::before {
-  left: 0;
-  top: 0;
-}
-
-.article-corners::after {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
+  border-left-color: var(--accent);
+  background: rgba(0, 240, 255, 0.1);
 }
 
 :deep(.markdown-body) {
@@ -774,114 +520,112 @@ onUnmounted(() => {
 :deep(.markdown-body h3),
 :deep(.markdown-body h4) {
   color: var(--text-h);
-  margin: 24px 0 16px;
-  font-weight: 700;
   font-family: var(--heading);
-  letter-spacing: 0.8px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 2.1em 0 0.75em;
 }
 
-:deep(.markdown-body h1) { font-size: 28px; }
-:deep(.markdown-body h2) { font-size: 24px; }
-:deep(.markdown-body h3) { font-size: 20px; }
+:deep(.markdown-body h1) { font-size: 30px; }
+:deep(.markdown-body h2) { font-size: 25px; }
+:deep(.markdown-body h3) { font-size: 21px; }
+:deep(.markdown-body h4) { font-size: 18px; }
 
 :deep(.markdown-body p) {
-  margin: 16px 0;
+  margin: 0 0 1.1em;
 }
 
 :deep(.markdown-body a) {
   color: var(--accent);
-  text-decoration: none;
-}
-
-:deep(.markdown-body a:hover) {
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 :deep(.markdown-body code) {
   background: var(--code-bg);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-family: var(--mono);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 6px;
+  padding: 2px 6px;
   font-size: 14px;
+  font-family: var(--mono);
 }
 
 :deep(.markdown-body pre) {
-  background: var(--code-bg);
+  margin: 1.3em 0;
   padding: 16px;
-  border-radius: 8px;
+  background: var(--code-bg);
+  border: 1px solid rgba(0, 240, 255, 0.26);
+  border-radius: 10px;
   overflow-x: auto;
-  margin: 16px 0;
-  border: 1px solid rgba(0, 240, 255, 0.18);
 }
 
 :deep(.markdown-body pre code) {
-  background: none;
+  border: none;
   padding: 0;
+  background: transparent;
 }
 
 :deep(.markdown-body blockquote) {
-  border-left: 4px solid var(--accent);
-  margin: 16px 0;
-  padding: 8px 16px;
-  background: var(--accent-bg);
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.12);
+  margin: 1.2em 0;
+  padding: 8px 0 8px 14px;
+  border-left: 3px solid var(--accent);
+  color: color-mix(in srgb, var(--text) 88%, var(--text-h) 12%);
 }
 
 :deep(.markdown-body ul),
 :deep(.markdown-body ol) {
+  margin: 0 0 1.2em;
   padding-left: 24px;
-  margin: 16px 0;
 }
 
 :deep(.markdown-body li) {
-  margin: 8px 0;
+  margin: 0.45em 0;
 }
 
 :deep(.markdown-body img) {
+  display: block;
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin: 1.2em auto;
 }
 
 :deep(.markdown-body table) {
   width: 100%;
   border-collapse: collapse;
-  margin: 16px 0;
+  margin: 1.3em 0;
 }
 
 :deep(.markdown-body th),
 :deep(.markdown-body td) {
-  border: 1px solid var(--border);
-  padding: 12px;
+  border: 1px solid rgba(0, 240, 255, 0.24);
+  padding: 10px 12px;
   text-align: left;
 }
 
 :deep(.markdown-body th) {
-  background: var(--code-bg);
+  color: var(--text-h);
+  background: rgba(11, 23, 40, 0.9);
 }
 
 @media (max-width: 768px) {
   .content-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .workbench-sidebar {
-    display: none;
+    grid-template-columns: minmax(0, 760px);
   }
 
   .toc-sidebar {
     display: none;
   }
 
-  .article-title {
-    font-size: 28px;
-  }
-  
   .main-content {
-    padding: 24px 16px;
+    padding: 22px 14px 34px;
   }
 
   .article-detail {
-    padding: 20px;
+    padding: 22px 16px;
+  }
+
+  .article-title {
+    font-size: 24px;
   }
 }
 </style>

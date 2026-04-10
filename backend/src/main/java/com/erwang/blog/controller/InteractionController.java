@@ -80,6 +80,11 @@ public class InteractionController {
 
     @GetMapping("/status/{articleId}")
     public Result<Map<String, Object>> getStatus(@PathVariable Long articleId, Authentication auth) {
+        Map<String, Object> data = buildStatusMap(articleId, auth);
+        return Result.success(data);
+    }
+    
+    private Map<String, Object> buildStatusMap(Long articleId, Authentication auth) {
         Map<String, Object> data = new HashMap<>();
         long likeCount = likeMapper.selectCount(new LambdaQueryWrapper<ArticleLike>().eq(ArticleLike::getArticleId, articleId));
         long favCount = favoriteMapper.selectCount(new LambdaQueryWrapper<ArticleFavorite>().eq(ArticleFavorite::getArticleId, articleId));
@@ -94,7 +99,54 @@ public class InteractionController {
             data.put("favorited", favoriteMapper.selectCount(new LambdaQueryWrapper<ArticleFavorite>()
                     .eq(ArticleFavorite::getUserId, user.getId()).eq(ArticleFavorite::getArticleId, articleId)) > 0);
         }
-        return Result.success(data);
+        return data;
+    }
+    
+    @PostMapping("/statuses")
+    public Result<Map<Long, Map<String, Object>>> getStatuses(@RequestBody Map<String, Object> body, Authentication auth) {
+        List<Long> articleIds = (List<Long>) body.get("articleIds");
+        if (articleIds == null || articleIds.isEmpty()) {
+            return Result.success(new HashMap<>());
+        }
+        
+        Map<Long, Map<String, Object>> result = new HashMap<>();
+        Map<Long, Long> likeCounts = likeMapper.selectList(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<ArticleLike>()
+                        .in(ArticleLike::getArticleId, articleIds))
+                .stream().collect(Collectors.groupingBy(ArticleLike::getArticleId, Collectors.counting()));
+        
+        Map<Long, Long> favCounts = favoriteMapper.selectList(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<ArticleFavorite>()
+                        .in(ArticleFavorite::getArticleId, articleIds))
+                .stream().collect(Collectors.groupingBy(ArticleFavorite::getArticleId, Collectors.counting()));
+        
+        Set<Long> likedIds = new HashSet<>();
+        Set<Long> favoritedIds = new HashSet<>();
+        
+        if (auth != null && auth.getPrincipal() instanceof User) {
+            User user = (User) auth.getPrincipal();
+            likedIds = likeMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<ArticleLike>()
+                            .eq(ArticleLike::getUserId, user.getId())
+                            .in(ArticleLike::getArticleId, articleIds))
+                    .stream().map(ArticleLike::getArticleId).collect(Collectors.toSet());
+            favoritedIds = favoriteMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<ArticleFavorite>()
+                            .eq(ArticleFavorite::getUserId, user.getId())
+                            .in(ArticleFavorite::getArticleId, articleIds))
+                    .stream().map(ArticleFavorite::getArticleId).collect(Collectors.toSet());
+        }
+        
+        for (Long id : articleIds) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("likeCount", likeCounts.getOrDefault(id, 0L));
+            item.put("favoriteCount", favCounts.getOrDefault(id, 0L));
+            item.put("liked", likedIds.contains(id));
+            item.put("favorited", favoritedIds.contains(id));
+            result.put(id, item);
+        }
+        
+        return Result.success(result);
     }
 
     @GetMapping("/my-favorites")

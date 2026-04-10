@@ -153,6 +153,16 @@ public class ArticleServiceImpl implements ArticleService {
         return tagIds;
     }
     
+    @Override
+    public List<ArticleTag> getTagIdsByArticleIds(List<Long> articleIds) {
+        if (articleIds == null || articleIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        LambdaQueryWrapper<ArticleTag> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(ArticleTag::getArticleId, articleIds);
+        return articleTagMapper.selectList(wrapper);
+    }
+    
     private void saveArticleTags(Long articleId, List<Long> tagIds) {
         for (Long tagId : tagIds) {
             ArticleTag articleTag = new ArticleTag();

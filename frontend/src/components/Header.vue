@@ -12,7 +12,7 @@ const hasToken = () => !!localStorage.getItem('token')
 const isLoggedIn = ref(hasToken())
 const userRole = ref(normalizeRole(localStorage.getItem('userRole') || ''))
 const userInfo = ref({
-  avatar: ''
+  avatar: localStorage.getItem('userAvatar') || ''
 })
 
 const displayAvatar = computed(() => resolveFileUrl(userInfo.value.avatar))
@@ -129,6 +129,9 @@ const fetchUserInfo = async () => {
       ...user,
       avatar: user.avatar || ''
     }
+    if (user.avatar) {
+      localStorage.setItem('userAvatar', user.avatar)
+    }
     if (user.role) {
       userRole.value = normalizeRole(user.role)
       localStorage.setItem('userRole', normalizeRole(user.role))
@@ -151,6 +154,7 @@ const syncAuthState = () => {
 const handleLogout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('userRole')
+  localStorage.removeItem('userAvatar')
   isLoggedIn.value = false
   userRole.value = ''
   userInfo.value = { avatar: '' }
@@ -190,7 +194,6 @@ onBeforeUnmount(() => {
 
 <template>
   <header class="site-header">
-    <div class="header-scanline"></div>
     <div class="header-container">
       <div class="logo" @click="navigateTo('/')">
         <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -201,13 +204,6 @@ onBeforeUnmount(() => {
         <span class="logo-text">ERWANG</span>
       </div>
       <nav ref="navLinksRef" class="nav-links" aria-label="主导航">
-        <div class="nav-energy-indicator" :style="indicatorStyle" aria-hidden="true">
-          <span class="indicator-core"></span>
-          <span class="indicator-halo"></span>
-        </div>
-        <div class="nav-data-stream" aria-hidden="true">
-          <span class="stream-dot" v-for="dot in 6" :key="dot" :style="{ '--dot-delay': `${dot * 0.5}s` }"></span>
-        </div>
         <button
           v-for="(item, index) in navItems"
           :key="item.path"
@@ -223,8 +219,6 @@ onBeforeUnmount(() => {
           :aria-current="isActiveRoute(item.path) ? 'page' : undefined"
           @click="navigateTo(item.path)"
         >
-          <span class="tab-shimmer" aria-hidden="true"></span>
-          <span class="tab-discharge-flash" aria-hidden="true"></span>
           <span class="tab-icon" aria-hidden="true">{{ item.icon }}</span>
           <span class="tab-label">{{ item.label }}</span>
         </button>
@@ -232,7 +226,6 @@ onBeforeUnmount(() => {
       <div class="header-actions">
         <el-dropdown v-if="isLoggedIn" trigger="click" class="profile-dropdown" popper-class="cyber-user-dropdown">
           <button class="avatar-button" type="button" aria-label="用户菜单">
-            <span class="avatar-ring"></span>
             <el-avatar v-if="displayAvatar" :src="displayAvatar" :size="32" class="header-avatar" />
             <span v-else class="avatar-fallback" aria-hidden="true">
               <el-icon><UserFilled /></el-icon>
@@ -262,7 +255,6 @@ onBeforeUnmount(() => {
         <span class="toggle-bar" :class="{ open: mobileMenuOpen }"></span>
       </button>
     </div>
-    <div class="header-corners" aria-hidden="true"></div>
 
     <Transition name="mobile-menu">
       <div v-if="mobileMenuOpen" class="mobile-overlay" @click.self="mobileMenuOpen = false">
@@ -296,29 +288,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .site-header {
-  background: linear-gradient(180deg, rgba(7, 11, 20, 0.96), rgba(7, 11, 20, 0.78));
-  border-bottom: 1px solid var(--border);
-  padding: 16px 0;
+  background: rgba(7, 11, 20, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 0;
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(14px);
-  overflow: visible;
-}
-
-.header-scanline {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  clip-path: inset(0);
-  background-image: linear-gradient(100deg, transparent, rgba(0, 240, 255, 0.16), transparent);
-  background-size: 32% 100%;
-  background-repeat: no-repeat;
-  background-position: -42% 0;
-  animation: header-scan 5.5s linear infinite;
-  pointer-events: none;
+  backdrop-filter: blur(16px);
 }
 
 .header-container {
@@ -328,8 +304,6 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: relative;
-  z-index: 1;
 }
 
 .logo {
@@ -337,7 +311,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 220ms ease, transform 220ms ease;
 }
 
 .logo:hover {
@@ -348,12 +322,12 @@ onBeforeUnmount(() => {
 .logo-svg {
   width: 30px;
   height: 30px;
-  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.4));
-  transition: filter 0.3s ease;
+  filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.2));
+  transition: filter 220ms ease;
 }
 
 .logo:hover .logo-svg {
-  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
+  filter: drop-shadow(0 0 9px rgba(0, 240, 255, 0.3));
 }
 
 .logo-text {
@@ -365,242 +339,137 @@ onBeforeUnmount(() => {
 }
 
 .nav-links {
-  --nav-gap: 12px;
   display: flex;
-  gap: var(--nav-gap);
-  position: relative;
-  padding: 6px 0 12px;
+  align-items: center;
+  gap: 8px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.01);
 }
 
 .nav-link {
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  background: linear-gradient(135deg, rgba(8, 18, 34, 0.74), rgba(6, 12, 23, 0.88));
-  padding: 10px 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 999px;
+  padding: 9px 14px;
   color: var(--text);
   font-size: 13px;
   font-family: var(--heading);
-  text-transform: uppercase;
-  letter-spacing: 0.9px;
+  letter-spacing: 0.55px;
   cursor: pointer;
-  transition: color 0.28s ease, text-shadow 0.28s ease, filter 0.28s ease, border-color 0.28s ease, background 0.28s ease;
-  position: relative;
-  min-width: 96px;
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.nav-link::before {
-  content: '';
-  position: absolute;
-  inset: 1px;
-  background: linear-gradient(140deg, rgba(0, 240, 255, 0.1), rgba(0, 240, 255, 0.02) 46%, rgba(114, 255, 220, 0.12));
-  opacity: 0.56;
-  z-index: -1;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0.18;
-  transition: opacity 0.3s ease;
+  gap: 6px;
 }
 
 .tab-icon,
 .tab-label {
-  position: relative;
-  z-index: 2;
+  line-height: 1;
 }
 
 .tab-icon {
-  color: var(--accent-secondary);
-  text-shadow: 0 0 12px rgba(114, 255, 220, 0.34);
+  color: color-mix(in srgb, var(--accent) 72%, var(--text) 28%);
+  font-size: 12px;
 }
 
 .tab-label {
   color: inherit;
 }
 
-.tab-shimmer {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent 12%, rgba(255, 255, 255, 0.4) 44%, transparent 76%);
-  transform: translateX(-150%);
-  transition: transform 0.55s ease;
-  mix-blend-mode: screen;
-  opacity: 0.3;
-}
-
-.tab-discharge-flash {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.1) 45%, transparent 76%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 3;
-}
-
 .nav-link:hover {
-  color: var(--accent-hover);
-  text-shadow: 0 0 10px var(--accent-glow), 0 0 18px rgba(0, 240, 255, 0.25);
-  border-color: rgba(0, 240, 255, 0.38);
-}
-
-.nav-link:hover .tab-shimmer {
-  transform: translateX(160%);
+  color: var(--text-h);
+  border-color: rgba(0, 240, 255, 0.2);
+  box-shadow: inset 0 -1px 0 rgba(0, 240, 255, 0.18), 0 0 10px rgba(0, 240, 255, 0.08);
 }
 
 .nav-link.active {
-  color: var(--accent);
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.55), 0 0 24px rgba(0, 240, 255, 0.3);
-  border-color: rgba(0, 240, 255, 0.62);
-  background: linear-gradient(135deg, rgba(11, 29, 46, 0.86), rgba(6, 16, 31, 0.9));
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.16), 0 0 20px rgba(0, 240, 255, 0.18);
-}
-
-.nav-link.active::after {
-  opacity: 1;
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
-  animation: nav-active-pulse 1.8s ease-in-out infinite;
+  color: var(--text-h);
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.08);
 }
 
 .nav-link.tab-fading {
-  animation: tab-flicker-dim 0.46s steps(3, end);
+  opacity: 0.72;
 }
 
 .nav-link.tab-activating {
-  animation: tab-power-up 0.4s ease-out;
+  transform: translateY(-1px);
 }
 
-.nav-link.tab-discharge .tab-discharge-flash {
-  animation: tab-discharge-flash 0.4s ease-out;
+.nav-link.tab-discharge {
+  animation: tab-discharge-soft 420ms ease-out;
 }
 
-.nav-energy-indicator {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 4px;
-  pointer-events: none;
-  z-index: 4;
-  transition: transform 0.52s cubic-bezier(0.22, 1.35, 0.35, 1), width 0.34s ease;
-}
-
-.indicator-core,
-.indicator-halo {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-}
-
-.indicator-core {
-  background: linear-gradient(90deg, rgba(0, 240, 255, 0.24), var(--accent), rgba(114, 255, 220, 0.94));
-  box-shadow: 0 0 18px rgba(0, 240, 255, 0.48), 0 0 30px rgba(0, 240, 255, 0.26);
-}
-
-.indicator-halo {
-  filter: blur(7px);
-  opacity: 0.75;
-  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.9), transparent);
-}
-
-.nav-data-stream {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -3px;
-  height: 10px;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.stream-dot {
-  position: absolute;
-  left: -10px;
-  top: 4px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(114, 255, 220, 0.9);
-  box-shadow: 0 0 10px rgba(114, 255, 220, 0.8);
-  animation: nav-data-flow 3.4s linear infinite;
-  animation-delay: var(--dot-delay);
+.nav-link:active {
+  transform: scale(0.97);
 }
 
 .login-btn {
-  background: var(--accent);
-  border: 1px solid transparent;
-  color: #061018;
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+  background: rgba(0, 240, 255, 0.14);
+  border: 1px solid rgba(0, 240, 255, 0.32);
+  color: var(--text-h);
+  box-shadow: none;
   font-family: var(--heading);
-  text-transform: uppercase;
+  text-transform: none;
+  transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease, transform 220ms ease;
 }
 
 .login-btn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.45);
+  background: rgba(0, 240, 255, 0.2);
+  border-color: rgba(0, 240, 255, 0.44);
+  color: var(--text-h);
+}
+
+.login-btn:active {
+  transform: scale(0.97);
 }
 
 .profile-dropdown {
   display: inline-flex;
 }
 
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+}
+
 .avatar-button {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  border: none;
-  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
   padding: 0;
   display: grid;
   place-items: center;
   cursor: pointer;
-  position: relative;
-  transition: transform 0.24s ease;
+  transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
 }
 
 .avatar-button:hover {
-  transform: scale(1.08);
-}
-
-.avatar-ring {
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  border: 2px solid var(--accent);
-  box-shadow: 0 0 12px var(--accent-glow), inset 0 0 8px rgba(0, 240, 255, 0.15);
-  animation: ring-pulse 2.5s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.avatar-button:hover .avatar-ring {
-  box-shadow: 0 0 22px var(--accent-glow), 0 0 40px rgba(0, 240, 255, 0.2), inset 0 0 12px rgba(0, 240, 255, 0.2);
+  border-color: rgba(0, 240, 255, 0.34);
+  background: rgba(0, 240, 255, 0.08);
 }
 
 .header-avatar {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
 }
 
 .avatar-fallback {
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: var(--accent);
-  font-size: 18px;
-  background: radial-gradient(circle, rgba(0, 240, 255, 0.18), rgba(7, 11, 20, 0.95));
+  color: color-mix(in srgb, var(--accent) 68%, var(--text-h) 32%);
+  font-size: 16px;
+  background: rgba(0, 240, 255, 0.12);
 }
 
 .menu-icon {
@@ -609,110 +478,15 @@ onBeforeUnmount(() => {
   font-size: 14px;
 }
 
-@keyframes ring-pulse {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
-
-.header-corners {
-  position: absolute;
-  inset: 6px 12px;
-  pointer-events: none;
-}
-
-.header-corners::before,
-.header-corners::after {
-  content: '';
-  position: absolute;
-  width: 28px;
-  height: 14px;
-  border-top: 1px solid var(--accent-border);
-}
-
-.header-corners::before {
-  left: 0;
-  top: 0;
-  border-left: 1px solid var(--accent-border);
-}
-
-.header-corners::after {
-  right: 0;
-  bottom: 0;
-  border-right: 1px solid var(--accent-border);
-  border-top: none;
-  border-bottom: 1px solid var(--accent-border);
-}
-
-@keyframes header-scan {
+@keyframes tab-discharge-soft {
   0% {
-    background-position: -42% 0;
+    box-shadow: inset 0 0 0 0 rgba(0, 240, 255, 0);
+  }
+  40% {
+    box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.22);
   }
   100% {
-    background-position: 142% 0;
-  }
-}
-
-@keyframes nav-active-pulse {
-  0%,
-  100% {
-    opacity: 0.75;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes tab-discharge-flash {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  25% {
-    opacity: 0.94;
-    transform: scale(1.02);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.08);
-  }
-}
-
-@keyframes tab-flicker-dim {
-  0% { opacity: 1; filter: brightness(1); }
-  30% { opacity: 0.42; filter: brightness(0.72); }
-  55% { opacity: 0.88; filter: brightness(0.95); }
-  100% { opacity: 0.56; filter: brightness(0.76); }
-}
-
-@keyframes tab-power-up {
-  0% {
-    transform: translateY(2px) scale(0.98);
-    filter: brightness(0.9);
-  }
-  55% {
-    transform: translateY(-1px) scale(1.03);
-    filter: brightness(1.15);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    filter: brightness(1);
-  }
-}
-
-@keyframes nav-data-flow {
-  0% {
-    transform: translateX(0) scale(0.7);
-    opacity: 0;
-  }
-  12% {
-    opacity: 0.75;
-  }
-  85% {
-    opacity: 0.35;
-  }
-  100% {
-    transform: translateX(520px) scale(1.15);
-    opacity: 0;
+    box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.08);
   }
 }
 
@@ -720,12 +494,18 @@ onBeforeUnmount(() => {
   display: none;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(0, 240, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.02);
   cursor: pointer;
   position: relative;
   flex-shrink: 0;
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.mobile-toggle:hover {
+  border-color: rgba(0, 240, 255, 0.32);
+  background: rgba(0, 240, 255, 0.08);
 }
 
 .toggle-bar,
@@ -753,9 +533,8 @@ onBeforeUnmount(() => {
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  top: 60px;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  top: 66px;
+  background: rgba(7, 11, 20, 0.58);
   z-index: 99;
   display: flex;
   justify-content: flex-end;
@@ -764,8 +543,8 @@ onBeforeUnmount(() => {
 .mobile-nav {
   width: 260px;
   height: 100%;
-  background: linear-gradient(180deg, rgba(7, 11, 20, 0.98), rgba(8, 16, 31, 0.96));
-  border-left: 1px solid rgba(0, 240, 255, 0.2);
+  background: var(--bg);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
@@ -777,7 +556,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border: 1px solid rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   background: transparent;
   color: var(--text);
@@ -790,13 +569,9 @@ onBeforeUnmount(() => {
 
 .mobile-nav-item:hover,
 .mobile-nav-item.active {
-  color: var(--accent);
-  border-color: rgba(0, 240, 255, 0.4);
-  background: rgba(0, 240, 255, 0.06);
-}
-
-.mobile-nav-item.active {
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
+  color: var(--text-h);
+  border-color: rgba(0, 240, 255, 0.3);
+  background: rgba(0, 240, 255, 0.08);
 }
 
 .mobile-nav-item.logout {
@@ -811,18 +586,18 @@ onBeforeUnmount(() => {
 
 .mobile-nav-divider {
   height: 1px;
-  background: rgba(0, 240, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   margin: 8px 0;
 }
 
 .mobile-menu-enter-active,
 .mobile-menu-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 240ms ease;
 }
 
 .mobile-menu-enter-active .mobile-nav,
 .mobile-menu-leave-active .mobile-nav {
-  transition: transform 0.3s ease;
+  transition: transform 260ms ease;
 }
 
 .mobile-menu-enter-from,
@@ -856,7 +631,23 @@ onBeforeUnmount(() => {
   }
 
   .logo-text {
-    font-size: 20px;
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo,
+  .logo-svg,
+  .nav-link,
+  .login-btn,
+  .avatar-button,
+  .mobile-toggle,
+  .mobile-menu-enter-active,
+  .mobile-menu-leave-active,
+  .mobile-menu-enter-active .mobile-nav,
+  .mobile-menu-leave-active .mobile-nav {
+    transition-duration: 1ms;
+    animation: none;
   }
 }
 </style>

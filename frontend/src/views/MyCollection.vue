@@ -38,7 +38,6 @@ onMounted(fetchData)
     <Header />
     <main class="main-content">
       <section class="collection-panel">
-        <div class="panel-corners" aria-hidden="true"></div>
         <h1 class="page-title">{{ pageTitle }}</h1>
         <div v-loading="loading" class="articles-grid">
           <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
@@ -55,17 +54,77 @@ onMounted(fetchData)
 </template>
 
 <style scoped>
-.page-container { min-height: 100vh; display: flex; flex-direction: column; }
-.main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 32px 24px; width: 100%; box-sizing: border-box; }
-.collection-panel { position: relative; }
-.panel-corners { position: absolute; inset: 0; pointer-events: none; }
-.panel-corners::before, .panel-corners::after { content: ''; position: absolute; width: 28px; height: 18px; border-top: 1px solid var(--accent-border); border-left: 1px solid var(--accent-border); opacity: 0.5; }
-.panel-corners::before { left: 0; top: 0; }
-.panel-corners::after { right: 0; bottom: 0; transform: rotate(180deg); }
-.page-title { font-size: 28px; color: var(--text-h); margin: 0 0 24px; }
-.articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
-.empty-state { text-align: center; padding: 60px 24px; }
-.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.6; }
-.empty-title { font-size: 18px; color: var(--text-h); font-family: var(--heading); margin: 0 0 8px; }
-.empty-desc { font-size: 14px; color: var(--text); opacity: 0.7; }
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--sp-8) var(--sp-6);
+  box-sizing: border-box;
+}
+
+.collection-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  padding: var(--sp-8);
+  box-shadow: var(--shadow);
+}
+
+.page-title {
+  margin: 0 0 var(--sp-6);
+  font-size: 28px;
+  color: var(--text-h);
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--sp-5);
+}
+
+.empty-state {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 60px var(--sp-6);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+
+.empty-icon {
+  font-size: 44px;
+  margin-bottom: var(--sp-4);
+  opacity: 0.68;
+}
+
+.empty-title {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--heading);
+  font-size: 18px;
+  color: var(--text-h);
+}
+
+.empty-desc {
+  font-size: 14px;
+  color: var(--text);
+  opacity: 0.78;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: var(--sp-5) var(--sp-4);
+  }
+
+  .collection-panel {
+    padding: var(--sp-6);
+  }
+}
 </style>

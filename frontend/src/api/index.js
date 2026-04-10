@@ -66,6 +66,7 @@ export const deleteQuickLink = (id) => api.delete(`/quick-links/${id}`)
 export const toggleLike = (articleId) => api.post(`/interaction/like/${articleId}`)
 export const toggleFavorite = (articleId) => api.post(`/interaction/favorite/${articleId}`)
 export const getInteractionStatus = (articleId) => api.get(`/interaction/status/${articleId}`)
+export const getInteractionStatuses = (articleIds) => api.post('/interaction/statuses', { articleIds })
 export const getMyFavorites = () => api.get('/interaction/my-favorites')
 export const getMyLikes = () => api.get('/interaction/my-likes')
 

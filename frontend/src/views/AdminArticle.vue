@@ -242,8 +242,6 @@ onBeforeUnmount(() => {
 
     <main class="main-content">
       <section class="editor-shell">
-        <div class="editor-corners" aria-hidden="true"></div>
-
         <div class="editor-header">
           <h1 class="editor-title">{{ isEdit ? '编辑文章' : '新建文章' }}</h1>
           <div class="header-actions">
@@ -348,40 +346,11 @@ onBeforeUnmount(() => {
 
 .editor-shell {
   position: relative;
-  border: 1px solid rgba(0, 240, 255, 0.18);
-  border-radius: 16px;
-  background: linear-gradient(165deg, rgba(10, 20, 38, 0.72), rgba(8, 16, 31, 0.48));
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.06), var(--shadow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
   padding: 24px;
-}
-
-.editor-corners {
-  position: absolute;
-  inset: 8px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.editor-corners::before,
-.editor-corners::after {
-  content: '';
-  position: absolute;
-  width: 28px;
-  height: 18px;
-  border-top: 1px solid var(--accent-border);
-  border-left: 1px solid var(--accent-border);
-  opacity: 0.7;
-}
-
-.editor-corners::before {
-  left: 0;
-  top: 0;
-}
-
-.editor-corners::after {
-  right: 0;
-  bottom: 0;
-  transform: rotate(180deg);
 }
 
 .editor-header {
@@ -407,8 +376,8 @@ onBeforeUnmount(() => {
 
 .header-actions .el-button--primary {
   background: var(--accent);
-  border: 1px solid rgba(0, 240, 255, 0.28);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.32);
+  border: 1px solid var(--border-accent);
+  box-shadow: none;
 }
 
 .editor-container {
@@ -429,7 +398,7 @@ onBeforeUnmount(() => {
 .editor-separator {
   margin: 8px 0 16px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.32), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
 }
 
 .meta-row {
