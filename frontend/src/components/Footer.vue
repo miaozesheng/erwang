@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import BrandMark from './BrandMark.vue'
 
 const router = useRouter()
 const currentYear = new Date().getFullYear()
@@ -10,25 +11,23 @@ const isAdmin = computed(() => (localStorage.getItem('userRole') || '').toLowerC
 <template>
   <footer class="site-footer">
     <div class="footer-container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <svg class="footer-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="28" height="28" rx="6" stroke="var(--accent)" stroke-width="2" fill="rgba(0,240,255,0.06)"/>
-            <path d="M8 11h16M8 16h12M8 21h8" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="24" cy="21" r="3" fill="var(--accent)" opacity="0.8"/>
-          </svg>
+      <div class="footer-brand">
+        <BrandMark class="footer-mark" :size="44" />
+
+        <div class="footer-brand-copy">
           <span class="brand-text">ERWANG</span>
+          <p class="footer-desc">写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。</p>
         </div>
-        <p class="footer-desc">探索技术世界，分享Coding乐趣</p>
-        <div class="footer-links">
-          <button type="button" class="footer-link-btn" @click="router.push('/')">首页</button>
-          <span class="divider" aria-hidden="true"></span>
-          <button type="button" class="footer-link-btn" @click="router.push('/about')">关于</button>
-          <template v-if="isAdmin">
-            <span class="divider" aria-hidden="true"></span>
-            <button type="button" class="footer-link-btn" @click="router.push('/admin')">管理</button>
-          </template>
-        </div>
+      </div>
+
+      <div class="footer-nav" aria-label="页脚导航">
+        <button type="button" class="footer-link-btn" @click="router.push('/')">首页</button>
+        <button type="button" class="footer-link-btn" @click="router.push('/about')">关于</button>
+        <button v-if="isAdmin" type="button" class="footer-link-btn" @click="router.push('/admin')">管理</button>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="footer-meta">个人技术写作 · 阅读优先</span>
         <p class="copyright">© {{ currentYear }} Erwang. All rights reserved.</p>
       </div>
     </div>
@@ -37,102 +36,112 @@ const isAdmin = computed(() => (localStorage.getItem('userRole') || '').toLowerC
 
 <style scoped>
 .site-footer {
-  background: var(--bg);
-  border-top: 1px solid rgba(0, 240, 255, 0.12);
-  padding: 42px 0 24px;
   margin-top: auto;
+  padding: 32px 0 28px;
+  background: linear-gradient(180deg, rgba(250, 249, 247, 0.3), rgba(245, 243, 239, 0.9));
+  border-top: 1px solid color-mix(in srgb, var(--border-strong) 82%, white 18%);
 }
 
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
-}
-
-.footer-content {
-  text-align: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) auto;
+  gap: 24px 32px;
+  align-items: end;
 }
 
 .footer-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
 }
 
-.footer-logo-svg {
-  width: 24px;
-  height: 24px;
-  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.22));
+.footer-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .brand-text {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-h);
+  font-size: 17px;
+  line-height: 1;
+  letter-spacing: 0.16em;
   font-family: var(--heading);
-  letter-spacing: 3px;
+  color: var(--text-h);
 }
 
 .footer-desc {
-  color: var(--text);
+  max-width: 40ch;
+  color: var(--text-muted);
   font-size: 14px;
-  margin-bottom: 14px;
-  opacity: 0.9;
+  line-height: 1.7;
 }
 
-.footer-links {
+.footer-nav {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 10px;
-  margin-bottom: 16px;
 }
 
-.footer-links .footer-link-btn {
+.footer-link-btn {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: transparent;
   color: var(--text);
-  cursor: pointer;
   font-size: 13px;
   font-family: var(--heading);
-  letter-spacing: 0.45px;
-  transition: color 220ms ease, text-shadow 220ms ease, transform 220ms ease;
-  background: transparent;
-  border: none;
-  border-radius: 999px;
-  padding: 6px 10px;
+  letter-spacing: 0.04em;
 }
 
-.footer-links .footer-link-btn:hover {
+.footer-link-btn:hover {
   color: var(--text-h);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: color-mix(in srgb, var(--accent) 16%, var(--border-strong));
 }
 
-.footer-links .footer-link-btn:active {
-  transform: scale(0.97);
+.footer-bottom {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(45, 90, 74, 0.08);
 }
 
-.footer-links .divider {
-  width: 1px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.16);
-  border-radius: 999px;
+.footer-meta,
+.copyright {
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
 }
 
 .copyright {
-  color: var(--text);
-  font-size: 13px;
-  opacity: 0.7;
-  letter-spacing: 0.4px;
-  font-family: var(--mono);
+  margin: 0;
 }
 
 @media (max-width: 768px) {
+  .site-footer {
+    padding-top: 26px;
+  }
+
   .footer-container {
+    grid-template-columns: 1fr;
     padding: 0 16px;
   }
 
-  .footer-links {
-    gap: 8px;
+  .footer-nav {
+    justify-content: flex-start;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

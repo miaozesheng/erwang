@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { UserFilled } from '@element-plus/icons-vue'
 import { getUserInfo, resolveFileUrl } from '../api'
+import BrandMark from './BrandMark.vue'
 
 const router = useRouter()
 
@@ -22,16 +23,16 @@ const isAdmin = computed(() => normalizeRole(userRole.value) === 'admin')
 
 const navItems = computed(() => {
   const base = [
-    { icon: '◈', label: '首页', path: '/' },
-    { icon: '🔥', label: 'GitHub', path: '/github' },
+    { icon: '◦', label: '首页', path: '/' },
+    { icon: '↗', label: 'GitHub', path: '/github' }
   ]
   if (isLoggedIn.value) {
     base.push(
-      { icon: '⭐', label: '收藏', path: '/favorites' },
-      { icon: '❤', label: '喜欢', path: '/likes' },
+      { icon: '★', label: '收藏', path: '/favorites' },
+      { icon: '♥', label: '喜欢', path: '/likes' }
     )
     if (isAdmin.value) {
-      base.push({ icon: '⚡', label: '管理', path: '/admin' })
+      base.push({ icon: '◆', label: '管理', path: '/admin' })
     }
   }
   return base
@@ -104,7 +105,7 @@ const navigateTo = (path) => {
 
     activationTimer.value = setTimeout(() => {
       activatingPath.value = ''
-    }, 420)
+    }, 380)
 
     dischargeTimer.value = setTimeout(() => {
       dischargePath.value = ''
@@ -112,7 +113,7 @@ const navigateTo = (path) => {
 
     fadeTimer.value = setTimeout(() => {
       fadingPath.value = ''
-    }, 480)
+    }, 460)
 
     router.push(path)
     mobileMenuOpen.value = false
@@ -193,6 +194,10 @@ watch(currentPath, () => {
   updateIndicator()
 })
 
+watch(navItems, () => {
+  updateIndicator()
+})
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateIndicator)
   window.removeEventListener('storage', syncAuthState)
@@ -206,15 +211,16 @@ onBeforeUnmount(() => {
 <template>
   <header class="site-header">
     <div class="header-container">
-      <div class="logo" @click="navigateTo('/')">
-        <svg class="logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="28" height="28" rx="6" stroke="var(--accent)" stroke-width="2" fill="rgba(0,240,255,0.06)"/>
-          <path d="M8 11h16M8 16h12M8 21h8" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="24" cy="21" r="3" fill="var(--accent)" opacity="0.8"/>
-        </svg>
-        <span class="logo-text">ERWANG</span>
-      </div>
+      <button type="button" class="logo" @click="navigateTo('/')" aria-label="回到首页">
+        <BrandMark class="logo-mark" :size="40" />
+        <span class="logo-copy">
+          <span class="logo-eyebrow">personal tech notes</span>
+          <span class="logo-text">ERWANG</span>
+        </span>
+      </button>
+
       <nav ref="navLinksRef" class="nav-links" aria-label="主导航">
+        <span class="nav-indicator" :style="indicatorStyle" aria-hidden="true"></span>
         <button
           v-for="(item, index) in navItems"
           :key="item.path"
@@ -234,10 +240,11 @@ onBeforeUnmount(() => {
           <span class="tab-label">{{ item.label }}</span>
         </button>
       </nav>
+
       <div class="header-actions">
-        <el-dropdown v-if="isLoggedIn" trigger="click" class="profile-dropdown" popper-class="cyber-user-dropdown">
+        <el-dropdown v-if="isLoggedIn" trigger="click" class="profile-dropdown" popper-class="app-user-dropdown">
           <button class="avatar-button" type="button" aria-label="用户菜单">
-            <el-avatar v-if="displayAvatar" :src="displayAvatar" :size="32" class="header-avatar" />
+            <el-avatar v-if="displayAvatar" :src="displayAvatar" :size="34" class="header-avatar" />
             <span v-else class="avatar-fallback" aria-hidden="true">
               <el-icon><UserFilled /></el-icon>
             </span>
@@ -245,24 +252,34 @@ onBeforeUnmount(() => {
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="goToProfile">
-                <span class="menu-icon">◈</span> 个人中心
+                <span class="menu-icon">◦</span>
+                个人中心
               </el-dropdown-item>
               <el-dropdown-item divided @click="handleLogout">
-                <span class="menu-icon">⏻</span> 登出
+                <span class="menu-icon">⏻</span>
+                登出
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <el-button 
-          v-else 
-          type="primary" 
+
+        <el-button
+          v-else
+          type="primary"
           @click="handleLogin"
-          class="login-btn"
+          class="header-login-btn"
         >
           登录
         </el-button>
       </div>
-      <button type="button" class="mobile-toggle" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="菜单">
+
+      <button
+        type="button"
+        class="mobile-toggle"
+        :aria-expanded="mobileMenuOpen ? 'true' : 'false'"
+        aria-label="菜单"
+        @click="mobileMenuOpen = !mobileMenuOpen"
+      >
         <span class="toggle-bar" :class="{ open: mobileMenuOpen }"></span>
       </button>
     </div>
@@ -270,6 +287,11 @@ onBeforeUnmount(() => {
     <Transition name="mobile-menu">
       <div v-if="mobileMenuOpen" class="mobile-overlay" @click.self="mobileMenuOpen = false">
         <nav class="mobile-nav">
+          <div class="mobile-nav-intro">
+            <span class="mobile-nav-kicker">导航</span>
+            <p class="mobile-nav-title">继续阅读或管理你的内容。</p>
+          </div>
+
           <button
             v-for="item in navItems"
             :key="item.path"
@@ -279,17 +301,22 @@ onBeforeUnmount(() => {
             @click="navigateTo(item.path)"
           >
             <span class="mobile-nav-icon">{{ item.icon }}</span>
-            {{ item.label }}
+            <span>{{ item.label }}</span>
           </button>
+
           <div class="mobile-nav-divider"></div>
+
           <button v-if="isLoggedIn" type="button" class="mobile-nav-item" @click="router.push('/profile'); mobileMenuOpen = false">
-            <span class="mobile-nav-icon">◈</span> 个人中心
+            <span class="mobile-nav-icon">◦</span>
+            <span>个人中心</span>
           </button>
           <button v-if="isLoggedIn" type="button" class="mobile-nav-item logout" @click="handleLogout(); mobileMenuOpen = false">
-            <span class="mobile-nav-icon">⏻</span> 登出
+            <span class="mobile-nav-icon">⏻</span>
+            <span>登出</span>
           </button>
           <button v-else type="button" class="mobile-nav-item" @click="router.push('/login'); mobileMenuOpen = false">
-            <span class="mobile-nav-icon">→</span> 登录
+            <span class="mobile-nav-icon">→</span>
+            <span>登录</span>
           </button>
         </nav>
       </div>
@@ -299,81 +326,110 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .site-header {
-  background: rgba(7, 11, 20, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 14px 0;
   position: sticky;
   top: 0;
   z-index: 100;
+  padding: 14px 0;
+  background: rgba(250, 249, 247, 0.86);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-strong) 82%, white 18%);
   backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(119, 99, 78, 0.05);
 }
 
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  justify-content: space-between;
+  gap: 18px;
 }
 
 .logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: opacity 220ms ease, transform 220ms ease;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  text-align: left;
 }
 
 .logo:hover {
-  opacity: 0.95;
   transform: translateY(-1px);
 }
 
-.logo-svg {
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.2));
-  transition: filter 220ms ease;
+.logo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.logo:hover .logo-svg {
-  filter: drop-shadow(0 0 9px rgba(0, 240, 255, 0.3));
+.logo-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: var(--sans);
 }
 
 .logo-text {
   font-size: 18px;
-  font-weight: 700;
-  color: var(--text-h);
-  letter-spacing: 3px;
+  line-height: 1;
+  letter-spacing: 0.18em;
   font-family: var(--heading);
+  color: var(--text-h);
 }
 
 .nav-links {
-  display: flex;
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 2px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.01);
+  justify-self: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 82%, white 18%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.nav-indicator {
+  position: absolute;
+  inset-block: 4px;
+  left: 0;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  border: 1px solid rgba(45, 90, 74, 0.1);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-slow) var(--ease-emphasis),
+    width var(--duration-slow) var(--ease-emphasis);
 }
 
 .nav-link {
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: 999px;
-  padding: 9px 14px;
-  color: var(--text);
-  font-size: 13px;
-  font-family: var(--heading);
-  letter-spacing: 0.55px;
-  cursor: pointer;
-  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  font-family: var(--heading);
+  transition:
+    color var(--duration-normal) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    opacity var(--duration-normal) var(--ease-out);
 }
 
 .tab-icon,
@@ -382,25 +438,17 @@ onBeforeUnmount(() => {
 }
 
 .tab-icon {
-  color: color-mix(in srgb, var(--accent) 72%, var(--text) 28%);
   font-size: 12px;
+  color: color-mix(in srgb, var(--accent) 62%, var(--text-muted));
 }
 
-.tab-label {
-  color: inherit;
-}
-
-.nav-link:hover {
-  color: var(--text-h);
-  border-color: rgba(0, 240, 255, 0.2);
-  box-shadow: inset 0 -1px 0 rgba(0, 240, 255, 0.18), 0 0 10px rgba(0, 240, 255, 0.08);
-}
-
+.nav-link:hover,
 .nav-link.active {
   color: var(--text-h);
-  background: rgba(0, 240, 255, 0.1);
-  border-color: rgba(0, 240, 255, 0.26);
-  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.08);
+}
+
+.nav-link.active .tab-icon {
+  color: var(--accent);
 }
 
 .nav-link.tab-fading {
@@ -412,203 +460,215 @@ onBeforeUnmount(() => {
 }
 
 .nav-link.tab-discharge {
-  animation: tab-discharge-soft 420ms ease-out;
+  animation: tab-settle 420ms var(--ease-out);
 }
 
-.nav-link:active {
-  transform: scale(0.97);
-}
-
-.login-btn {
-  background: rgba(0, 240, 255, 0.14);
-  border: 1px solid rgba(0, 240, 255, 0.32);
-  color: var(--text-h);
-  box-shadow: none;
-  font-family: var(--heading);
-  text-transform: none;
-  transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease, transform 220ms ease;
-}
-
-.login-btn:hover {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: rgba(0, 240, 255, 0.44);
-  color: var(--text-h);
-}
-
-.login-btn:active {
-  transform: scale(0.97);
-}
-
+.header-actions,
 .profile-dropdown {
-  display: inline-flex;
-}
-
-.header-actions {
   display: inline-flex;
   align-items: center;
 }
 
+.header-login-btn {
+  min-width: 92px;
+}
+
 .avatar-button {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--border-strong) 86%, white 14%);
+  background: rgba(255, 255, 255, 0.84);
   padding: 0;
-  display: grid;
+  display: inline-grid;
   place-items: center;
-  cursor: pointer;
-  transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
 }
 
 .avatar-button:hover {
-  border-color: rgba(0, 240, 255, 0.34);
-  background: rgba(0, 240, 255, 0.08);
+  background: #ffffff;
+  border-color: color-mix(in srgb, var(--accent) 26%, var(--border-strong));
 }
 
-.header-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+.header-avatar,
+.avatar-fallback {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
 }
 
 .avatar-fallback {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: grid;
+  display: inline-grid;
   place-items: center;
-  color: color-mix(in srgb, var(--accent) 68%, var(--text-h) 32%);
+  background: color-mix(in srgb, var(--accent) 10%, white 90%);
+  color: var(--accent);
   font-size: 16px;
-  background: rgba(0, 240, 255, 0.12);
 }
 
 .menu-icon {
-  margin-right: 8px;
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
   color: var(--accent);
-  font-size: 14px;
-}
-
-@keyframes tab-discharge-soft {
-  0% {
-    box-shadow: inset 0 0 0 0 rgba(0, 240, 255, 0);
-  }
-  40% {
-    box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.22);
-  }
-  100% {
-    box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.08);
-  }
 }
 
 .mobile-toggle {
   display: none;
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.02);
-  cursor: pointer;
+  width: 42px;
+  height: 42px;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 86%, white 14%);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
   position: relative;
-  flex-shrink: 0;
-  transition: border-color 220ms ease, background-color 220ms ease;
-}
-
-.mobile-toggle:hover {
-  border-color: rgba(0, 240, 255, 0.32);
-  background: rgba(0, 240, 255, 0.08);
+  padding: 0;
 }
 
 .toggle-bar,
 .toggle-bar::before,
 .toggle-bar::after {
-  display: block;
-  width: 18px;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 1px;
   position: absolute;
   left: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text-h);
   transform: translateX(-50%);
-  transition: all 0.3s ease;
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out),
+    top var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out);
 }
 
-.toggle-bar { top: 50%; margin-top: -1px; }
-.toggle-bar::before { content: ''; top: -6px; left: 0; }
-.toggle-bar::after { content: ''; top: 6px; left: 0; }
+.toggle-bar {
+  top: 50%;
+  margin-top: -1px;
+}
 
-.toggle-bar.open { background: transparent; }
-.toggle-bar.open::before { top: 0; transform: rotate(45deg); }
-.toggle-bar.open::after { top: 0; transform: rotate(-45deg); }
+.toggle-bar::before,
+.toggle-bar::after {
+  content: '';
+}
+
+.toggle-bar::before {
+  top: -6px;
+}
+
+.toggle-bar::after {
+  top: 6px;
+}
+
+.toggle-bar.open {
+  background: transparent;
+}
+
+.toggle-bar.open::before {
+  top: 0;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.toggle-bar.open::after {
+  top: 0;
+  transform: translateX(-50%) rotate(-45deg);
+}
 
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  top: 66px;
-  background: rgba(7, 11, 20, 0.58);
-  z-index: 99;
+  padding: 82px 14px 14px;
   display: flex;
   justify-content: flex-end;
+  background: rgba(62, 47, 28, 0.14);
+  backdrop-filter: blur(6px);
+  z-index: 99;
 }
 
 .mobile-nav {
-  width: 260px;
-  height: 100%;
-  background: var(--bg);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 24px 16px;
+  width: min(360px, 100%);
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  padding: 20px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--border-strong) 84%, white 16%);
+  background: rgba(250, 249, 247, 0.97);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.mobile-nav-intro {
+  padding: 4px 4px 10px;
+}
+
+.mobile-nav-kicker {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.mobile-nav-title {
+  color: var(--text-h);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .mobile-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 16px;
   background: transparent;
   color: var(--text);
   font-family: var(--heading);
   font-size: 15px;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  letter-spacing: 0.03em;
 }
 
 .mobile-nav-item:hover,
 .mobile-nav-item.active {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--border-strong));
   color: var(--text-h);
-  border-color: rgba(0, 240, 255, 0.3);
-  background: rgba(0, 240, 255, 0.08);
 }
 
 .mobile-nav-item.logout {
-  color: #f89898;
+  color: var(--danger);
+}
+
+.mobile-nav-item.logout:hover {
+  background: color-mix(in srgb, var(--danger) 8%, white 92%);
+  border-color: color-mix(in srgb, var(--danger) 20%, var(--border-strong));
 }
 
 .mobile-nav-icon {
-  font-size: 16px;
-  width: 20px;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  color: var(--accent);
 }
 
 .mobile-nav-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
-  margin: 8px 0;
+  margin: 6px 4px;
+  background: linear-gradient(90deg, transparent, rgba(45, 90, 74, 0.18), transparent);
 }
 
 .mobile-menu-enter-active,
 .mobile-menu-leave-active {
-  transition: opacity 240ms ease;
+  transition: opacity var(--duration-normal) var(--ease-out);
 }
 
 .mobile-menu-enter-active .mobile-nav,
 .mobile-menu-leave-active .mobile-nav {
-  transition: transform 260ms ease;
+  transition: transform var(--duration-slow) var(--ease-emphasis), opacity var(--duration-normal) var(--ease-out);
 }
 
 .mobile-menu-enter-from,
@@ -616,49 +676,84 @@ onBeforeUnmount(() => {
   opacity: 0;
 }
 
-.mobile-menu-enter-from .mobile-nav {
-  transform: translateX(100%);
-}
-
+.mobile-menu-enter-from .mobile-nav,
 .mobile-menu-leave-to .mobile-nav {
-  transform: translateX(100%);
+  transform: translateY(-8px) translateX(12px);
+  opacity: 0;
 }
 
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
+@keyframes tab-settle {
+  0% {
+    box-shadow: 0 0 0 0 rgba(45, 90, 74, 0);
+  }
+  45% {
+    box-shadow: 0 0 0 6px rgba(45, 90, 74, 0.06);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 90, 74, 0);
+  }
+}
+
+@media (max-width: 920px) {
+  .header-container {
+    grid-template-columns: auto 1fr auto;
   }
 
-  .mobile-toggle {
-    display: block;
-  }
-
+  .nav-links,
   .header-actions {
     display: none;
   }
 
+  .mobile-toggle {
+    display: inline-block;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding: 12px 0;
+  }
+
   .header-container {
     padding: 0 16px;
+    gap: 12px;
+  }
+
+  .logo-copy {
+    gap: 1px;
+  }
+
+  .logo-eyebrow {
+    display: none;
   }
 
   .logo-text {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  .logo-mark {
+    --brand-size: 38px;
+    --brand-icon-size: 30px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-header,
   .logo,
-  .logo-svg,
+  .nav-indicator,
   .nav-link,
-  .login-btn,
   .avatar-button,
   .mobile-toggle,
+  .toggle-bar,
+  .toggle-bar::before,
+  .toggle-bar::after,
   .mobile-menu-enter-active,
   .mobile-menu-leave-active,
   .mobile-menu-enter-active .mobile-nav,
   .mobile-menu-leave-active .mobile-nav {
-    transition-duration: 1ms;
-    animation: none;
+    transition-duration: 0.01ms !important;
+    animation: none !important;
   }
 }
 </style>
