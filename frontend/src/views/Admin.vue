@@ -206,10 +206,19 @@ onMounted(() => {
         </div>
 
         <div v-if="activeTab === 'articles'">
-          <div class="admin-header">
-            <h2 class="admin-title">文章管理</h2>
-            <el-button type="primary" @click="handleCreate" class="create-btn"><el-icon><Plus /></el-icon> 新建文章</el-button>
-          </div>
+<div class="admin-header">
+         <div class="admin-header-content">
+           <button
+             v-if="$route.path !== '/profile'"
+             class="back-btn"
+             @click="$router.push('/profile')"
+           >
+             ← 返回个人中心
+           </button>
+           <h2 class="admin-title">文章管理</h2>
+         </div>
+         <el-button type="primary" @click="handleCreate" class="create-btn"><el-icon><Plus /></el-icon> 新建文章</el-button>
+       </div>
           <div class="articles-list" v-loading="loading">
             <div v-for="article in articles" :key="article.id" class="article-row">
               <div class="row-main">
@@ -305,6 +314,34 @@ onMounted(() => {
 
 /* Stats - Clean white cards with subtle border */
 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+.back-btn {
+   display: inline-flex;
+   align-items: center;
+   gap: 6px;
+   padding: 8px 16px;
+   border: 1px solid var(--border);
+   border-radius: 6px;
+   background: transparent;
+   color: var(--text);
+   font-size: 13px;
+   cursor: pointer;
+   transition: all 0.2s ease;
+ }
+
+.back-btn:hover {
+   border-color: var(--accent);
+   color: var(--accent);
+   background: rgba(255, 255, 255, 0.96);
+   transform: translateY(-1px);
+ }
+
+.admin-header-content {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 20px;
+ }
 .stat-card { background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: border-color var(--duration-normal) ease; }
 .stat-card:hover { border-color: var(--border-accent); }
 .stat-value { font-size: 32px; font-weight: 700; color: var(--accent); font-family: var(--heading); }

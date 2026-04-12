@@ -37,9 +37,18 @@ onMounted(fetchData)
   <div class="collection-page">
     <Header />
     <main class="main-content">
-      <div class="page-header">
-        <h1 class="page-title">{{ pageTitle }}</h1>
-      </div>
+<div class="page-header">
+         <div class="page-header-content">
+           <button
+             v-if="route.path !== '/profile'"
+             class="back-btn"
+             @click="router.push('/profile')"
+           >
+             ← 返回个人中心
+           </button>
+           <h1 class="page-title">{{ pageTitle }}</h1>
+         </div>
+       </div>
       <div v-loading="loading" class="articles-grid">
         <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
       </div>
@@ -74,11 +83,35 @@ onMounted(fetchData)
 }
 
 .page-header {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-6) var(--sp-6);
-}
+   background: #ffffff;
+   border: 1px solid var(--border);
+   border-radius: var(--radius-lg);
+   padding: var(--sp-6) var(--sp-6);
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+ }
+
+.back-btn {
+   display: inline-flex;
+   align-items: center;
+   gap: 6px;
+   padding: 8px 16px;
+   border: 1px solid var(--border);
+   border-radius: 6px;
+   background: transparent;
+   color: var(--text);
+   font-size: 13px;
+   cursor: pointer;
+   transition: all 0.2s ease;
+ }
+
+.back-btn:hover {
+   border-color: var(--accent);
+   color: var(--accent);
+   background: rgba(255, 255, 255, 0.96);
+   transform: translateY(-1px);
+ }
 
 .page-title {
   margin: 0;

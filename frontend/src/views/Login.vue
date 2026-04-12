@@ -111,16 +111,21 @@ const handleLogin = async () => {
                 <circle class="bot-antenna-tip" cx="0" cy="-4" r="5" fill="var(--accent)" />
               </g>
 
-              <g class="bot-body" transform="translate(30 38)">
-                <rect x="18" y="76" width="84" height="40" rx="20" fill="rgba(45, 90, 74, 0.08)" />
-                <rect x="8" y="12" width="104" height="86" rx="34" fill="url(#loginBotShell)" stroke="rgba(45, 90, 74, 0.18)" stroke-width="2" />
-                <rect class="bot-face" x="22" y="24" width="76" height="48" rx="24" fill="url(#loginBotFace)" stroke="rgba(45, 90, 74, 0.1)" />
-                <circle class="bot-eye bot-eye-left" cx="50" cy="48" r="7.5" fill="var(--accent)" />
-                <circle class="bot-eye bot-eye-right" cx="70" cy="48" r="7.5" fill="var(--accent)" />
-                <path d="M48 66c6 5 18 5 24 0" stroke="rgba(87, 72, 58, 0.72)" stroke-width="2.5" stroke-linecap="round" />
-                <circle cx="35" cy="60" r="4" fill="rgba(184, 135, 112, 0.18)" />
-                <circle cx="85" cy="60" r="4" fill="rgba(184, 135, 112, 0.18)" />
-              </g>
+               <g class="bot-body" transform="translate(30 38)">
+                 <rect x="18" y="76" width="84" height="40" rx="20" fill="rgba(45, 90, 74, 0.08)" />
+                 <rect x="8" y="12" width="104" height="86" rx="34" fill="url(#loginBotShell)" stroke="rgba(45, 90, 74, 0.18)" stroke-width="2" />
+                 <rect class="bot-face" x="22" y="24" width="76" height="48" rx="24" fill="url(#loginBotFace)" stroke="rgba(45, 90, 74, 0.1)" />
+                 <circle class="bot-eye bot-eye-left" cx="50" cy="48" r="7.5" fill="var(--accent)" />
+                 <circle class="bot-eye bot-eye-right" cx="70" cy="48" r="7.5" fill="var(--accent)" />
+                 <!-- Hands covering eyes when password focused -->
+                 <g class="bot-hands" :class="{ 'is-password-focused': focusedField.value === 'password' }">
+                   <path class="bot-hand-left" d="M30 40q10 -15 25 0t25 0" stroke="var(--accent)" stroke-width="6" fill="none" stroke-linecap="round"/>
+                   <path class="bot-hand-right" d="M70 40q-10 -15 -25 0t-25 0" stroke="var(--accent)" stroke-width="6" fill="none" stroke-linecap="round"/>
+                 </g>
+                 <path d="M48 66c6 5 18 5 24 0" stroke="rgba(87, 72, 58, 0.72)" stroke-width="2.5" stroke-linecap="round" />
+                 <circle cx="35" cy="60" r="4" fill="rgba(184, 135, 112, 0.18)" />
+                 <circle cx="85" cy="60" r="4" fill="rgba(184, 135, 112, 0.18)" />
+               </g>
 
               <g class="bot-arm bot-arm-left" transform="translate(42 104)">
                 <rect x="0" y="0" width="18" height="54" rx="9" fill="#e8dfd1" stroke="rgba(45, 90, 74, 0.14)" stroke-width="1.5" />
@@ -287,9 +292,32 @@ const handleLogin = async () => {
 }
 
 .bot-arm {
-  transform-box: fill-box;
-  transform-origin: center 8px;
-  transition: transform var(--duration-slow) var(--ease-emphasis);
+   transform-box: fill-box;
+   transform-origin: center 8px;
+   transition: transform var(--duration-slow) var(--ease-emphasis);
+ }
+
+.bot-hands {
+   opacity: 0;
+   transition: opacity var(--duration-normal) var(--ease-out);
+ }
+
+.bot-hands.is-password-focused {
+   opacity: 1;
+}
+
+.bot-hand-left,
+.bot-hand-right {
+   transform-origin: bottom;
+   transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.bot-hands.is-password-focused .bot-hand-left {
+   transform: rotate(-15deg) translateX(-5px) translateY(-10px);
+}
+
+.bot-hands.is-password-focused .bot-hand-right {
+   transform: rotate(15deg) translateX(5px) translateY(-10px);
 }
 
 .bot-arm-left {
