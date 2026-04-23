@@ -1,7 +1,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserFilled } from '@element-plus/icons-vue'
+import { UserFilled, House, Connection, Star, StarFilled, Management, Operation, SwitchButton, User } from '@element-plus/icons-vue'
 import { getUserInfo, resolveFileUrl } from '../api'
 import BrandMark from './BrandMark.vue'
 
@@ -23,16 +23,15 @@ const isAdmin = computed(() => normalizeRole(userRole.value) === 'admin')
 
 const navItems = computed(() => {
   const base = [
-    { icon: '◦', label: '首页', path: '/' },
-    { icon: '↗', label: 'GitHub', path: '/github' }
+    { icon: House, label: '首页', path: '/' },
+    { icon: Connection, label: 'GitHub', path: '/github' }
   ]
   if (isLoggedIn.value) {
     base.push(
-      { icon: '★', label: '收藏', path: '/favorites' },
-      { icon: '♥', label: '喜欢', path: '/likes' }
+      { icon: Star, label: '收藏', path: '/favorites' }
     )
     if (isAdmin.value) {
-      base.push({ icon: '◆', label: '管理', path: '/admin' })
+      base.push({ icon: Operation, label: '管理', path: '/admin' })
     }
   }
   return base
@@ -209,7 +208,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <header class="site-header">
+  <header class="site-header" data-site-header>
     <div class="header-container">
       <button type="button" class="logo" @click="navigateTo('/')" aria-label="回到首页">
         <BrandMark class="logo-mark" :size="40" />
@@ -236,7 +235,7 @@ onBeforeUnmount(() => {
           :aria-current="isActiveRoute(item.path) ? 'page' : undefined"
           @click="navigateTo(item.path)"
         >
-          <span class="tab-icon" aria-hidden="true">{{ item.icon }}</span>
+          <el-icon class="tab-icon"><component :is="item.icon" /></el-icon>
           <span class="tab-label">{{ item.label }}</span>
         </button>
       </nav>
@@ -252,11 +251,11 @@ onBeforeUnmount(() => {
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="goToProfile">
-                <span class="menu-icon">◦</span>
+                <el-icon class="menu-icon"><User /></el-icon>
                 个人中心
               </el-dropdown-item>
               <el-dropdown-item divided @click="handleLogout">
-                <span class="menu-icon">⏻</span>
+                <el-icon class="menu-icon logout"><SwitchButton /></el-icon>
                 登出
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -300,23 +299,23 @@ onBeforeUnmount(() => {
             :class="{ active: isActiveRoute(item.path) }"
             @click="navigateTo(item.path)"
           >
-            <span class="mobile-nav-icon">{{ item.icon }}</span>
+            <el-icon class="mobile-nav-icon"><component :is="item.icon" /></el-icon>
             <span>{{ item.label }}</span>
           </button>
 
           <div class="mobile-nav-divider"></div>
 
           <button v-if="isLoggedIn" type="button" class="mobile-nav-item" @click="router.push('/profile'); mobileMenuOpen = false">
-            <span class="mobile-nav-icon">◦</span>
+            <el-icon class="mobile-nav-icon"><User /></el-icon>
             <span>个人中心</span>
           </button>
           <button v-if="isLoggedIn" type="button" class="mobile-nav-item logout" @click="handleLogout(); mobileMenuOpen = false">
-            <span class="mobile-nav-icon">⏻</span>
-            <span>登出</span>
+            <el-icon class="mobile-nav-icon"><SwitchButton /></el-icon>
+            <span>登出账户</span>
           </button>
           <button v-else type="button" class="mobile-nav-item" @click="router.push('/login'); mobileMenuOpen = false">
-            <span class="mobile-nav-icon">→</span>
-            <span>登录</span>
+            <el-icon class="mobile-nav-icon"><ArrowRight /></el-icon>
+            <span>立即登录</span>
           </button>
         </nav>
       </div>
@@ -330,20 +329,20 @@ onBeforeUnmount(() => {
   top: 0;
   z-index: 100;
   padding: 14px 0;
-  background: rgba(250, 249, 247, 0.86);
-  border-bottom: 1px solid color-mix(in srgb, var(--border-strong) 82%, white 18%);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 10px 30px rgba(119, 99, 78, 0.05);
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
 }
 
 .header-container {
-  max-width: 1200px;
+  max-width: var(--shell-default);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--page-gutter);
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
-  gap: 18px;
+  gap: 24px;
 }
 
 .logo {
@@ -355,32 +354,29 @@ onBeforeUnmount(() => {
   padding: 0;
   color: inherit;
   text-align: left;
-}
-
-.logo:hover {
-  transform: translateY(-1px);
+  cursor: pointer;
 }
 
 .logo-copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .logo-eyebrow {
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--text-muted);
-  font-family: var(--sans);
+  font-family: var(--mono);
 }
 
 .logo-text {
-  font-size: 18px;
-  line-height: 1;
-  letter-spacing: 0.18em;
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: 0.15em;
   font-family: var(--heading);
+  font-weight: 800;
   color: var(--text-h);
 }
 
@@ -389,12 +385,11 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   justify-self: center;
-  gap: 2px;
+  gap: 4px;
   padding: 4px;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid color-mix(in srgb, var(--border-strong) 82%, white 18%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
 }
 
 .nav-indicator {
@@ -403,8 +398,7 @@ onBeforeUnmount(() => {
   left: 0;
   border-radius: var(--radius-full);
   background: #ffffff;
-  border: 1px solid rgba(45, 90, 74, 0.1);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
   transition:
     transform var(--duration-slow) var(--ease-emphasis),
     width var(--duration-slow) var(--ease-emphasis);
@@ -415,345 +409,131 @@ onBeforeUnmount(() => {
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 40px;
-  padding: 0 14px;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 16px;
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
   color: var(--text-muted);
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font-size: 14px;
+  font-weight: 600;
   font-family: var(--heading);
-  transition:
-    color var(--duration-normal) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out),
-    opacity var(--duration-normal) var(--ease-out);
-}
-
-.tab-icon,
-.tab-label {
-  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .tab-icon {
-  font-size: 12px;
-  color: color-mix(in srgb, var(--accent) 62%, var(--text-muted));
+  font-size: 15px;
+  color: var(--text-muted);
 }
 
-.nav-link:hover,
-.nav-link.active {
+.nav-link:hover {
   color: var(--text-h);
+}
+
+.nav-link.active {
+  color: var(--accent);
 }
 
 .nav-link.active .tab-icon {
   color: var(--accent);
 }
 
-.nav-link.tab-fading {
-  opacity: 0.72;
-}
-
-.nav-link.tab-activating {
-  transform: translateY(-1px);
-}
-
-.nav-link.tab-discharge {
-  animation: tab-settle 420ms var(--ease-out);
-}
-
-.header-actions,
-.profile-dropdown {
-  display: inline-flex;
+.header-actions {
+  display: flex;
   align-items: center;
 }
 
-.header-login-btn {
-  min-width: 92px;
-}
-
 .avatar-button {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--border-strong) 86%, white 14%);
-  background: rgba(255, 255, 255, 0.84);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: #ffffff;
   padding: 0;
-  display: inline-grid;
+  display: grid;
   place-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .avatar-button:hover {
-  background: #ffffff;
-  border-color: color-mix(in srgb, var(--accent) 26%, var(--border-strong));
-}
-
-.header-avatar,
-.avatar-fallback {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-full);
-}
-
-.avatar-fallback {
-  display: inline-grid;
-  place-items: center;
-  background: color-mix(in srgb, var(--accent) 10%, white 90%);
-  color: var(--accent);
-  font-size: 16px;
+  border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .menu-icon {
-  display: inline-flex;
-  width: 18px;
-  justify-content: center;
-  color: var(--accent);
+  margin-right: 8px;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.menu-icon.logout {
+  color: var(--danger);
 }
 
 .mobile-toggle {
   display: none;
-  width: 42px;
-  height: 42px;
-  border: 1px solid color-mix(in srgb, var(--border-strong) 86%, white 14%);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.82);
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
   position: relative;
   padding: 0;
 }
 
-.toggle-bar,
-.toggle-bar::before,
-.toggle-bar::after {
-  position: absolute;
-  left: 50%;
-  width: 18px;
-  height: 2px;
-  border-radius: 999px;
-  background: var(--text-h);
-  transform: translateX(-50%);
-  transition:
-    transform var(--duration-normal) var(--ease-out),
-    opacity var(--duration-fast) var(--ease-out),
-    top var(--duration-normal) var(--ease-out),
-    background-color var(--duration-normal) var(--ease-out);
-}
-
-.toggle-bar {
-  top: 50%;
-  margin-top: -1px;
-}
-
-.toggle-bar::before,
-.toggle-bar::after {
-  content: '';
-}
-
-.toggle-bar::before {
-  top: -6px;
-}
-
-.toggle-bar::after {
-  top: 6px;
-}
-
-.toggle-bar.open {
-  background: transparent;
-}
-
-.toggle-bar.open::before {
-  top: 0;
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.toggle-bar.open::after {
-  top: 0;
-  transform: translateX(-50%) rotate(-45deg);
-}
-
+/* --- Mobile Menu --- */
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  padding: 82px 14px 14px;
+  background: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+  z-index: 99;
   display: flex;
   justify-content: flex-end;
-  background: rgba(62, 47, 28, 0.14);
-  backdrop-filter: blur(6px);
-  z-index: 99;
+  padding: 80px 16px 16px;
 }
 
 .mobile-nav {
-  width: min(360px, 100%);
-  max-height: calc(100vh - 96px);
-  overflow: auto;
-  padding: 20px;
+  width: min(320px, 100%);
+  background: #ffffff;
   border-radius: 24px;
-  border: 1px solid color-mix(in srgb, var(--border-strong) 84%, white 16%);
-  background: rgba(250, 249, 247, 0.97);
+  border: 1px solid var(--border);
+  padding: 24px;
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.mobile-nav-intro {
-  padding: 4px 4px 10px;
-}
-
-.mobile-nav-kicker {
-  display: inline-block;
-  margin-bottom: 6px;
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.mobile-nav-title {
-  color: var(--text-h);
-  font-size: 15px;
-  line-height: 1.5;
+  gap: 8px;
 }
 
 .mobile-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  min-height: 48px;
-  padding: 0 14px;
-  border: 1px solid transparent;
-  border-radius: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
   background: transparent;
-  color: var(--text);
+  color: var(--text-muted);
+  font-weight: 600;
   font-family: var(--heading);
-  font-size: 15px;
-  letter-spacing: 0.03em;
+  text-align: left;
+  cursor: pointer;
 }
 
-.mobile-nav-item:hover,
 .mobile-nav-item.active {
-  background: rgba(255, 255, 255, 0.92);
-  border-color: color-mix(in srgb, var(--accent) 18%, var(--border-strong));
-  color: var(--text-h);
-}
-
-.mobile-nav-item.logout {
-  color: var(--danger);
-}
-
-.mobile-nav-item.logout:hover {
-  background: color-mix(in srgb, var(--danger) 8%, white 92%);
-  border-color: color-mix(in srgb, var(--danger) 20%, var(--border-strong));
-}
-
-.mobile-nav-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
+  background: var(--accent-bg);
   color: var(--accent);
 }
 
-.mobile-nav-divider {
-  height: 1px;
-  margin: 6px 4px;
-  background: linear-gradient(90deg, transparent, rgba(45, 90, 74, 0.18), transparent);
-}
-
-.mobile-menu-enter-active,
-.mobile-menu-leave-active {
-  transition: opacity var(--duration-normal) var(--ease-out);
-}
-
-.mobile-menu-enter-active .mobile-nav,
-.mobile-menu-leave-active .mobile-nav {
-  transition: transform var(--duration-slow) var(--ease-emphasis), opacity var(--duration-normal) var(--ease-out);
-}
-
-.mobile-menu-enter-from,
-.mobile-menu-leave-to {
-  opacity: 0;
-}
-
-.mobile-menu-enter-from .mobile-nav,
-.mobile-menu-leave-to .mobile-nav {
-  transform: translateY(-8px) translateX(12px);
-  opacity: 0;
-}
-
-@keyframes tab-settle {
-  0% {
-    box-shadow: 0 0 0 0 rgba(45, 90, 74, 0);
-  }
-  45% {
-    box-shadow: 0 0 0 6px rgba(45, 90, 74, 0.06);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(45, 90, 74, 0);
-  }
+.mobile-nav-icon {
+  font-size: 18px;
 }
 
 @media (max-width: 920px) {
-  .header-container {
-    grid-template-columns: auto 1fr auto;
-  }
-
-  .nav-links,
-  .header-actions {
-    display: none;
-  }
-
-  .mobile-toggle {
-    display: inline-block;
-    justify-self: end;
-  }
-}
-
-@media (max-width: 640px) {
-  .site-header {
-    padding: 12px 0;
-  }
-
-  .header-container {
-    padding: 0 16px;
-    gap: 12px;
-  }
-
-  .logo-copy {
-    gap: 1px;
-  }
-
-  .logo-eyebrow {
-    display: none;
-  }
-
-  .logo-text {
-    font-size: 16px;
-  }
-
-  .logo-mark {
-    --brand-size: 38px;
-    --brand-icon-size: 30px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .site-header,
-  .logo,
-  .nav-indicator,
-  .nav-link,
-  .avatar-button,
-  .mobile-toggle,
-  .toggle-bar,
-  .toggle-bar::before,
-  .toggle-bar::after,
-  .mobile-menu-enter-active,
-  .mobile-menu-leave-active,
-  .mobile-menu-enter-active .mobile-nav,
-  .mobile-menu-leave-active .mobile-nav {
-    transition-duration: 0.01ms !important;
-    animation: none !important;
-  }
+  .nav-links, .header-actions { display: none; }
+  .mobile-toggle { display: block; }
 }
 </style>

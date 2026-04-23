@@ -1,0 +1,57 @@
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - button "回到首页" [ref=e7] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]:
+          - generic [ref=e14]: personal tech notes
+          - generic [ref=e15]: ERWANG
+      - navigation "主导航" [ref=e16]:
+        - button "首页" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: ◦
+          - generic [ref=e20]: 首页
+        - button "GitHub" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: ↗
+          - generic [ref=e23]: GitHub
+      - button "登录" [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 登录
+  - main [ref=e27]:
+    - generic [ref=e29]:
+      - generic [ref=e30]: "> /erwang/tech-notes"
+      - heading "Erwang Blog" [level=1] [ref=e31]
+      - paragraph [ref=e32]: 记录技术探索与编程实践
+      - generic "terminal status" [ref=e33]:
+        - generic [ref=e34]: $
+        - generic [ref=e35]: ">"
+    - generic [ref=e38]:
+      - complementary [ref=e39]:
+        - generic [ref=e40]:
+          - heading "标签" [level=2] [ref=e41]
+          - button "全部" [ref=e43] [cursor=pointer]
+      - region "文章发现" [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e48]:
+            - generic [ref=e50]: ⌕
+            - searchbox "搜索文章" [ref=e51]
+          - button "搜索" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: 搜索
+        - group "文章分类" [ref=e54]:
+          - button "全部" [pressed] [ref=e55] [cursor=pointer]
+        - generic [ref=e56]:
+          - paragraph [ref=e57]: 全部文章 · 0 篇文章
+          - button "更多筛选" [ref=e59] [cursor=pointer]:
+            - text: 更多筛选
+            - generic [ref=e60]: ↘
+  - contentinfo [ref=e69]:
+    - generic [ref=e70]:
+      - generic [ref=e71]:
+        - img [ref=e73]
+        - generic [ref=e77]:
+          - generic [ref=e78]: ERWANG
+          - paragraph [ref=e79]: 写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。
+      - generic "页脚导航" [ref=e80]:
+        - button "首页" [ref=e81] [cursor=pointer]
+        - button "关于" [ref=e82] [cursor=pointer]
+      - generic [ref=e83]:
+        - generic [ref=e84]: 个人技术写作 · 阅读优先
+        - paragraph [ref=e85]: © 2026 Erwang. All rights reserved.

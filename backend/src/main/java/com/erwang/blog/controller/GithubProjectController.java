@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class GithubProjectController {
         IPage<GithubProject> pageResult = githubProjectService.listByCategory(category, language, keyword, page, size);
         
         List<String> languages = githubProjectService.getAvailableLanguages();
+        LocalDate latestFetchDate = githubProjectService.getLatestFetchDate();
         
         Map<String, Object> data = new HashMap<>();
         data.put("list", pageResult.getRecords());
@@ -37,6 +39,7 @@ public class GithubProjectController {
         data.put("page", pageResult.getCurrent());
         data.put("size", pageResult.getSize());
         data.put("languages", languages);
+        data.put("latestFetchDate", latestFetchDate);
         
         return Result.success(data);
     }

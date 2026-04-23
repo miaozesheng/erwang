@@ -1,0 +1,48 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e160]:
+    - banner [ref=e161]:
+      - generic [ref=e162]:
+        - button "回到首页" [ref=e163] [cursor=pointer]:
+          - img [ref=e165]
+          - generic [ref=e169]:
+            - generic [ref=e170]: personal tech notes
+            - generic [ref=e171]: ERWANG
+        - navigation "主导航" [ref=e172]:
+          - button "首页" [ref=e174] [cursor=pointer]:
+            - generic [ref=e175]: ◦
+            - generic [ref=e176]: 首页
+          - button "GitHub" [ref=e177] [cursor=pointer]:
+            - generic [ref=e178]: ↗
+            - generic [ref=e179]: GitHub
+          - button "收藏" [ref=e180] [cursor=pointer]:
+            - generic [ref=e181]: ★
+            - generic [ref=e182]: 收藏
+          - button "喜欢" [ref=e183] [cursor=pointer]:
+            - generic [ref=e184]: ♥
+            - generic [ref=e185]: 喜欢
+          - button "管理" [ref=e186] [cursor=pointer]:
+            - generic [ref=e187]: ◆
+            - generic [ref=e188]: 管理
+        - button "用户菜单" [ref=e191] [cursor=pointer]:
+          - img [ref=e194]
+    - main [ref=e196]:
+      - generic [ref=e197]:
+        - img [ref=e199]
+        - paragraph [ref=e216]: 文章不存在
+    - contentinfo [ref=e217]:
+      - generic [ref=e218]:
+        - generic [ref=e219]:
+          - img [ref=e221]
+          - generic [ref=e225]:
+            - generic [ref=e226]: ERWANG
+            - paragraph [ref=e227]: 写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。
+        - generic "页脚导航" [ref=e228]:
+          - button "首页" [ref=e229] [cursor=pointer]
+          - button "关于" [ref=e230] [cursor=pointer]
+          - button "管理" [ref=e231] [cursor=pointer]
+        - generic [ref=e232]:
+          - generic [ref=e233]: 个人技术写作 · 阅读优先
+          - paragraph [ref=e234]: © 2026 Erwang. All rights reserved.
+  - alert [ref=e235]:
+    - img [ref=e237]
+    - paragraph [ref=e239]: 加载文章失败

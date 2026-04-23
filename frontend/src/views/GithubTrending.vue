@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-import { getGithubProjects, syncGithubProjects } from '../api'
+import { ref, onBeforeUnmount, onMounted, computed, watch } from 'vue'
+import { getGithubProjects, getUserInfo, syncGithubProjects } from '../api'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
 
-const activeTab = ref('trending')
+const activeTab = ref('all_time')
 const projects = ref([])
 const loading = ref(false)
 const syncing = ref(false)
@@ -14,14 +14,34 @@ const searchKeyword = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
+const latestFetchDate = ref('')
 
-const isAdmin = computed(() => localStorage.getItem('userRole') === 'ROLE_ADMIN')
+const normalizeRole = (role = '') => role.toLowerCase().replace(/^role_/, '')
+const isAdmin = ref(normalizeRole(localStorage.getItem('userRole') || '') === 'admin')
+const hasToken = computed(() => !!localStorage.getItem('token'))
+const dataHint = computed(() => {
+  const leaderboardLabelMap = {
+    all_time: '总 star 榜单',
+    growth_7d: '最近 7 天增长榜',
+    growth_30d: '最近 30 天增长榜'
+  }
+  const totalText = total.value ? `当前展示 ${total.value} 个去重仓库 · ${leaderboardLabelMap[activeTab.value]}` : '还没有同步到可展示的数据'
+  const timeText = latestFetchDate.value ? `最近同步：${latestFetchDate.value}` : '等待首次同步'
+  return isAdmin.value
+    ? `${totalText} · ${timeText} · 你可以手动刷新榜单。`
+    : `${totalText} · ${timeText}`
+})
+
+const growthLabel = computed(() => {
+  if (activeTab.value === 'growth_7d') return '7天增长'
+  if (activeTab.value === 'growth_30d') return '30天增长'
+  return ''
+})
 
 const tabs = [
-  { key: 'trending', label: '今日热门' },
-  { key: 'weekly', label: '本周增长' },
-  { key: 'monthly', label: '本月热门' },
-  { key: 'all_time', label: '历史star' },
+  { key: 'all_time', label: '总 Star 榜' },
+  { key: 'growth_7d', label: '近 7 天增长' },
+  { key: 'growth_30d', label: '近 30 天增长' },
 ]
 
 const fetchProjects = async () => {
@@ -43,11 +63,36 @@ const fetchProjects = async () => {
     projects.value = data.list || []
     total.value = data.total || 0
     languages.value = data.languages || []
+    latestFetchDate.value = data.latestFetchDate || ''
   } catch (e) {
     console.error('Failed to fetch GitHub projects:', e)
   } finally {
     loading.value = false
   }
+}
+
+const syncAdminState = async () => {
+  if (!hasToken.value) {
+    isAdmin.value = false
+    return
+  }
+
+  try {
+    const res = await getUserInfo()
+    const user = res.data?.data || {}
+    const role = normalizeRole(user.role || localStorage.getItem('userRole') || '')
+    isAdmin.value = role === 'admin'
+    if (role) {
+      localStorage.setItem('userRole', role)
+    }
+  } catch (error) {
+    console.error('Failed to sync admin state:', error)
+    isAdmin.value = normalizeRole(localStorage.getItem('userRole') || '') === 'admin'
+  }
+}
+
+const handleAuthChanged = () => {
+  syncAdminState()
 }
 
 const handleSearch = () => {
@@ -109,7 +154,15 @@ const getLanguageColor = (lang) => {
 }
 
 onMounted(() => {
+  syncAdminState()
   fetchProjects()
+  window.addEventListener('auth-changed', handleAuthChanged)
+  window.addEventListener('storage', handleAuthChanged)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('auth-changed', handleAuthChanged)
+  window.removeEventListener('storage', handleAuthChanged)
 })
 
 watch(activeTab, () => {
@@ -130,8 +183,8 @@ watch(searchKeyword, () => {
         <div class="hero-grid" aria-hidden="true"></div>
         <div class="hero-body">
           <span class="hero-kicker">&gt; /erwang/github-trending</span>
-          <h1 class="hero-title">GitHub 热门项目</h1>
-          <p class="hero-subtitle">发现当下最火的开源项目</p>
+          <h1 class="hero-title">GitHub 排行榜</h1>
+          <p class="hero-subtitle">看总 star 榜单，也看最近一周与一个月增长最快的项目</p>
         </div>
       </section>
 
@@ -174,9 +227,11 @@ watch(searchKeyword, () => {
             >
               <span v-if="syncing" class="sync-spinner">⟳</span>
               <span v-else class="sync-icon">↻</span>
-              {{ syncing ? '同步中...' : '手动同步' }}
+              {{ syncing ? '同步中...' : '立即同步榜单' }}
             </button>
           </div>
+
+          <p class="sync-hint">{{ dataHint }}</p>
 
           <div class="projects-grid">
             <div v-if="loading" class="loading-state">
@@ -191,7 +246,7 @@ watch(searchKeyword, () => {
 
             <a
               v-else
-              v-for="project in projects"
+              v-for="(project, index) in projects"
               :key="project.id"
               :href="project.url"
               target="_blank"
@@ -199,6 +254,7 @@ watch(searchKeyword, () => {
               class="project-card"
             >
               <div class="project-header">
+                <span class="rank-badge">#{{ (currentPage - 1) * pageSize + index + 1 }}</span>
                 <img
                   v-if="project.ownerAvatar"
                   :src="project.ownerAvatar"
@@ -219,6 +275,10 @@ watch(searchKeyword, () => {
                 <span class="stat-item">
                   <span class="stat-icon">★</span>
                   {{ formatStars(project.stars) }}
+                </span>
+                <span v-if="growthLabel && typeof project.starGrowth === 'number'" class="stat-item stat-item--growth">
+                  <span class="stat-icon">↗</span>
+                  {{ growthLabel }} +{{ formatStars(project.starGrowth) }}
                 </span>
                 <span class="stat-item">
                   <span class="stat-icon">⑂</span>
@@ -254,11 +314,12 @@ watch(searchKeyword, () => {
 }
 
 .main-content {
+  --page-shell-max: var(--shell-wide);
   flex: 1;
   width: 100%;
-  max-width: 1200px;
+  max-width: var(--page-shell-max);
   margin: 0 auto;
-  padding: 0 clamp(14px, 2.8vw, 32px);
+  padding: 0 var(--page-gutter);
 }
 
 .hero-section {
@@ -425,6 +486,13 @@ watch(searchKeyword, () => {
   pointer-events: none;
 }
 
+.sync-hint {
+  margin: -6px 0 2px;
+  color: var(--text);
+  opacity: 0.7;
+  font-size: 13px;
+}
+
 .sync-icon {
   font-size: 14px;
 }
@@ -441,7 +509,7 @@ watch(searchKeyword, () => {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 24vw, 360px), 1fr));
   gap: 16px;
 }
 
@@ -466,6 +534,20 @@ watch(searchKeyword, () => {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 12px;
+  font-family: var(--heading);
 }
 
 .owner-avatar {
@@ -525,6 +607,10 @@ watch(searchKeyword, () => {
   color: var(--text);
 }
 
+.stat-item--growth {
+  color: var(--accent);
+}
+
 .stat-icon {
   color: var(--accent-secondary);
 }
@@ -581,8 +667,17 @@ watch(searchKeyword, () => {
 }
 
 @media (max-width: 768px) {
+  .main-content {
+    padding: 20px 16px 100px;
+  }
+
   .projects-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .project-card {
+    padding: 14px;
   }
 
   .tabs-header {
@@ -593,6 +688,18 @@ watch(searchKeyword, () => {
 
   .tab-btn {
     flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: 20px;
   }
 }
 </style>

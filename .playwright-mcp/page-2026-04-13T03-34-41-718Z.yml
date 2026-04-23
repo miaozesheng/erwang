@@ -1,0 +1,161 @@
+- generic [ref=e1]:
+  - img
+  - generic [ref=e95]:
+    - banner [ref=e96]:
+      - generic [ref=e97]:
+        - button "回到首页" [ref=e98] [cursor=pointer]:
+          - img [ref=e100]
+          - generic [ref=e104]:
+            - generic [ref=e105]: personal tech notes
+            - generic [ref=e106]: ERWANG
+        - navigation "主导航" [ref=e107]:
+          - button "首页" [ref=e109] [cursor=pointer]:
+            - generic [ref=e110]: ◦
+            - generic [ref=e111]: 首页
+          - button "GitHub" [ref=e112] [cursor=pointer]:
+            - generic [ref=e113]: ↗
+            - generic [ref=e114]: GitHub
+          - button "收藏" [ref=e115] [cursor=pointer]:
+            - generic [ref=e116]: ★
+            - generic [ref=e117]: 收藏
+          - button "喜欢" [ref=e118] [cursor=pointer]:
+            - generic [ref=e119]: ♥
+            - generic [ref=e120]: 喜欢
+          - button "管理" [ref=e121] [cursor=pointer]:
+            - generic [ref=e122]: ◆
+            - generic [ref=e123]: 管理
+        - button "用户菜单" [ref=e126] [cursor=pointer]:
+          - img [ref=e129]
+    - main [ref=e131]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - generic [ref=e134]:
+            - button "← 返回个人中心" [ref=e135] [cursor=pointer]
+            - generic [ref=e136]:
+              - paragraph [ref=e137]: 内容编辑器
+              - heading "新建文章" [level=1] [ref=e138]
+              - paragraph [ref=e139]: 支持直接导入本地 Markdown 草稿；空白标题和摘要会按正文自动补全。
+          - generic [ref=e140]:
+            - button "Choose File" [ref=e141]
+            - button "导入 Markdown" [active] [ref=e142] [cursor=pointer]:
+              - generic [ref=e143]:
+                - img [ref=e145]
+                - text: 导入 Markdown
+            - button "取消" [ref=e147] [cursor=pointer]:
+              - generic [ref=e148]: 取消
+            - button "发布" [ref=e149] [cursor=pointer]:
+              - generic [ref=e150]: 发布
+        - generic [ref=e152]:
+          - generic [ref=e153]: // META
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]: "*标题"
+              - generic [ref=e159]:
+                - textbox "*标题" [ref=e160]:
+                  - /placeholder: 请输入文章标题
+                  - text: Markdown 导入测试标题
+                - generic [ref=e163]: 15 / 100
+            - generic [ref=e164]:
+              - generic [ref=e165]: 分类
+              - generic [ref=e168]:
+                - generic:
+                  - combobox "分类" [ref=e170]
+                  - generic [ref=e171]: 选择或输入分类
+                - img [ref=e174] [cursor=pointer]
+          - generic [ref=e176]:
+            - generic [ref=e177]:
+              - generic [ref=e178]: 标签
+              - generic [ref=e181]:
+                - generic:
+                  - combobox "标签" [ref=e183]
+                  - generic [ref=e184]: 选择或输入标签
+                - img [ref=e187] [cursor=pointer]
+            - generic [ref=e189]:
+              - generic [ref=e190]: 摘要
+              - textbox "摘要" [ref=e194]:
+                - /placeholder: 文章摘要（可选）
+                - text: 这是用于验证导入功能的第一段正文，会被当作摘要候选内容。
+          - generic [ref=e196]:
+            - generic [ref=e197]: // CONTENT
+            - generic [ref=e198]:
+              - generic [ref=e199]: 导入
+              - generic [ref=e200]: .tmp-import-sample.md
+          - group "*正文" [ref=e201]:
+            - generic [ref=e202]: "*正文"
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - button "标题 <⌘H>" [ref=e228] [cursor=pointer]:
+                  - img [ref=e229]
+                - button "粗体 <⌘B>" [ref=e232] [cursor=pointer]:
+                  - img [ref=e233]
+                - button "斜体 <⌘I>" [ref=e236] [cursor=pointer]:
+                  - img [ref=e237]
+                - button "删除线 <⌘D>" [ref=e240] [cursor=pointer]:
+                  - img [ref=e241]
+                - button "分隔线 <⇧⌘H>" [ref=e245] [cursor=pointer]:
+                  - img [ref=e246]
+                - button "引用 <⌘;>" [ref=e249] [cursor=pointer]:
+                  - img [ref=e250]
+                - button "无序列表 <⌘L>" [ref=e253] [cursor=pointer]:
+                  - img [ref=e254]
+                - button "有序列表 <⌘O>" [ref=e257] [cursor=pointer]:
+                  - img [ref=e258]
+                - button "任务列表 <⌘J>" [ref=e261] [cursor=pointer]:
+                  - img [ref=e262]
+                - button "代码块 <⌘U>" [ref=e266] [cursor=pointer]:
+                  - img [ref=e267]
+                - button "行内代码 <⌘G>" [ref=e270] [cursor=pointer]:
+                  - img [ref=e271]
+                - button "表格 <⌘M>" [ref=e274] [cursor=pointer]:
+                  - img [ref=e275]
+                - button "链接 <⌘K>" [ref=e278] [cursor=pointer]:
+                  - img [ref=e279]
+                - generic "上传图片或文件" [ref=e282] [cursor=pointer]:
+                  - img [ref=e283]
+                  - button "Choose File" [ref=e285]
+                - button "撤销 <⌘Z>" [ref=e288] [cursor=pointer]:
+                  - img [ref=e289]
+                - button "重做 <⌘Y>" [ref=e292]:
+                  - img [ref=e293]
+                - button "切换编辑模式" [ref=e297] [cursor=pointer]:
+                  - img [ref=e298]
+                - button "大纲" [ref=e301] [cursor=pointer]:
+                  - img [ref=e302]
+                - button "全屏切换 <⌘'>" [ref=e305] [cursor=pointer]:
+                  - img [ref=e306]
+              - generic [ref=e308]:
+                - text: 开始编写 Markdown 内容... 开始编写 Markdown 内容...
+                - generic [ref=e310]:
+                  - 'heading "H1 # Markdown 导入测试标题" [level=1] [ref=e312]':
+                    - text: H1
+                    - generic: "#"
+                    - text: Markdown 导入测试标题
+                  - paragraph [ref=e313]: 这是用于验证导入功能的第一段正文，会被当作摘要候选内容。
+                  - 'heading "H2 ## 小节" [level=2] [ref=e314]':
+                    - text: H2
+                    - generic: "##"
+                    - text: 小节
+                  - list [ref=e315]:
+                    - listitem [ref=e316]: 列表项一
+                    - listitem [ref=e317]: 列表项二
+                  - generic [ref=e318]:
+                    - generic: js
+                    - code [ref=e319]: console.log('import test')
+                    - code [ref=e321] [cursor=pointer]: console.log('import test')
+          - generic [ref=e203]:
+            - generic [ref=e204]: WORDS 6
+            - generic [ref=e205]: CHARS 107
+    - contentinfo [ref=e206]:
+      - generic [ref=e207]:
+        - generic [ref=e208]:
+          - img [ref=e210]
+          - generic [ref=e214]:
+            - generic [ref=e215]: ERWANG
+            - paragraph [ref=e216]: 写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。
+        - generic "页脚导航" [ref=e217]:
+          - button "首页" [ref=e218] [cursor=pointer]
+          - button "关于" [ref=e219] [cursor=pointer]
+          - button "管理" [ref=e220] [cursor=pointer]
+        - generic [ref=e221]:
+          - generic [ref=e222]: 个人技术写作 · 阅读优先
+          - paragraph [ref=e223]: © 2026 Erwang. All rights reserved.

@@ -1,0 +1,17 @@
+[     295ms] [ERROR] Failed to fetch quick links: AxiosError: Network Error
+    at XMLHttpRequest.handleError (http://127.0.0.1:5176/node_modules/.vite/deps/axios.js?v=e5a61cf6:1979:16)
+    at Axios$1.request (http://127.0.0.1:5176/node_modules/.vite/deps/axios.js?v=e5a61cf6:2518:37)
+    at async fetchQuickLinks (http://127.0.0.1:5176/src/App.vue:22:17) @ http://127.0.0.1:5176/src/App.vue:24
+[     295ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:9090/api/quick-links:0
+[   10010ms] [ERROR] Failed to fetch user info: AxiosError: Network Error
+    at XMLHttpRequest.handleError (http://127.0.0.1:5176/node_modules/.vite/deps/axios.js?v=e5a61cf6:1979:16)
+    at Axios$1.request (http://127.0.0.1:5176/node_modules/.vite/deps/axios.js?v=e5a61cf6:2518:37)
+    at async fetchUserInfo (http://127.0.0.1:5176/src/components/Header.vue:132:17) @ http://127.0.0.1:5176/src/components/Header.vue:155
+[   10011ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:9090/api/auth/info:0
+[   10024ms] [ERROR] Failed to fetch data: AxiosError: Network Error
+    at XMLHttpRequest.handleError (http://127.0.0.1:5176/node_modules/.vite/deps/axios.js?v=e5a61cf6:1979:16)
+    at Axios$1.request (http://127.0.0.1:5176/node_modules/.vite/deps/axios.js?v=e5a61cf6:2518:37)
+    at async Promise.all (index 0)
+    at async fetchData (http://127.0.0.1:5176/src/views/AdminArticle.vue:228:30) @ http://127.0.0.1:5176/src/views/AdminArticle.vue:246
+[   10026ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:9090/api/categories:0
+[   10035ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:9090/api/tags:0

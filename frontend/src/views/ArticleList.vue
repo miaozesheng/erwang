@@ -4,61 +4,21 @@ import { getArticles, getCategories, getTags, getInteractionStatuses } from '../
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
 import ArticleCard from '../components/ArticleCard.vue'
+import { Search, Filter, Close, ArrowRight } from '@element-plus/icons-vue'
 
 const articles = ref([])
 const loading = ref(false)
-const featuredArticles = ref([])
 const categories = ref([])
 const tags = ref([])
 const keyword = ref('')
 const selectedCategory = ref('')
 const selectedTag = ref('')
+const startDate = ref('')
+const endDate = ref('')
+const showAdvancedFilters = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const heroParticlesRef = ref(null)
-const dataColumns = Array.from({ length: 18 }, (_, index) => index)
-
-const terminalText = '> SYSTEM ONLINE_ TECH FEED INITIALIZED'
-const typedTerminalText = ref('')
-
-const useTypewriter = (sourceText, targetRef, speed = 64) => {
-  let index = 0
-  const timer = setInterval(() => {
-    targetRef.value = sourceText.slice(0, index + 1)
-    index += 1
-    if (index >= sourceText.length) {
-      clearInterval(timer)
-    }
-  }, speed)
-  return timer
-}
-
-const createHeroParticles = () => {
-  const container = heroParticlesRef.value
-  if (!container) return
-
-  const particleCount = 5
-  for (let i = 0; i < particleCount; i += 1) {
-    const particle = document.createElement('span')
-    particle.className = 'hero-particle'
-    const size = 2 + Math.random() * 6
-    const opacity = 0.3 + Math.random() * 0.6
-    particle.style.left = `${Math.random() * 100}%`
-    particle.style.top = `${Math.random() * 100}%`
-    particle.style.width = `${size}px`
-    particle.style.height = `${size}px`
-    particle.style.opacity = `${opacity}`
-    particle.style.setProperty('--float-x', `${-12 + Math.random() * 24}px`)
-    particle.style.setProperty('--float-y', `${-20 - Math.random() * 45}px`)
-    particle.style.setProperty('--particle-scale', `${0.8 + Math.random() * 0.6}`)
-    particle.style.animationDelay = `${Math.random() * 4}s`
-    particle.style.animationDuration = `${5 + Math.random() * 6}s`
-    container.appendChild(particle)
-  }
-}
-
-let typewriterTimer = null
 
 const normalizeFilterItems = (items) => {
   if (!Array.isArray(items)) return []
@@ -74,23 +34,30 @@ const normalizeFilterItems = (items) => {
     .filter(Boolean)
 }
 
+const formatDateValue = (date) => {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 const fetchArticles = async () => {
   loading.value = true
   try {
     const res = await getArticles({
       page: currentPage.value,
       size: pageSize.value,
-      keyword: keyword.value || undefined,
+      keyword: trimmedKeyword.value || undefined,
       category: selectedCategory.value || undefined,
-      tag: selectedTag.value || undefined
+      tag: selectedTag.value || undefined,
+      startDate: startDate.value || undefined,
+      endDate: endDate.value || undefined
     })
     const data = res.data?.data || {}
     articles.value = data.list || data || []
     total.value = Number(data.total ?? (Array.isArray(articles.value) ? articles.value.length : 0))
     currentPage.value = Number(data.page ?? currentPage.value)
     pageSize.value = Number(data.size ?? pageSize.value)
-    const topArticles = articles.value.filter(a => a.is_top || a.isTop)
-    featuredArticles.value = topArticles.length > 0 ? topArticles.slice(0, 3) : articles.value.slice(0, 3)
     
     if (articles.value.length > 0 && localStorage.getItem('token')) {
       try {
@@ -142,37 +109,62 @@ const handleTagFilter = (tag) => {
 const handlePageChange = (page) => {
   currentPage.value = page
   fetchArticles()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+const hasDateFilter = computed(() => Boolean(startDate.value && endDate.value))
+const trimmedKeyword = computed(() => keyword.value.trim())
+
 const hasActiveFilters = computed(() => {
-  return Boolean(keyword.value || selectedCategory.value || selectedTag.value)
+  return Boolean(trimmedKeyword.value || selectedCategory.value || selectedTag.value || startDate.value || endDate.value)
 })
+
+const toggleAdvancedFilters = () => {
+  showAdvancedFilters.value = !showAdvancedFilters.value
+}
+
+const applyRelativeDateRange = (days) => {
+  const end = new Date()
+  const start = new Date()
+  start.setDate(end.getDate() - days)
+  startDate.value = formatDateValue(start)
+  endDate.value = formatDateValue(end)
+  currentPage.value = 1
+  fetchArticles()
+}
 
 const clearAllFilters = () => {
   keyword.value = ''
   selectedCategory.value = ''
   selectedTag.value = ''
+  startDate.value = ''
+  endDate.value = ''
+  showAdvancedFilters.value = false
   currentPage.value = 1
   fetchArticles()
 }
 
-const featuredCount = computed(() => featuredArticles.value.length)
-const totalArticleCount = computed(() => total.value)
-const categoryCount = computed(() => categories.value.length)
-const tagCount = computed(() => tags.value.length)
-const currentYear = new Date().getFullYear()
-
-onMounted(() => {
-  typewriterTimer = useTypewriter(terminalText, typedTerminalText)
-  createHeroParticles()
-  fetchFilters()
-  fetchArticles()
+const dateRange = computed({
+  get: () => (startDate.value && endDate.value ? [startDate.value, endDate.value] : null),
+  set: (val) => {
+    if (val && val[0] && val[1]) {
+      startDate.value = val[0]
+      endDate.value = val[1]
+    } else {
+      startDate.value = ''
+      endDate.value = ''
+    }
+  }
 })
 
-onUnmounted(() => {
-  if (typewriterTimer) {
-    clearInterval(typewriterTimer)
-  }
+const handleDateChange = () => {
+  currentPage.value = 1
+  fetchArticles()
+}
+
+onMounted(() => {
+  fetchFilters()
+  fetchArticles()
 })
 </script>
 
@@ -181,139 +173,161 @@ onUnmounted(() => {
     <Header />
 
     <main class="main-content">
-      <section class="hero-section">
-        <div class="hero-grid" aria-hidden="true"></div>
-        <div ref="heroParticlesRef" class="hero-particles" aria-hidden="true"></div>
-
-        <div class="hero-body">
-          <span class="hero-kicker">&gt; /erwang/tech-notes</span>
-          <h1 class="hero-title">Erwang Blog</h1>
-          <p class="hero-subtitle">记录技术探索与编程实践</p>
-          <div class="hero-terminal" aria-label="terminal status">
-            <span class="terminal-prompt">$</span>
-            <span class="terminal-text">{{ typedTerminalText }}</span>
-            <span class="typing-cursor terminal-cursor" aria-hidden="true"></span>
+      <section class="hero-minimal">
+        <div class="hero-inner">
+          <div class="hero-content">
+            <span class="hero-eyebrow">Notes & Thoughts</span>
+            <h1 class="hero-title">记录技术探索的<br />每一段旅程</h1>
+            <p class="hero-desc">在这里，我分享关于编程、系统架构以及在技术世界中的种种思考。</p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-value">{{ total }}</span>
+              <span class="stat-label">文章总数</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-value">{{ categories.length }}</span>
+              <span class="stat-label">专栏分类</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="feed-shell">
-        <div class="content-layout">
-          <aside class="sidebar-panel">
-            <section class="sidebar-section">
-              <h2 class="sidebar-title">分类</h2>
-              <div class="sidebar-pills">
-                <button
-                  type="button"
-                  class="sidebar-pill"
-                  :class="{ active: !selectedCategory }"
-                  @click="handleCategoryFilter('')"
-                >
-                  全部
-                </button>
-                <button
-                  v-for="category in categories"
-                  :key="category"
-                  type="button"
-                  class="sidebar-pill"
-                  :class="{ active: selectedCategory === category }"
-                  @click="handleCategoryFilter(category)"
-                >
-                  {{ category }}
-                </button>
-              </div>
-            </section>
-
-            <section class="sidebar-section">
-              <h2 class="sidebar-title">标签</h2>
-              <div class="sidebar-pills">
-                <button
-                  type="button"
-                  class="sidebar-pill"
-                  :class="{ active: !selectedTag }"
-                  @click="handleTagFilter('')"
-                >
-                  全部
-                </button>
-                <button
-                  v-for="tag in tags"
-                  :key="tag"
-                  type="button"
-                  class="sidebar-pill"
-                  :class="{ active: selectedTag === tag }"
-                  @click="handleTagFilter(tag)"
-                >
-                  # {{ tag }}
-                </button>
-              </div>
-            </section>
-
-            <button v-if="hasActiveFilters" type="button" class="clear-filter-btn" @click="clearAllFilters">
-              清除全部筛选
+      <div class="discovery-section">
+        <div class="discovery-card">
+          <div class="search-bar-row">
+            <el-input
+              v-model="keyword"
+              placeholder="搜索感兴趣的内容..."
+              class="search-input"
+              clearable
+              @keyup.enter="handleSearch"
+              @clear="handleSearch"
+            >
+              <template #prefix>
+                <el-icon class="search-icon-svg"><Search /></el-icon>
+              </template>
+            </el-input>
+            <el-button type="primary" class="search-main-btn" @click="handleSearch">搜索</el-button>
+            <button
+              type="button"
+              class="filter-toggle-btn"
+              :class="{ active: showAdvancedFilters }"
+              @click="toggleAdvancedFilters"
+            >
+              <el-icon><Filter /></el-icon>
+              <span>筛选</span>
             </button>
-          </aside>
+          </div>
 
-          <section class="content-panel">
-            <div class="search-bar">
-              <el-input
-                v-model="keyword"
-                class="search-input"
-                placeholder="搜索文章关键词"
-                clearable
-                @keyup.enter="handleSearch"
-                @clear="handleSearch"
-              >
-                <template #append>
-                  <el-button class="search-btn" @click="handleSearch">检索</el-button>
-                </template>
-              </el-input>
+          <div class="category-row">
+            <button
+              type="button"
+              class="cat-chip"
+              :class="{ active: !selectedCategory }"
+              @click="handleCategoryFilter('')"
+            >
+              全部
+            </button>
+            <button
+              v-for="cat in categories"
+              :key="cat"
+              type="button"
+              class="cat-chip"
+              :class="{ active: selectedCategory === cat }"
+              @click="handleCategoryFilter(cat)"
+            >
+              {{ cat }}
+            </button>
+          </div>
+
+          <Transition name="expand">
+            <div v-if="showAdvancedFilters" class="advanced-filter-drawer">
+              <div class="filter-group">
+                <span class="filter-label">发布时间</span>
+                <div class="filter-options">
+                  <el-date-picker
+                    v-model="dateRange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    value-format="YYYY-MM-DD"
+                    @change="handleDateChange"
+                    class="refined-date-picker"
+                  />
+                  <div class="quick-dates">
+                    <button type="button" class="quick-date-link" @click="applyRelativeDateRange(30)">近一月</button>
+                    <button type="button" class="quick-date-link" @click="applyRelativeDateRange(180)">近半年</button>
+                  </div>
+                </div>
+              </div>
+              <div class="filter-group">
+                <span class="filter-label">热门标签</span>
+                <div class="tag-cloud">
+                  <button
+                    v-for="tag in tags"
+                    :key="tag"
+                    type="button"
+                    class="tag-link"
+                    :class="{ active: selectedTag === tag }"
+                    @click="handleTagFilter(tag)"
+                  >
+                    #{{ tag }}
+                  </button>
+                </div>
+              </div>
+              <div v-if="hasActiveFilters" class="filter-actions">
+                <el-button link :icon="Close" @click="clearAllFilters">重置所有筛选</el-button>
+              </div>
             </div>
+          </Transition>
+        </div>
+      </div>
 
-            <section class="timeline-section">
-              <el-skeleton :rows="5" animated v-if="loading" />
+      <section class="content-timeline">
+        <div class="timeline-container">
+          <el-skeleton :rows="6" animated v-if="loading" />
 
-              <div v-else-if="articles.length" class="timeline-list">
-                <article v-for="article in articles" :key="article.id" class="timeline-row">
-                  <div class="timeline-date">
-                    <span class="date-month">
-                      {{ article.created_at ? new Date(article.created_at).toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : '--' }}
-                    </span>
-                    <span class="date-day">
-                      {{ article.created_at ? new Date(article.created_at).toLocaleDateString('en-US', { day: '2-digit' }) : '--' }}
-                    </span>
-                    <span class="date-year">
-                      {{ article.created_at ? new Date(article.created_at).toLocaleDateString('en-US', { year: 'numeric' }) : '----' }}
-                    </span>
-                  </div>
-
-                  <div class="timeline-axis" aria-hidden="true">
-                    <span class="timeline-dot"></span>
-                  </div>
-
-                  <div class="timeline-card">
-                    <ArticleCard :article="article" />
-                  </div>
-                </article>
+          <div v-else-if="articles.length" class="articles-timeline">
+            <div v-for="article in articles" :key="article.id" class="timeline-item">
+              <div class="timeline-meta">
+                <time class="time-main">
+                  {{ article.created_at ? new Date(article.created_at).getDate().toString().padStart(2, '0') : '--' }}
+                </time>
+                <span class="time-sub">
+                  {{ article.created_at ? new Date(article.created_at).toLocaleDateString('en-US', { month: 'short' }).toUpperCase() : '--' }}
+                </span>
               </div>
-
-              <div v-else class="empty-state">
-                <div class="empty-icon">◈</div>
-                <p class="empty-title">{{ keyword || selectedCategory || selectedTag ? '未找到相关内容' : '暂无文章' }}</p>
-                <p class="empty-desc">{{ keyword || selectedCategory || selectedTag ? '试试其他关键词或清除筛选条件' : '期待第一篇文章的到来' }}</p>
+              <div class="timeline-marker">
+                <div class="marker-dot"></div>
+                <div class="marker-line"></div>
               </div>
-
-              <div class="pagination-wrap" v-if="total > 0">
-                <el-pagination
-                  background
-                  layout="total, prev, pager, next"
-                  :current-page="currentPage"
-                  :page-size="pageSize"
-                  :total="total"
-                  @current-change="handlePageChange"
-                />
+              <div class="timeline-content">
+                <ArticleCard :article="article" />
               </div>
-            </section>
-          </section>
+            </div>
+          </div>
+
+          <div v-else class="empty-state-refined">
+            <div class="empty-illustration">
+              <el-icon><Search /></el-icon>
+            </div>
+            <h3>没能找到相关文章</h3>
+            <p>尝试更换关键词或清除筛选条件</p>
+            <el-button plain round @click="clearAllFilters">清除所有筛选</el-button>
+          </div>
+
+          <div v-if="total > pageSize" class="pagination-refined">
+            <el-pagination
+              layout="prev, pager, next"
+              :total="total"
+              :page-size="pageSize"
+              v-model:current-page="currentPage"
+              @current-change="handlePageChange"
+            />
+          </div>
         </div>
       </section>
     </main>
@@ -324,488 +338,398 @@ onUnmounted(() => {
 
 <style scoped>
 .page-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: var(--bg);
 }
 
 .main-content {
-  --space-1: 8px;
-  --space-2: 12px;
-  --space-3: 16px;
-  --space-4: 24px;
-  --space-5: 32px;
-  --space-6: 40px;
-  flex: 1;
-  width: 100%;
-  max-width: 1200px;
+  max-width: var(--shell-reading);
   margin: 0 auto;
-  padding: 0 clamp(14px, 2.8vw, 32px);
+  padding: 0 var(--page-gutter);
 }
 
-.hero-section {
+/* --- Refined Hero Section --- */
+.hero-minimal {
+  padding: 80px 0 60px;
   position: relative;
-  margin-top: 20px;
-  min-height: 240px;
-  max-height: 280px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: #ffffff;
-  overflow: hidden;
 }
 
-.hero-grid {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.06;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
-.hero-particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hero-body {
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  min-height: 240px;
+.hero-inner {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
-  gap: var(--space-2);
-  padding: clamp(26px, 4.5vw, 40px) var(--space-4);
+  gap: 40px;
 }
 
-.hero-kicker {
+.hero-eyebrow {
+  display: block;
   font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 1.4px;
+  font-size: 13px;
   color: var(--accent);
-  opacity: 0.9;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
 }
 
 .hero-title {
-  margin: 0;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.2;
+  color: var(--text-h);
+  margin-bottom: 20px;
+  font-weight: 800;
+}
+
+.hero-desc {
+  max-width: 540px;
+  font-size: 17px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 20px 40px;
+  background: #ffffff;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
   font-family: var(--heading);
-  font-size: clamp(34px, 6vw, 54px);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text-h);
 }
 
-.hero-subtitle {
-  margin: 0;
-  color: var(--text);
-  font-size: clamp(16px, 2.1vw, 19px);
-  letter-spacing: 0.2px;
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-.hero-terminal {
-  display: inline-flex;
+.stat-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border);
+}
+
+/* --- Discovery Section --- */
+.discovery-section {
+  margin-bottom: 40px;
+}
+
+.discovery-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+}
+
+.search-bar-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  flex: 1;
+}
+
+:deep(.search-input .el-input__wrapper) {
+  border-radius: var(--radius-lg) !important;
+  box-shadow: inset 0 0 0 1px var(--border) !important;
+  height: 48px;
+}
+
+.search-main-btn {
+  height: 48px;
+  padding: 0 28px;
+  border-radius: var(--radius-lg);
+  font-family: var(--heading);
+  font-weight: 600;
+}
+
+.filter-toggle-btn {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 14px;
+  height: 48px;
+  padding: 0 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: #ffffff;
-  font-family: var(--mono);
-  font-size: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.terminal-prompt {
+.filter-toggle-btn:hover,
+.filter-toggle-btn.active {
+  border-color: var(--accent);
   color: var(--accent);
+  background: var(--accent-bg);
 }
 
-.terminal-text {
-  color: var(--text);
-  letter-spacing: 0.6px;
-}
-
-.terminal-cursor {
-  margin-left: -3px;
-}
-
-.feed-shell {
-  width: 100%;
-  margin: var(--space-5) auto var(--space-6);
-}
-
-.content-layout {
+.category-row {
   display: flex;
-  align-items: flex-start;
-  gap: 32px;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
 }
 
-.sidebar-panel {
-  width: 240px;
-  flex: 0 0 240px;
-  position: sticky;
-  top: 80px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: #ffffff;
-  padding: 20px;
+.category-row::-webkit-scrollbar { display: none; }
+
+.cat-chip {
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.cat-chip:hover {
+  background: var(--border);
+  color: var(--text-h);
+}
+
+.cat-chip.active {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.advanced-filter-drawer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border);
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.sidebar-section {
+.filter-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.sidebar-title {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
+.filter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+  font-family: var(--heading);
 }
 
-.sidebar-pills {
+.filter-options {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
-.sidebar-pill {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-  border-radius: 999px;
-  padding: 5px 11px;
-  font-size: 11px;
-  font-family: var(--mono);
-  letter-spacing: 0.25px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: border-color 0.22s ease, color 0.22s ease, background-color 0.22s ease;
+.quick-dates {
+  display: flex;
+  gap: 12px;
 }
 
-.sidebar-pill:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.sidebar-pill.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.clear-filter-btn {
-  width: fit-content;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 11px;
-  font-family: var(--mono);
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.clear-filter-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-:deep(.search-input .el-input__wrapper) {
-  border-radius: var(--radius-md);
-  border-color: var(--border);
-  background: #ffffff !important;
-  box-shadow: none;
-}
-
-:deep(.search-input .el-input__wrapper.is-focus) {
-  border-color: var(--accent);
-}
-
-:deep(.search-input .el-input-group__append) {
-  border-color: var(--border);
-  background: transparent;
-}
-
-.search-btn {
+.quick-date-link {
   border: none;
-  background: var(--accent);
-  color: #ffffff;
-  font-family: var(--heading);
-  letter-spacing: 0.3px;
-}
-
-.content-panel {
-  flex: 1;
-  min-width: 0;
-}
-
-.search-bar {
-  margin-bottom: var(--space-4);
-}
-
-.timeline-section {
-  position: relative;
-}
-
-.timeline-list {
-  --date-col: 108px;
-  --axis-col: 52px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.timeline-list::before {
-  content: '';
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: calc(var(--date-col) + (var(--axis-col) / 2));
-  width: 1px;
-  background: var(--border);
-  transform: translateX(-0.5px);
-}
-
-.timeline-row {
-  display: grid;
-  grid-template-columns: var(--date-col) var(--axis-col) minmax(0, 1fr);
-  align-items: start;
-  column-gap: 0;
-}
-
-.timeline-date {
-  padding-top: 12px;
-  text-align: right;
-  font-family: var(--mono);
-  line-height: 1.1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  color: var(--text);
-}
-
-.date-month {
-  font-size: 11px;
-  opacity: 0.82;
-  letter-spacing: 1px;
-}
-
-.date-day {
-  font-size: 20px;
-  color: var(--text-h);
-}
-
-.date-year {
-  font-size: 11px;
-  opacity: 0.58;
-}
-
-.timeline-axis {
-  display: flex;
-  justify-content: center;
-  padding-top: 18px;
-}
-
-.timeline-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  transition: transform 0.25s ease;
-}
-
-.timeline-row:hover .timeline-dot {
-  transform: scale(1.1);
-}
-
-.timeline-row:hover .timeline-dot {
-  transform: scale(1.12);
-  box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.16), 0 0 12px rgba(0, 240, 255, 0.35);
-}
-
-.timeline-card {
-  min-width: 0;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 56px 24px;
-}
-
-.empty-icon {
-  font-size: 40px;
+  background: transparent;
   color: var(--accent);
-  margin-bottom: 12px;
-  opacity: 0.68;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.empty-title {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: var(--text-h);
-  font-family: var(--heading);
-}
-
-.empty-desc {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text);
-  opacity: 0.78;
-}
-
-.pagination-wrap {
-  margin-top: 28px;
+.tag-cloud {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-:deep(.el-pagination.is-background .btn-next),
-:deep(.el-pagination.is-background .btn-prev),
-:deep(.el-pagination.is-background .el-pager li) {
-  background: #ffffff;
+.tag-link {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
   border: 1px solid var(--border);
-  color: var(--text);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-family: var(--mono);
+  cursor: pointer;
 }
 
-:deep(.el-pagination.is-background .el-pager li.is-active) {
+.tag-link.active {
   background: var(--accent-bg);
-  color: var(--accent);
   border-color: var(--accent);
+  color: var(--accent);
 }
 
-:deep(.timeline-card .article-card) {
-  min-height: 100%;
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
-:deep(.timeline-card .article-card:hover) {
-  transform: translateY(-2px);
+/* --- Timeline Section --- */
+.content-timeline {
+  padding-bottom: 80px;
 }
 
-:deep(.hero-particle) {
+.articles-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 60px 40px 1fr;
+  align-items: stretch;
+}
+
+.timeline-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 24px;
+  gap: 4px;
+}
+
+.time-main {
+  font-family: var(--heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+  line-height: 1;
+}
+
+.time-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.marker-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  margin-top: 30px;
+  z-index: 2;
+  transition: all 0.3s var(--ease-out);
+}
+
+.marker-line {
   position: absolute;
-  border-radius: 999px;
-  background: var(--border);
-  animation-name: hero-particle-float;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-iteration-count: infinite;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background-color: var(--border);
+  z-index: 1;
 }
 
-@keyframes hero-particle-float {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 0;
-  }
-  18% {
-    opacity: var(--particle-opacity, 0.65);
-  }
-  100% {
-    transform: translate3d(var(--float-x), var(--float-y), 0) scale(var(--particle-scale));
-    opacity: 0;
-  }
+.timeline-item:first-child .marker-line {
+  top: 30px;
 }
 
-@media (max-width: 1024px) {
-  .content-layout {
-    gap: 24px;
-  }
+.timeline-item:last-child .marker-line {
+  bottom: calc(100% - 30px);
+}
 
-  .sidebar-panel {
-    width: 220px;
-    flex-basis: 220px;
-  }
+.timeline-content {
+  padding: 12px 0 32px;
+}
+
+.timeline-item:hover .marker-dot {
+  background: var(--accent);
+  transform: scale(1.4);
+  box-shadow: 0 0 0 4px var(--accent-bg);
+}
+
+/* --- Empty State --- */
+.empty-state-refined {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.empty-illustration {
+  font-size: 48px;
+  color: var(--border-strong);
+  margin-bottom: 16px;
+}
+
+.empty-state-refined h3 {
+  margin-bottom: 8px;
+}
+
+.empty-state-refined p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* --- Pagination --- */
+.pagination-refined {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* --- Transitions --- */
+.expand-enter-active, .expand-leave-active {
+  transition: all 0.3s ease-in-out;
+  max-height: 400px;
+  overflow: hidden;
+}
+.expand-enter-from, .expand-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding: 0 14px;
+  .hero-minimal { padding: 40px 0; }
+  .hero-stats { display: none; }
+  
+  .timeline-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
   }
-
-  .hero-section {
-    min-height: 210px;
-    max-height: 260px;
-    border-radius: 12px;
-  }
-
-  .hero-body {
-    min-height: 210px;
-    padding: 22px 14px;
-  }
-
-  .hero-kicker {
-    font-size: 11px;
-  }
-
-  .hero-terminal {
-    font-size: 11px;
-    width: 100%;
-    max-width: 100%;
-    justify-content: center;
-  }
-
-  .feed-shell {
-    margin-top: 24px;
-  }
-
-  .content-layout {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .sidebar-panel {
-    width: 100%;
-    flex-basis: auto;
-    position: static;
-    top: auto;
-  }
-
-  .sidebar-section {
+  
+  .timeline-meta {
+    flex-direction: row;
+    align-items: baseline;
     gap: 8px;
+    padding-top: 0;
+    justify-content: flex-start;
   }
-
-  .sidebar-pills {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  .clear-filter-btn {
-    align-self: flex-start;
-  }
-
-  .timeline-list {
-    gap: 14px;
-  }
-
-  .timeline-list::before,
-  .timeline-date,
-  .timeline-axis {
-    display: none;
-  }
-
-  .timeline-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .timeline-dot,
-  :deep(.hero-particle) {
-    animation: none;
-    transition: none;
-  }
+  
+  .timeline-marker { display: none; }
+  .timeline-content { padding: 0; }
+  
+  .search-bar-row { flex-direction: column; }
+  .search-main-btn { width: 100%; }
 }
 </style>

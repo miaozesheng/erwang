@@ -9,7 +9,7 @@ import { ElMessage } from 'element-plus'
 import { getArticle, toggleLike, toggleFavorite, getInteractionStatus } from '../api'
 import Header from '../components/Header.vue'
 import Footer from '../components/Footer.vue'
-import { ArrowLeft, Folder, Calendar, View } from '@element-plus/icons-vue'
+import { ArrowLeft, Folder, Calendar, View, Star, StarFilled } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -137,7 +137,13 @@ const collectHeadings = () => {
 const scrollToHeading = (id) => {
   const el = document.getElementById(id)
   if (!el) return
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const offset = 80
+  const elementPosition = el.getBoundingClientRect().top
+  const offsetPosition = elementPosition + window.pageYOffset - offset
+  window.scrollTo({
+    top: offsetPosition,
+    behavior: 'smooth'
+  })
 }
 
 const observeHeadingScroll = () => {
@@ -201,76 +207,88 @@ onUnmounted(() => {
     <main class="main-content">
       <el-skeleton :rows="10" animated v-if="loading" />
 
-      <div v-else-if="article" class="content-layout">
-        <section class="reader-column">
-          <button type="button" class="back-btn" @click="router.push('/')">
-            <el-icon><ArrowLeft /></el-icon>
-            返回首页
-          </button>
+      <div v-else-if="article" class="article-layout">
+        <aside class="toc-sidebar">
+          <div class="toc-sticky">
+            <h3 class="toc-title">目录索引</h3>
+            <ul class="toc-list">
+              <li
+                v-for="item in headings"
+                :key="item.id"
+                class="toc-item"
+                :class="[
+                  `level-${item.level}`,
+                  { active: activeHeadingId === item.id }
+                ]"
+              >
+                <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
+                  <span class="toc-dot"></span>
+                  <span class="toc-text">{{ item.text }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </aside>
 
-          <article class="article-detail">
+        <section class="article-column">
+          <nav class="article-nav">
+            <button type="button" class="refined-back-btn" @click="router.push('/')">
+              <el-icon><ArrowLeft /></el-icon>
+              <span>返回列表</span>
+            </button>
+          </nav>
+
+          <article class="article-viewer">
             <header class="article-header">
               <h1 class="article-title">{{ article.title }}</h1>
-              <div class="article-meta">
-                <span v-if="article.category" class="meta-item">
-                  <el-icon><Folder /></el-icon>
-                  {{ article.category }}
-                </span>
-                <span class="meta-item">
-                  <el-icon><Calendar /></el-icon>
-                  {{ formatDate(article.created_at) }}
-                </span>
-                <span v-if="article.views" class="meta-item">
-                  <el-icon><View /></el-icon>
-                  {{ article.views }} 阅读
-                </span>
+              
+              <div class="article-meta-row">
+                <div class="meta-main">
+                  <span v-if="article.category" class="meta-tag category">
+                    <el-icon><Folder /></el-icon>
+                    {{ article.category }}
+                  </span>
+                  <span class="meta-info">
+                    <el-icon><Calendar /></el-icon>
+                    {{ formatDate(article.created_at) }}
+                  </span>
+                  <span v-if="article.views" class="meta-info">
+                    <el-icon><View /></el-icon>
+                    {{ article.views }} 阅读
+                  </span>
+                </div>
+                
+                <div class="interaction-pill">
+                  <button type="button" class="i-btn like" :class="{ active: liked }" @click="handleLike" aria-label="点赞">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="heart-svg">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    </svg>
+                    <span>{{ likeCount }}</span>
+                  </button>
+                  <div class="i-divider"></div>
+                  <button type="button" class="i-btn fav" :class="{ active: favorited }" @click="handleFavorite" aria-label="收藏">
+                    <el-icon v-if="favorited"><StarFilled /></el-icon>
+                    <el-icon v-else><Star /></el-icon>
+                    <span>{{ favoriteCount }}</span>
+                  </button>
+                </div>
               </div>
 
-              <div v-if="article.tags?.length" class="article-tags">
-                <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
-              </div>
-
-              <div class="interaction-bar">
-                <button type="button" class="interact-btn like" :class="{ active: liked }" @click="handleLike">
-                  <span class="btn-icon" aria-hidden="true">❤</span>
-                  <span>{{ likeCount }}</span>
-                </button>
-                <button type="button" class="interact-btn favorite" :class="{ active: favorited }" @click="handleFavorite">
-                  <span class="btn-icon" aria-hidden="true">★</span>
-                  <span>{{ favoriteCount }}</span>
-                </button>
+              <div v-if="article.tags?.length" class="article-tags-cloud">
+                <span v-for="tag in article.tags" :key="tag" class="refined-tag">#{{ tag }}</span>
               </div>
             </header>
 
             <div
               ref="contentRef"
-              class="article-content markdown-body"
+              class="article-content-body markdown-body"
               v-html="renderedContent"
             ></div>
           </article>
         </section>
-
-        <aside v-if="headings.length" class="toc-sidebar">
-          <h3 class="toc-title">目录</h3>
-          <ul class="toc-list">
-            <li
-              v-for="item in headings"
-              :key="item.id"
-              class="toc-item"
-              :class="[
-                `level-${item.level}`,
-                { active: activeHeadingId === item.id }
-              ]"
-            >
-              <button type="button" class="toc-link" @click="scrollToHeading(item.id)">
-                {{ item.text }}
-              </button>
-            </li>
-          </ul>
-        </aside>
       </div>
 
-      <el-empty v-else description="文章不存在" />
+      <el-empty v-else description="没能找到该文章" />
     </main>
 
     <Footer />
@@ -280,212 +298,72 @@ onUnmounted(() => {
 <style scoped>
 .page-container {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 .main-content {
-  flex: 1;
-  max-width: 1160px;
+  max-width: var(--shell-default);
   margin: 0 auto;
-  padding: 32px 24px 44px;
+  padding: 40px var(--page-gutter) 80px;
   width: 100%;
-  box-sizing: border-box;
 }
 
-.content-layout {
+.article-layout {
   display: grid;
-  grid-template-columns: minmax(0, 760px) 200px;
-  gap: 40px;
-  justify-content: center;
+  grid-template-columns: 240px 1fr;
+  gap: 60px;
   align-items: start;
 }
 
-.reader-column {
-  width: 100%;
-}
-
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 13px;
-  padding: 0;
-  margin: 0 0 20px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.back-btn:hover {
-  color: var(--accent);
-}
-
-.article-detail {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 40px;
-}
-
-.article-header {
-  margin-bottom: 30px;
-  padding-bottom: 22px;
-  border-bottom: 1px solid var(--border);
-}
-
-.article-title {
-  margin: 0;
-  font-size: 32px;
-  line-height: 1.3;
-  font-weight: 700;
-  color: var(--text-h);
-}
-
-.article-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 14px;
-  color: var(--text-secondary);
-}
-
-.meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-secondary);
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.2px;
-}
-
-.meta-item .el-icon {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.article-tags {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  font-family: var(--mono);
-  font-size: 11px;
-}
-
-.interaction-bar {
-  margin-top: 18px;
-  display: flex;
-  gap: 10px;
-}
-
-.interact-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-secondary);
-  font-family: var(--mono);
-  font-size: 13px;
-  cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
-}
-
-.interact-btn:active {
-  transform: scale(0.97);
-}
-
-.interact-btn:hover,
-.interact-btn.active {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: var(--accent-bg);
-}
-
-.btn-icon {
-  font-size: 12px;
-}
-
-.article-content {
-  font-size: 16px;
-  line-height: 1.8;
-  color: var(--text);
-}
-
+/* --- TOC Sidebar --- */
 .toc-sidebar {
+  position: relative;
+}
+
+.toc-sticky {
   position: sticky;
-  top: 88px;
-  width: 200px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--bg);
-  padding: 14px 10px;
+  top: 100px;
 }
 
 .toc-title {
-  margin: 0 0 10px;
-  color: var(--text-h);
+  font-family: var(--heading);
   font-size: 13px;
-  font-family: var(--mono);
-  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: 24px;
 }
 
 .toc-list {
-  margin: 0;
-  padding: 0;
   list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 1.5px solid var(--border);
 }
 
 .toc-item {
-  margin-bottom: 2px;
-}
-
-.toc-item.level-2 .toc-link {
-  padding-left: 16px;
-}
-
-.toc-item.level-3 .toc-link {
-  padding-left: 28px;
+  position: relative;
 }
 
 .toc-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   width: 100%;
-  border: 0;
-  border-left: 2px solid transparent;
-  border-radius: 0;
+  padding: 10px 16px;
+  border: none;
   background: transparent;
-  color: var(--text-secondary);
-  text-align: left;
-  font-family: var(--mono);
-  font-size: 13px;
+  color: var(--text-muted);
+  font-size: 14px;
   line-height: 1.4;
-  padding: 6px 8px;
+  text-align: left;
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition: all 0.2s;
+  margin-left: -1.5px;
+  border-left: 1.5px solid transparent;
 }
 
 .toc-link:hover {
-  color: var(--text);
-  background: var(--bg-secondary);
+  color: var(--text-h);
 }
 
 .toc-item.active .toc-link {
@@ -494,121 +372,207 @@ onUnmounted(() => {
   background: var(--accent-bg);
 }
 
-:deep(.markdown-body) {
-  color: var(--text);
+.toc-item.level-3 .toc-link {
+  padding-left: 32px;
+  font-size: 13px;
 }
 
-:deep(.markdown-body h1),
-:deep(.markdown-body h2),
-:deep(.markdown-body h3),
-:deep(.markdown-body h4) {
-  color: var(--text-h);
-  font-family: var(--heading);
-  font-weight: 700;
-  line-height: 1.35;
-  margin: 2.1em 0 0.75em;
+/* --- Article Column --- */
+.article-column {
+  min-width: 0;
 }
 
-:deep(.markdown-body h1) { font-size: 30px; }
-:deep(.markdown-body h2) { font-size: 25px; }
-:deep(.markdown-body h3) { font-size: 21px; }
-:deep(.markdown-body h4) { font-size: 18px; }
-
-:deep(.markdown-body p) {
-  margin: 0 0 1.1em;
+.article-nav {
+  margin-bottom: 24px;
 }
 
-:deep(.markdown-body a) {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-:deep(.markdown-body code) {
-  background: var(--code-bg);
+.refined-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 2px 6px;
-  font-size: 14px;
+  background: #ffffff;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refined-back-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateX(-4px);
+}
+
+.article-viewer {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 60px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.article-header {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.article-title {
+  font-size: 40px;
+  line-height: 1.25;
+  margin-bottom: 24px;
+  font-weight: 800;
+  color: var(--text-h);
+}
+
+.article-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.meta-main {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.meta-tag.category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
   font-family: var(--mono);
 }
 
-:deep(.markdown-body pre) {
-  margin: 1.3em 0;
-  padding: 16px;
-  background: var(--code-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow-x: auto;
+.meta-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--mono);
 }
 
-:deep(.markdown-body pre code) {
+.interaction-pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 2px;
+}
+
+.i-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border: none;
-  padding: 0;
   background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--mono);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+}
+
+.i-btn:hover {
+  color: var(--text-h);
+}
+
+.i-btn.active.like { color: #e05e5e; background: #fee; }
+.i-btn.active.like .heart-svg { fill: currentColor; stroke: #e05e5e; }
+.i-btn.active.fav { color: #e6a23c; background: #fff7e6; }
+
+.i-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+}
+
+.article-tags-cloud {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+.refined-tag {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--mono);
+  opacity: 0.8;
+}
+
+/* --- Content Typography --- */
+.article-content-body {
+  font-size: 17px;
+  line-height: 1.75;
+  color: #333;
+}
+
+:deep(.markdown-body) {
+  font-family: var(--sans);
+}
+
+:deep(.markdown-body h1, .markdown-body h2, .markdown-body h3) {
+  font-family: var(--heading);
+  margin-top: 2em;
+  margin-bottom: 0.8em;
+  color: var(--text-h);
 }
 
 :deep(.markdown-body blockquote) {
-  margin: 1.2em 0;
-  padding: 8px 0 8px 14px;
-  border-left: 3px solid var(--accent);
-  color: color-mix(in srgb, var(--text) 88%, var(--text-h) 12%);
+  border-left: 4px solid var(--accent);
+  background: var(--accent-bg);
+  padding: 16px 24px;
+  margin: 2em 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: #555;
+  font-style: italic;
 }
 
-:deep(.markdown-body ul),
-:deep(.markdown-body ol) {
-  margin: 0 0 1.2em;
-  padding-left: 24px;
-}
-
-:deep(.markdown-body li) {
-  margin: 0.45em 0;
-}
-
-:deep(.markdown-body img) {
-  display: block;
-  max-width: 100%;
-  border-radius: 10px;
-  margin: 1.2em auto;
-}
-
-:deep(.markdown-body table) {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.3em 0;
-}
-
-:deep(.markdown-body th),
-:deep(.markdown-body td) {
+:deep(.markdown-body pre) {
+  background: #f8f9fa;
   border: 1px solid var(--border);
-  padding: 10px 12px;
-  text-align: left;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  margin: 2em 0;
 }
 
-:deep(.markdown-body th) {
-  color: var(--text-h);
-  background: var(--bg-secondary);
+:deep(.markdown-body code) {
+  background: var(--bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+@media (max-width: 1024px) {
+  .article-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .toc-sidebar { display: none; }
 }
 
 @media (max-width: 768px) {
-  .content-layout {
-    grid-template-columns: minmax(0, 760px);
-  }
-
-  .toc-sidebar {
-    display: none;
-  }
-
-  .main-content {
-    padding: 22px 14px 34px;
-  }
-
-  .article-detail {
-    padding: 22px 16px;
-  }
-
-  .article-title {
-    font-size: 24px;
-  }
+  .main-content { padding: 20px 16px 60px; }
+  .article-viewer { padding: 32px 20px; }
+  .article-title { font-size: 28px; }
+  .article-meta-row { flex-direction: column; align-items: flex-start; }
 }
 </style>

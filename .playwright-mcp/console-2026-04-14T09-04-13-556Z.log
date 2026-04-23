@@ -1,0 +1,26 @@
+[     504ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/auth/info:0
+[     504ms] [ERROR] Failed to fetch user info: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async ge (http://localhost:8888/assets/Footer-CeS7yGHO.js:1:3012) @ http://localhost:8888/assets/Footer-CeS7yGHO.js:0
+[     510ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/categories:0
+[     510ms] [ERROR] Failed to fetch data: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async Promise.all (index 0)
+    at async Ne (http://localhost:8888/assets/AdminArticle-BxQXFc4D.js:241:2614) @ http://localhost:8888/assets/AdminArticle-BxQXFc4D.js:240
+[     515ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/tags:0
+[  375415ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/auth/info:0
+[  375416ms] [ERROR] Failed to fetch user info: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async ge (http://localhost:8888/assets/Footer-CeS7yGHO.js:1:3012) @ http://localhost:8888/assets/Footer-CeS7yGHO.js:0
+[  375431ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/auth/info:0
+[  375432ms] [ERROR] Failed to fetch user profile: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async $ (http://localhost:8888/assets/Profile-tdApNKeF.js:1:2674) @ http://localhost:8888/assets/Profile-tdApNKeF.js:0

@@ -13,6 +13,13 @@ const loading = ref(false)
 
 const isFavorites = computed(() => route.path === '/favorites')
 const pageTitle = computed(() => isFavorites.value ? '我的收藏' : '我的喜欢')
+const userRole = computed(() => (localStorage.getItem('userRole') || '').toLowerCase())
+const sectionNav = computed(() => [
+  { key: 'profile', label: '个人中心', path: '/profile' },
+  { key: 'favorites', label: '收藏', path: '/favorites' },
+  { key: 'likes', label: '喜欢', path: '/likes' },
+  ...(userRole.value === 'admin' ? [{ key: 'admin', label: '管理', path: '/admin' }] : [])
+])
 
 const fetchData = async () => {
   loading.value = true
@@ -37,18 +44,25 @@ onMounted(fetchData)
   <div class="collection-page">
     <Header />
     <main class="main-content">
-<div class="page-header">
-         <div class="page-header-content">
-           <button
-             v-if="route.path !== '/profile'"
-             class="back-btn"
-             @click="router.push('/profile')"
-           >
-             ← 返回个人中心
-           </button>
-           <h1 class="page-title">{{ pageTitle }}</h1>
-         </div>
-       </div>
+      <div class="page-header">
+        <div class="page-header-content">
+          <h1 class="page-title">{{ pageTitle }}</h1>
+          <p class="page-subtitle">把与你相关的内容收在一处，切换时不用再显式返回上一层。</p>
+        </div>
+
+        <nav class="section-nav" aria-label="个人内容导航">
+          <button
+            v-for="item in sectionNav"
+            :key="item.key"
+            type="button"
+            class="section-nav__item"
+            :class="{ active: route.path === item.path }"
+            @click="router.push(item.path)"
+          >
+            {{ item.label }}
+          </button>
+        </nav>
+      </div>
       <div v-loading="loading" class="articles-grid">
         <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
       </div>
@@ -71,11 +85,12 @@ onMounted(fetchData)
 }
 
 .main-content {
+  --page-shell-max: var(--shell-default);
   flex: 1;
-  max-width: 1200px;
+  max-width: var(--page-shell-max);
   margin: 0 auto;
   width: 100%;
-  padding: var(--sp-8) var(--sp-6);
+  padding: var(--sp-8) var(--page-gutter);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -83,35 +98,20 @@ onMounted(fetchData)
 }
 
 .page-header {
-   background: #ffffff;
-   border: 1px solid var(--border);
-   border-radius: var(--radius-lg);
-   padding: var(--sp-6) var(--sp-6);
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
- }
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
-.back-btn {
-   display: inline-flex;
-   align-items: center;
-   gap: 6px;
-   padding: 8px 16px;
-   border: 1px solid var(--border);
-   border-radius: 6px;
-   background: transparent;
-   color: var(--text);
-   font-size: 13px;
-   cursor: pointer;
-   transition: all 0.2s ease;
- }
-
-.back-btn:hover {
-   border-color: var(--accent);
-   color: var(--accent);
-   background: rgba(255, 255, 255, 0.96);
-   transform: translateY(-1px);
- }
+.page-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 .page-title {
   margin: 0;
@@ -119,9 +119,42 @@ onMounted(fetchData)
   color: var(--text-h);
 }
 
+.page-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-nav__item {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--heading);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.section-nav__item:hover,
+.section-nav__item.active {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+  background: var(--accent-bg);
+}
+
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 24vw, 360px), 1fr));
   gap: var(--sp-5);
 }
 
@@ -156,11 +189,35 @@ onMounted(fetchData)
 
 @media (max-width: 768px) {
   .main-content {
-    padding: var(--sp-5) var(--sp-4);
+    padding: var(--sp-5) var(--sp-4) 100px;
   }
 
   .page-header {
-    padding: var(--sp-5);
+    padding: var(--sp-4);
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .section-nav {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .section-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .section-nav__item {
+    flex: 0 0 auto;
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+
+  .collection-grid {
+    gap: 12px;
   }
 }
 </style>

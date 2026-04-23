@@ -1,0 +1,66 @@
+- generic [ref=e3]:
+  - region "常用入口":
+    - generic:
+      - generic [ref=e77]:
+        - generic [ref=e78]: 常用入口
+        - paragraph [ref=e79]: 常去的地方单独收纳，不挤占正文，也不打断阅读。
+      - list [ref=e80]:
+        - listitem "Google" [ref=e81] [cursor=pointer]:
+          - generic [ref=e82]: 🔍
+          - generic [ref=e83]: Google
+        - listitem "Claude" [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]: 🤖
+          - generic [ref=e86]: Claude
+        - listitem "ChatGPT" [ref=e87] [cursor=pointer]:
+          - generic [ref=e88]: 💬
+          - generic [ref=e89]: ChatGPT
+        - listitem "GitHub" [ref=e90] [cursor=pointer]:
+          - generic [ref=e91]: 🐙
+          - generic [ref=e92]: GitHub
+        - listitem "MDN" [ref=e93] [cursor=pointer]:
+          - generic [ref=e94]: 📘
+          - generic [ref=e95]: MDN
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - button "回到首页" [ref=e7] [cursor=pointer]:
+          - img [ref=e9]
+          - generic [ref=e13]:
+            - generic [ref=e14]: personal tech notes
+            - generic [ref=e15]: ERWANG
+        - navigation "主导航" [ref=e16]:
+          - button "首页" [ref=e18] [cursor=pointer]:
+            - generic [ref=e19]: ◦
+            - generic [ref=e20]: 首页
+          - button "GitHub" [ref=e21] [cursor=pointer]:
+            - generic [ref=e22]: ↗
+            - generic [ref=e23]: GitHub
+          - button "收藏" [ref=e24] [cursor=pointer]:
+            - generic [ref=e25]: ★
+            - generic [ref=e26]: 收藏
+          - button "喜欢" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28]: ♥
+            - generic [ref=e29]: 喜欢
+          - button "管理" [ref=e30] [cursor=pointer]:
+            - generic [ref=e31]: ◆
+            - generic [ref=e32]: 管理
+        - button "用户菜单" [ref=e35] [cursor=pointer]:
+          - img [ref=e37]
+    - main [ref=e38]:
+      - generic [ref=e39]:
+        - img [ref=e41]
+        - paragraph [ref=e58]: 文章不存在
+    - contentinfo [ref=e59]:
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - img [ref=e63]
+          - generic [ref=e67]:
+            - generic [ref=e68]: ERWANG
+            - paragraph [ref=e69]: 写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。
+        - generic "页脚导航" [ref=e70]:
+          - button "首页" [ref=e71] [cursor=pointer]
+          - button "关于" [ref=e72] [cursor=pointer]
+          - button "管理" [ref=e73] [cursor=pointer]
+        - generic [ref=e74]:
+          - generic [ref=e75]: 个人技术写作 · 阅读优先
+          - paragraph [ref=e76]: © 2026 Erwang. All rights reserved.

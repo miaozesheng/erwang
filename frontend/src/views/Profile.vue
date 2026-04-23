@@ -402,21 +402,23 @@ onUnmounted(() => {
 }
 
 .main-content {
+  --page-shell-max: var(--shell-default);
   flex: 1;
-  max-width: 820px;
+  max-width: var(--page-shell-max);
   margin: 0 auto;
-  padding: 32px 24px 48px;
+  padding: 32px var(--page-gutter) 48px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .profile-layout {
   display: flex;
-  gap: 32px;
+  gap: clamp(20px, 3vw, 32px);
   align-items: flex-start;
 }
 
 .profile-sidebar {
-  width: 180px;
+  width: clamp(164px, 18vw, 220px);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -634,37 +636,118 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .profile-layout {
     flex-direction: column;
+    gap: 16px;
+    width: 100%;
   }
 
   .profile-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
     flex-direction: row;
-    flex-wrap: wrap;
-    gap: 8px;
+    background: rgba(250, 249, 247, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 8px 12px;
+    gap: 4px;
+    z-index: 50;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
   }
 
   .sidebar-item {
     flex: 1;
-    min-width: 100px;
-    justify-content: center;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+
+  .sidebar-item .el-icon {
+    font-size: 18px;
+  }
+
+  .sidebar-item span {
+    font-size: 10px;
+    white-space: nowrap;
   }
 
   .main-content {
-    padding: 20px 16px 32px;
+    padding: 12px 12px 100px;
+    max-width: 100% !important;
+    width: 100%;
+    overflow-x: clip;
   }
 
   .profile-header {
     flex-direction: column;
     text-align: center;
-    padding: 20px;
+    padding: 20px 16px;
+    gap: 16px;
+    border-radius: 12px;
+    margin: 0 12px;
+    width: calc(100% - 24px);
+    box-sizing: border-box;
   }
 
   .profile-info {
     text-align: center;
   }
 
+  .profile-name {
+    font-size: 20px;
+  }
+
+  .profile-meta {
+    font-size: 12px;
+  }
+
+  .info-card,
+  .security-card {
+    padding: 16px;
+    border-radius: 12px;
+    margin: 0 12px;
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+  }
+
+  .card-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-field {
+    margin-bottom: 0;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 12px;
+  }
+
+  :deep(.el-input__wrapper) {
+    padding: 8px 12px;
+  }
+
+  .field-value {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+
+  .form-actions {
+    margin-top: 16px;
   }
 }
 </style>

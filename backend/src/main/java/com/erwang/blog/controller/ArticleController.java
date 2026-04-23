@@ -39,17 +39,21 @@ public class ArticleController {
                                             @RequestParam(required = false) Integer size,
                                             @RequestParam(required = false) String keyword,
                                             @RequestParam(required = false) String category,
-                                            @RequestParam(required = false) String tag) {
+                                            @RequestParam(required = false) String tag,
+                                            @RequestParam(required = false) String startDate,
+                                            @RequestParam(required = false) String endDate) {
         boolean noParams = page == null
                 && size == null
                 && isBlank(keyword)
                 && isBlank(category)
-                && isBlank(tag);
+                && isBlank(tag)
+                && isBlank(startDate)
+                && isBlank(endDate);
 
         int pageNo = page == null ? 1 : page;
         int pageSize = size == null ? 10 : Math.min(size, 100);
 
-        IPage<Article> articlePage = articleService.listPage(pageNo, pageSize, keyword, category, tag);
+        IPage<Article> articlePage = articleService.listPage(pageNo, pageSize, keyword, category, tag, startDate, endDate);
         List<Article> articles = articlePage.getRecords();
         
         List<Category> categories = categoryService.listAll();

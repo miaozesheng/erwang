@@ -24,6 +24,12 @@ const newCategory = ref('')
 const newTag = ref('')
 const linkForm = reactive({ icon: '', label: '', url: '', sort: 0 })
 const editingLinkId = ref(null)
+const sectionNav = [
+  { key: 'profile', label: '个人中心', path: '/profile' },
+  { key: 'favorites', label: '收藏', path: '/favorites' },
+  { key: 'likes', label: '喜欢', path: '/likes' },
+  { key: 'admin', label: '管理后台', path: '/admin' }
+]
 
 const fetchArticles = async () => {
   loading.value = true
@@ -193,6 +199,26 @@ onMounted(() => {
     <Header />
 
     <main class="main-content">
+      <section class="admin-context-bar">
+        <div>
+          <p class="admin-context-eyebrow">内容工作台</p>
+          <h1 class="admin-context-title">管理内容与站点常用入口</h1>
+        </div>
+
+        <nav class="section-nav" aria-label="个人与管理导航">
+          <button
+            v-for="item in sectionNav"
+            :key="item.key"
+            type="button"
+            class="section-nav__item"
+            :class="{ active: router.currentRoute.value.path === item.path }"
+            @click="router.push(item.path)"
+          >
+            {{ item.label }}
+          </button>
+        </nav>
+      </section>
+
       <div class="stats-grid">
         <div class="stat-card"><span class="stat-value">{{ stats.articleCount }}</span><span class="stat-label">文章数</span></div>
         <div class="stat-card"><span class="stat-value">{{ stats.totalViews }}</span><span class="stat-label">总阅读</span></div>
@@ -205,20 +231,13 @@ onMounted(() => {
           <button v-for="tab in [{key:'articles',label:'文章'},{key:'categories',label:'分类'},{key:'tags',label:'标签'},{key:'links',label:'快捷链接'}]" :key="tab.key" type="button" class="tab-btn" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">{{ tab.label }}</button>
         </div>
 
-        <div v-if="activeTab === 'articles'">
+<div v-if="activeTab === 'articles'">
 <div class="admin-header">
-         <div class="admin-header-content">
-           <button
-             v-if="$route.path !== '/profile'"
-             class="back-btn"
-             @click="$router.push('/profile')"
-           >
-             ← 返回个人中心
-           </button>
-           <h2 class="admin-title">文章管理</h2>
-         </div>
-         <el-button type="primary" @click="handleCreate" class="create-btn"><el-icon><Plus /></el-icon> 新建文章</el-button>
-       </div>
+          <div class="admin-header-content">
+            <h2 class="admin-title">文章管理</h2>
+          </div>
+          <el-button type="primary" @click="handleCreate" class="create-btn"><el-icon><Plus /></el-icon> 新建文章</el-button>
+        </div>
           <div class="articles-list" v-loading="loading">
             <div v-for="article in articles" :key="article.id" class="article-row">
               <div class="row-main">
@@ -310,31 +329,58 @@ onMounted(() => {
 
 <style scoped>
 .page-container { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
-.main-content { flex: 1; max-width: 1200px; margin: 0 auto; padding: 32px 24px; width: 100%; box-sizing: border-box; }
+.main-content { --page-shell-max: var(--shell-default); flex: 1; max-width: var(--page-shell-max); margin: 0 auto; padding: 32px var(--page-gutter); width: 100%; box-sizing: border-box; }
+
+.admin-context-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.admin-context-eyebrow {
+  margin: 0 0 8px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.admin-context-title {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 30px);
+  color: var(--text-h);
+}
+
+.section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-nav__item {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--heading);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.section-nav__item:hover,
+.section-nav__item.active {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 24%, var(--border));
+  background: var(--accent-bg);
+}
 
 /* Stats - Clean white cards with subtle border */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-
-.back-btn {
-   display: inline-flex;
-   align-items: center;
-   gap: 6px;
-   padding: 8px 16px;
-   border: 1px solid var(--border);
-   border-radius: 6px;
-   background: transparent;
-   color: var(--text);
-   font-size: 13px;
-   cursor: pointer;
-   transition: all 0.2s ease;
- }
-
-.back-btn:hover {
-   border-color: var(--accent);
-   color: var(--accent);
-   background: rgba(255, 255, 255, 0.96);
-   transform: translateY(-1px);
- }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(clamp(180px, 22vw, 240px), 1fr)); gap: 16px; margin-bottom: 24px; }
 
 .admin-header-content {
    display: flex;
@@ -409,6 +455,7 @@ onMounted(() => {
 .pagination-row { display: flex; justify-content: center; margin-top: 20px; position: relative; z-index: 1; }
 
 @media (max-width: 768px) {
+  .admin-context-bar { flex-direction: column; align-items: stretch; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-header { flex-direction: column; gap: 16px; align-items: flex-start; }
   .main-content { padding: 24px 16px; }
@@ -416,5 +463,8 @@ onMounted(() => {
   .row-actions { align-self: flex-end; }
   .tab-bar { flex-wrap: wrap; }
   .link-form { flex-direction: column; }
+  .section-nav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .section-nav::-webkit-scrollbar { display: none; }
+  .section-nav__item { flex: 0 0 auto; }
 }
 </style>

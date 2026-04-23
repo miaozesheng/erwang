@@ -1,0 +1,20 @@
+[     162ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/quick-links:0
+[     162ms] [ERROR] Failed to fetch quick links: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async C (http://localhost:8888/assets/index-CW8HJLZR.js:2:6843) @ http://localhost:8888/assets/index-CW8HJLZR.js:1
+[     231ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/categories:0
+[     232ms] [ERROR] Failed to fetch filters: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async Promise.all (index 0)
+    at async We (http://localhost:8888/assets/ArticleList-jJadSOXT.js:1:3602) @ http://localhost:8888/assets/ArticleList-jJadSOXT.js:0
+[     236ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/tags:0
+[     236ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/articles?page=1&size=10:0
+[     236ms] [ERROR] Failed to fetch articles: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async U (http://localhost:8888/assets/ArticleList-jJadSOXT.js:1:2849) @ http://localhost:8888/assets/ArticleList-jJadSOXT.js:0

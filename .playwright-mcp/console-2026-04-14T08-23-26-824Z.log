@@ -1,0 +1,12 @@
+[     218ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://erwang.me/api/auth/info:0
+[     219ms] [ERROR] Failed to fetch user info: AxiosError: Request failed with status code 403
+    at Tr (https://erwang.me/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (https://erwang.me/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (https://erwang.me/assets/vendor-DYpsmOb-.js:5:1989)
+    at async ge (https://erwang.me/assets/Footer-CTOK9rr-.js:1:3012) @ https://erwang.me/assets/Footer-CTOK9rr-.js:0
+[     300ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://erwang.me/api/interaction/statuses:0
+[     301ms] [ERROR] Failed to fetch interaction statuses: AxiosError: Request failed with status code 403
+    at Tr (https://erwang.me/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (https://erwang.me/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (https://erwang.me/assets/vendor-DYpsmOb-.js:5:1989)
+    at async U (https://erwang.me/assets/ArticleList-DF7MDIdm.js:1:3330) @ https://erwang.me/assets/ArticleList-DF7MDIdm.js:0

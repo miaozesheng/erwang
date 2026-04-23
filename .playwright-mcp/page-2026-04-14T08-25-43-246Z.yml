@@ -1,0 +1,88 @@
+- generic [ref=e3]:
+  - region "常用入口":
+    - generic:
+      - generic [ref=e4]:
+        - generic [ref=e5]: 常用入口
+        - paragraph [ref=e6]: 常去的地方单独收纳，不挤占正文，也不打断阅读。
+      - list [ref=e7]:
+        - listitem "Google" [ref=e8] [cursor=pointer]:
+          - generic [ref=e9]: 🔍
+          - generic [ref=e10]: Google
+        - listitem "Claude" [ref=e11] [cursor=pointer]:
+          - generic [ref=e12]: 🤖
+          - generic [ref=e13]: Claude
+        - listitem "ChatGPT" [ref=e14] [cursor=pointer]:
+          - generic [ref=e15]: 💬
+          - generic [ref=e16]: ChatGPT
+        - listitem "GitHub" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: 🐙
+          - generic [ref=e19]: GitHub
+        - listitem "MDN" [ref=e20] [cursor=pointer]:
+          - generic [ref=e21]: 📘
+          - generic [ref=e22]: MDN
+  - generic [ref=e23]:
+    - banner [ref=e24]:
+      - generic [ref=e25]:
+        - button "回到首页" [ref=e26] [cursor=pointer]:
+          - img [ref=e28]
+          - generic [ref=e32]:
+            - generic [ref=e33]: personal tech notes
+            - generic [ref=e34]: ERWANG
+        - navigation "主导航" [ref=e35]:
+          - button "首页" [ref=e37] [cursor=pointer]:
+            - generic [ref=e38]: ◦
+            - generic [ref=e39]: 首页
+          - button "GitHub" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]: ↗
+            - generic [ref=e42]: GitHub
+          - button "收藏" [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: ★
+            - generic [ref=e45]: 收藏
+          - button "喜欢" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: ♥
+            - generic [ref=e48]: 喜欢
+          - button "管理" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]: ◆
+            - generic [ref=e51]: 管理
+        - button "用户菜单" [ref=e54] [cursor=pointer]:
+          - img [ref=e56]
+    - main [ref=e57]:
+      - generic [ref=e59]:
+        - generic [ref=e60]: "> /erwang/tech-notes"
+        - heading "Erwang Blog" [level=1] [ref=e61]
+        - paragraph [ref=e62]: 记录技术探索与编程实践
+        - generic "terminal status" [ref=e63]:
+          - generic [ref=e64]: $
+      - generic [ref=e67]:
+        - complementary [ref=e68]:
+          - generic [ref=e69]:
+            - heading "标签" [level=2] [ref=e70]
+            - button "全部" [ref=e72] [cursor=pointer]
+        - region "文章发现" [ref=e74]:
+          - generic [ref=e75]:
+            - generic [ref=e77]:
+              - generic [ref=e79]: ⌕
+              - searchbox "搜索文章" [ref=e80]
+            - button "搜索" [ref=e81] [cursor=pointer]:
+              - generic [ref=e82]: 搜索
+          - group "文章分类" [ref=e83]:
+            - button "全部" [pressed] [ref=e84] [cursor=pointer]
+          - generic [ref=e85]:
+            - paragraph [ref=e86]: 全部文章 · 0 篇文章
+            - button "更多筛选" [ref=e88] [cursor=pointer]:
+              - text: 更多筛选
+              - generic [ref=e89]: ↘
+    - contentinfo [ref=e98]:
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - img [ref=e102]
+          - generic [ref=e106]:
+            - generic [ref=e107]: ERWANG
+            - paragraph [ref=e108]: 写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。
+        - generic "页脚导航" [ref=e109]:
+          - button "首页" [ref=e110] [cursor=pointer]
+          - button "关于" [ref=e111] [cursor=pointer]
+          - button "管理" [ref=e112] [cursor=pointer]
+        - generic [ref=e113]:
+          - generic [ref=e114]: 个人技术写作 · 阅读优先
+          - paragraph [ref=e115]: © 2026 Erwang. All rights reserved.

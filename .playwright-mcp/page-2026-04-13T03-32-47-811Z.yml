@@ -1,0 +1,50 @@
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - generic [ref=e6]:
+      - button "回到首页" [ref=e7] [cursor=pointer]:
+        - img [ref=e9]
+        - generic [ref=e13]:
+          - generic [ref=e14]: personal tech notes
+          - generic [ref=e15]: ERWANG
+      - navigation "主导航" [ref=e16]:
+        - button "首页" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: ◦
+          - generic [ref=e20]: 首页
+        - button "GitHub" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: ↗
+          - generic [ref=e23]: GitHub
+      - button "登录" [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 登录
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - img [ref=e31]
+        - paragraph [ref=e51]: 账户登录
+        - heading "欢迎回来" [level=1] [ref=e52]
+        - paragraph [ref=e53]: 继续阅读、整理收藏，或回到你的个人主页。
+      - generic [ref=e54]:
+        - generic [ref=e58]:
+          - img [ref=e61]
+          - textbox "用户名" [ref=e63]
+        - generic [ref=e67]:
+          - img [ref=e70]
+          - textbox "密码" [ref=e73]
+        - button "登录" [ref=e74] [cursor=pointer]:
+          - generic [ref=e75]: 登录
+        - paragraph [ref=e76]:
+          - text: 还没有账号？
+          - link "立即注册" [ref=e77] [cursor=pointer]:
+            - /url: "#/register"
+  - contentinfo [ref=e78]:
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - img [ref=e82]
+        - generic [ref=e86]:
+          - generic [ref=e87]: ERWANG
+          - paragraph [ref=e88]: 写工程实践，也记下值得回看的阅读线索。希望每次打开，都能安静地读完一篇。
+      - generic "页脚导航" [ref=e89]:
+        - button "首页" [ref=e90] [cursor=pointer]
+        - button "关于" [ref=e91] [cursor=pointer]
+      - generic [ref=e92]:
+        - generic [ref=e93]: 个人技术写作 · 阅读优先
+        - paragraph [ref=e94]: © 2026 Erwang. All rights reserved.

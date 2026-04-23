@@ -45,6 +45,14 @@
   --sp-12: 48px;
   --sp-16: 64px;
 
+  /* ── Layout Shells ── */
+  --page-gutter: clamp(14px, 2.8vw, 32px);
+  --shell-wide: clamp(1200px, 86vw, 1680px);
+  --shell-default: clamp(960px, 80vw, 1440px);
+  --shell-reading: clamp(760px, 72vw, 1100px);
+  --shell-compact: clamp(760px, 74vw, 1180px);
+  --quick-links-reserve: clamp(216px, 18vw, 280px);
+
   /* ── Radius Scale ── */
   --radius-sm: 6px;
   --radius-md: 10px;

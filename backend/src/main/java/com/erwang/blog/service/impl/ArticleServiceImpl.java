@@ -40,10 +40,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public IPage<Article> listPage(Integer page, Integer size, String keyword, String category, String tag) {
+    public IPage<Article> listPage(Integer page, Integer size, String keyword, String category, String tag, String startDate, String endDate) {
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
         boolean hasCategory = category != null && !category.trim().isEmpty();
         boolean hasTag = tag != null && !tag.trim().isEmpty();
+        boolean hasStartDate = startDate != null && !startDate.trim().isEmpty();
+        boolean hasEndDate = endDate != null && !endDate.trim().isEmpty();
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1);
@@ -82,6 +84,13 @@ public class ArticleServiceImpl implements ArticleService {
             }
             List<Long> articleIds = articleTags.stream().map(ArticleTag::getArticleId).distinct().collect(Collectors.toList());
             wrapper.in(Article::getId, articleIds);
+        }
+
+        if (hasStartDate) {
+            wrapper.ge(Article::getCreatedAt, startDate.trim() + " 00:00:00");
+        }
+        if (hasEndDate) {
+            wrapper.le(Article::getCreatedAt, endDate.trim() + " 23:59:59");
         }
 
         wrapper.orderByDesc(Article::getIsTop, Article::getCreatedAt);

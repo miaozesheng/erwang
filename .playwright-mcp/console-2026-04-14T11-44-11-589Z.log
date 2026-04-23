@@ -1,0 +1,12 @@
+[     486ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/auth/info:0
+[     486ms] [ERROR] Failed to fetch user info: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async ge (http://localhost:8888/assets/Footer-CMEn0Nnr.js:1:3034) @ http://localhost:8888/assets/Footer-CMEn0Nnr.js:0
+[     499ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8888/api/articles/1:0
+[     499ms] [ERROR] Failed to fetch article: AxiosError: Request failed with status code 404
+    at Tr (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:1066)
+    at XMLHttpRequest.g (http://localhost:8888/assets/vendor-DYpsmOb-.js:3:5636)
+    at Q.request (http://localhost:8888/assets/vendor-DYpsmOb-.js:5:1989)
+    at async $ (http://localhost:8888/assets/ArticleDetail-vvLc6DUe.js:1:1778) @ http://localhost:8888/assets/ArticleDetail-vvLc6DUe.js:0

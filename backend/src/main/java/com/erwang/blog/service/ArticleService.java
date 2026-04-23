@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ArticleService {
     List<Article> listAll();
-    IPage<Article> listPage(Integer page, Integer size, String keyword, String category, String tag);
+    IPage<Article> listPage(Integer page, Integer size, String keyword, String category, String tag, String startDate, String endDate);
     Article getById(Long id);
     Article create(Article article, List<Long> tagIds);
     Article update(Article article, List<Long> tagIds);

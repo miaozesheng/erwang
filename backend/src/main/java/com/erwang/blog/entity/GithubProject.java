@@ -26,6 +26,9 @@ public class GithubProject {
     private String ownerName;
     private String primaryCategory;
     private LocalDate fetchDate;
+
+    @TableField(exist = false)
+    private Integer starGrowth;
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;

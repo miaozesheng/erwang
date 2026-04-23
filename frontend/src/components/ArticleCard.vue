@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Calendar, View } from '@element-plus/icons-vue'
+import { Calendar, View, Star, StarFilled, ChatDotSquare } from '@element-plus/icons-vue'
 import { getInteractionStatus, toggleLike, toggleFavorite } from '../api'
 
 const props = defineProps({
@@ -92,8 +92,10 @@ const formatDate = (date) => {
 <template>
   <div class="article-card" @click="goToDetail">
     <div class="card-header">
-      <h3 class="card-title">{{ article.title }}</h3>
-      <span v-if="article.category" class="card-category">{{ article.category }}</span>
+      <div class="card-title-row">
+        <h3 class="card-title">{{ article.title }}</h3>
+        <span v-if="article.category" class="card-category">{{ article.category }}</span>
+      </div>
     </div>
 
     <p class="card-excerpt">{{ article.excerpt || '暂无摘要' }}</p>
@@ -112,208 +114,218 @@ const formatDate = (date) => {
       </div>
 
       <div class="card-actions">
-        <button type="button" class="card-action-btn" :class="{ active: liked }" @click="handleLike" title="喜欢">
-          ❤ <span v-if="likeCount">{{ likeCount }}</span>
+        <button
+          type="button"
+          class="card-action-btn like-btn"
+          :class="{ active: liked }"
+          @click="handleLike"
+          aria-label="点赞"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="heart-icon"
+          >
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+          </svg>
+          <span v-if="likeCount" class="action-count">{{ likeCount }}</span>
         </button>
-        <button type="button" class="card-action-btn fav" :class="{ active: favorited }" @click="handleFav" title="收藏">
-          ⭐ <span v-if="favCount">{{ favCount }}</span>
+
+        <button
+          type="button"
+          class="card-action-btn fav-btn"
+          :class="{ active: favorited }"
+          @click="handleFav"
+          aria-label="收藏"
+        >
+          <el-icon v-if="favorited"><StarFilled /></el-icon>
+          <el-icon v-else><Star /></el-icon>
+          <span v-if="favCount" class="action-count">{{ favCount }}</span>
         </button>
       </div>
     </div>
 
     <div v-if="article.tags?.length" class="card-tags">
-      <el-tag v-for="tag in article.tags.slice(0, 3)" :key="tag" size="small" class="tag">{{ tag }}</el-tag>
+      <span v-for="tag in article.tags.slice(0, 3)" :key="tag" class="simple-tag">#{{ tag }}</span>
     </div>
   </div>
 </template>
 
 <style scoped>
 .article-card {
-  --card-like: hsl(from var(--accent) 352deg s l);
-  --card-fav: hsl(from var(--accent) 42deg s l);
+  --card-like: #e05e5e;
+  --card-fav: #e6a23c;
   background: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: var(--sp-6);
+  border-radius: var(--radius-lg);
+  padding: 24px;
   cursor: pointer;
-  transition: transform 250ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition:
+    transform var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out);
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-  box-shadow: none;
-  will-change: transform;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 
 .article-card:hover {
-  border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 12px 24px rgba(45, 90, 74, 0.06);
+  background: #ffffff;
 }
 
-.article-card:active {
-  transform: scale(0.99);
-}
-
-.card-header {
+.card-title-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: flex-start;
-  gap: var(--sp-2);
-  min-width: 0;
+  gap: 12px;
 }
 
 .card-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--text-h);
   margin: 0;
-  line-height: 1.35;
+  line-height: 1.4;
   flex: 1;
   font-family: var(--heading);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
 }
 
 .card-category {
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
-  padding: 2px var(--sp-2);
-  border-radius: var(--radius-full);
-  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
   font-size: 11px;
-  white-space: nowrap;
+  color: var(--accent);
+  background: var(--accent-bg);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
   font-family: var(--mono);
-  letter-spacing: 0.3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   flex-shrink: 0;
 }
 
 .card-excerpt {
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 14px;
-  line-height: 1.55;
+  line-height: 1.6;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  opacity: 0.8;
 }
 
 .card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--sp-2);
-  margin-top: var(--sp-1);
+  margin-top: 4px;
 }
 
 .card-meta {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-width: 0;
+  gap: 10px;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: var(--text);
+  gap: 5px;
+  color: var(--text-muted);
   font-size: 12px;
   font-family: var(--mono);
-  opacity: 0.72;
 }
 
 .meta-item .el-icon {
-  font-size: 13px;
-  color: var(--text);
-  opacity: 0.58;
+  font-size: 14px;
+  opacity: 0.8;
 }
 
 .meta-sep {
-  color: var(--text);
-  opacity: 0.3;
-  font-size: 12px;
+  color: var(--border);
 }
 
 .card-actions {
   display: flex;
-  gap: var(--sp-2);
+  gap: 8px;
 }
 
 .card-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  border: 1px solid color-mix(in srgb, var(--text-h) 8%, transparent);
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
   background: transparent;
-  color: var(--text);
+  color: var(--text-muted);
   font-size: 12px;
-  padding: 4px 10px;
-  min-height: 26px;
-  border-radius: var(--radius-sm);
+  font-family: var(--mono);
   cursor: pointer;
-  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease, transform 150ms ease;
-  opacity: 0.88;
+  transition: all 0.2s var(--ease-out);
 }
 
 .card-action-btn:hover {
-  opacity: 1;
-  border-color: color-mix(in srgb, var(--text-h) 16%, transparent);
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  color: var(--text-h);
 }
 
-.card-action-btn:active {
-  transform: scale(0.95);
+.action-count {
+  font-weight: 500;
 }
 
-.card-action-btn.active {
-  opacity: 1;
+.like-btn.active {
   color: var(--card-like);
-  border-color: color-mix(in srgb, var(--card-like) 45%, transparent);
-  background: color-mix(in srgb, var(--card-like) 14%, transparent);
+  border-color: color-mix(in srgb, var(--card-like) 24%, transparent);
+  background: color-mix(in srgb, var(--card-like) 8%, transparent);
 }
 
-.card-action-btn.fav.active {
+.like-btn.active .heart-icon {
+  fill: currentColor;
+}
+
+.fav-btn.active {
   color: var(--card-fav);
-  border-color: color-mix(in srgb, var(--card-fav) 45%, transparent);
-  background: color-mix(in srgb, var(--card-fav) 15%, transparent);
+  border-color: color-mix(in srgb, var(--card-fav) 24%, transparent);
+  background: color-mix(in srgb, var(--card-fav) 8%, transparent);
 }
 
 .card-tags {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: var(--sp-1);
+  gap: 12px;
+  margin-top: 4px;
 }
 
-.tag {
-  background: color-mix(in srgb, var(--accent) 8%, transparent);
-  color: color-mix(in srgb, var(--accent) 82%, var(--text-h));
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+.simple-tag {
+  font-size: 12px;
+  color: var(--text-muted);
   font-family: var(--mono);
-  font-size: 11px;
-  border-radius: var(--radius-full);
+  opacity: 0.7;
+  transition: opacity 0.2s ease, color 0.2s ease;
 }
 
-@media (max-width: 768px) {
+.simple-tag:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
   .article-card {
-    padding: var(--sp-5);
-  }
-
-  .card-footer {
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .article-card,
-  .card-action-btn {
-    transition-duration: 0.01ms;
+    padding: 20px;
   }
 }
 </style>

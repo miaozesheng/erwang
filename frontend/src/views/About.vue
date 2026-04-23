@@ -90,11 +90,12 @@ const socials = [
 }
 
 .main-content {
+  --page-shell-max: var(--shell-reading);
   flex: 1;
-  max-width: 720px;
+  max-width: var(--page-shell-max);
   margin: 0 auto;
   width: 100%;
-  padding: var(--sp-8) var(--sp-6) var(--sp-12);
+  padding: var(--sp-8) var(--page-gutter) var(--sp-12);
   box-sizing: border-box;
 }
 
